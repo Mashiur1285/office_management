@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light theme overrides for Flowbite inputs/selects/pagination */
+.fwb-input input,
+.fwb-input input:focus {
+    background-color: white !important;
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+}
+
+.fwb-select select,
+.fwb-select select:focus {
+    background-color: white !important;
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+}
+
+.fwb-pagination button {
+    background-color: white !important;
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+}
+
+.fwb-pagination button[disabled] {
+    background-color: #f9fafb !important;
+    color: #9ca3af !important;
+}
