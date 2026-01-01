@@ -1,4 +1,5 @@
 <template>
+    <Head title="Document Tracking" />
     <div class="py-6 space-y-6">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -217,7 +218,7 @@
 
 <script setup>
 import { computed, watch, onMounted } from "vue";
-import { Link, useForm, usePage } from "@inertiajs/vue3";
+import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
 
 const props = defineProps({
     client: Object,

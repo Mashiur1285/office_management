@@ -1,4 +1,5 @@
 <template>
+    <Head title="Expenses" />
     <div class="py-6 space-y-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -76,7 +77,7 @@
 
 <script setup>
 import { computed } from "vue";
-import { Link, router, usePage } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import IconButton from "@/Components/Buttons/IconButton.vue";
 
 const props = defineProps({
@@ -90,7 +91,7 @@ const flash = computed(() => usePage().props.flash || {});
 
 const money = (value) => {
     if (value === null || value === undefined || value === "") return "—";
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "BDT" }).format(Number(value || 0));
+    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(value || 0));
 };
 
 const expenses = props.expenses || [];

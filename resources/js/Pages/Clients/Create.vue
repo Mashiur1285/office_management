@@ -1,4 +1,5 @@
 <template>
+    <Head title="Create Client" />
     <div class="py-8 space-y-6">
         <div
             class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
@@ -918,7 +919,7 @@
 
 <script setup>
 import { computed, defineComponent, h, ref, watch } from "vue";
-import { Link, useForm } from "@inertiajs/vue3";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 import axios from "axios";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";

@@ -1,4 +1,5 @@
 <template>
+    <Head title="Accounting Dashboard" />
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header -->
@@ -238,7 +239,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { Pie, Doughnut, Line } from 'vue-chartjs';
 import {
     Chart as ChartJS,
@@ -274,7 +275,7 @@ const props = defineProps({
 
 const money = (value) => {
     if (value === null || value === undefined) return '৳0.00';
-    return new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT' }).format(value);
+    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 };
 
 const profitMargin = (profit, revenue) => {
@@ -431,10 +432,7 @@ const pieChartOptions = {
                 label: function(context) {
                     const label = context.label || '';
                     const value = context.parsed || 0;
-                    const formatted = new Intl.NumberFormat('en-BD', {
-                        style: 'currency',
-                        currency: 'BDT'
-                    }).format(value);
+                    const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                     return `${label}: ${formatted}`;
                 },
             },
@@ -460,10 +458,7 @@ const doughnutChartOptions = {
                 label: function(context) {
                     const label = context.label || '';
                     const value = context.parsed || 0;
-                    const formatted = new Intl.NumberFormat('en-BD', {
-                        style: 'currency',
-                        currency: 'BDT'
-                    }).format(value);
+                    const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                     return `${label}: ${formatted}`;
                 },
             },
@@ -489,10 +484,7 @@ const lineChartOptions = {
                 label: function(context) {
                     const label = context.dataset.label || '';
                     const value = context.parsed.y || 0;
-                    const formatted = new Intl.NumberFormat('en-BD', {
-                        style: 'currency',
-                        currency: 'BDT'
-                    }).format(value);
+                    const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                     return `${label}: ${formatted}`;
                 },
             },

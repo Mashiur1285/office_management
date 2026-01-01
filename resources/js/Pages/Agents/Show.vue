@@ -1,4 +1,5 @@
 <template>
+    <Head title="Agent Details" />
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header Section -->
@@ -330,7 +331,7 @@
 </template>
 
 <script setup>
-import { Link } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 const props = defineProps({

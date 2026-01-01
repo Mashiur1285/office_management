@@ -1,4 +1,5 @@
 <template>
+    <Head title="Create Foreign Company" />
     <div class="py-8 space-y-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -105,7 +106,7 @@
 
 <script setup>
 import { computed, defineComponent, h } from "vue";
-import { Link, useForm } from "@inertiajs/vue3";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
     company: {

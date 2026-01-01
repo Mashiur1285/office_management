@@ -262,12 +262,7 @@ const doughnutChartOptions = {
                 label: function(context) {
                     const label = context.label || '';
                     const value = context.parsed || 0;
-                    const formatted = new Intl.NumberFormat('en-BD', {
-                        style: 'currency',
-                        currency: 'BDT',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                    }).format(value);
+                    const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
                     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                     return `${label}: ${formatted} (${percentage}%)`;
@@ -298,12 +293,7 @@ const lineChartOptions = {
             ticks: {
                 font: { size: 11 },
                 callback: function(value) {
-                    return new Intl.NumberFormat('en-BD', {
-                        style: 'currency',
-                        currency: 'BDT',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                    }).format(value);
+                    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                 },
             },
         },
@@ -341,12 +331,7 @@ const lineChartOptions = {
                 label: function(context) {
                     const label = context.dataset.label || '';
                     const value = context.parsed.y;
-                    const formatted = new Intl.NumberFormat('en-BD', {
-                        style: 'currency',
-                        currency: 'BDT',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                    }).format(value);
+                    const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                     return `${label}: ${formatted}`;
                 },
             },
@@ -433,7 +418,7 @@ const lineChartOptions = {
                 <div class="mb-4">
                     <h2 class="text-lg font-semibold text-green-700">Total Receivable</h2>
                     <div class="text-2xl font-bold text-green-600">
-                        {{ new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.receivableToday.total) }}
+                        {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.receivableToday.total) }}
                     </div>
                     <div class="text-xs text-gray-500 mt-1">Money to receive from clients</div>
                 </div>
@@ -455,7 +440,7 @@ const lineChartOptions = {
                 <div class="mb-4">
                     <h2 class="text-lg font-semibold text-red-700">Total Payable</h2>
                     <div class="text-2xl font-bold text-red-600">
-                        {{ new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.payableToday.total) }}
+                        {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.payableToday.total) }}
                     </div>
                     <div class="text-xs text-gray-500 mt-1">Money to pay to clients</div>
                 </div>
@@ -480,7 +465,7 @@ const lineChartOptions = {
                 <div class="bg-white rounded-lg p-4 shadow-sm">
                     <div class="text-sm text-gray-600 mb-1">Net Position</div>
                     <div class="text-xl font-bold" :class="state.receivableToday.total - state.payableToday.total >= 0 ? 'text-green-600' : 'text-red-600'">
-                        {{ new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.receivableToday.total - state.payableToday.total) }}
+                        {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.receivableToday.total - state.payableToday.total) }}
                     </div>
                     <div class="text-xs text-gray-500 mt-1">Receivable - Payable</div>
                 </div>
@@ -494,7 +479,7 @@ const lineChartOptions = {
                 <div class="bg-white rounded-lg p-4 shadow-sm">
                     <div class="text-sm text-gray-600 mb-1">Average Monthly Sales</div>
                     <div class="text-xl font-bold text-indigo-600">
-                        {{ new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesMonthly.reduce((acc, m) => acc + m.amount, 0) / (state.salesMonthly.length || 1)) }}
+                        {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesMonthly.reduce((acc, m) => acc + m.amount, 0) / (state.salesMonthly.length || 1)) }}
                     </div>
                     <div class="text-xs text-gray-500 mt-1">Last 6 Months</div>
                 </div>

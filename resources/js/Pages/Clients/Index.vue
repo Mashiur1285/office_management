@@ -1,4 +1,6 @@
 <template>
+    <Head title="Clients" />
+
     <div class="py-6 space-y-6">
         <!-- Header Section -->
         <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl">
@@ -357,7 +359,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { Link, router, usePage } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import IconButton from "@/Components/Buttons/IconButton.vue";
 
 const props = defineProps({
@@ -425,7 +427,7 @@ const initials = (name = "") => {
 
 const money = (value) => {
     if (value === null || value === undefined) return "—";
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "BDT" }).format(
+    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(
         Number(value || 0)
     );
 };

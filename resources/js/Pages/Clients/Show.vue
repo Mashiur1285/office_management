@@ -1,4 +1,5 @@
 <template>
+    <Head title="Client Details" />
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header Section -->
@@ -445,7 +446,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { Link } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     client: {
@@ -467,7 +468,7 @@ const activeTab = ref('overview');
 
 const money = (value) => {
     if (value === null || value === undefined || value === "") return "—";
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "BDT" }).format(Number(value || 0));
+    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(value || 0));
 };
 
 const progressText = computed(() => {

@@ -1,4 +1,5 @@
 <template>
+    <Head title="Net Profit Before Tax" />
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-green-50/30 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header -->
@@ -172,7 +173,7 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     period: Object,
@@ -189,6 +190,6 @@ const props = defineProps({
 
 const money = (value) => {
     if (value === null || value === undefined) return '৳0.00';
-    return new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT' }).format(value);
+    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 };
 </script>

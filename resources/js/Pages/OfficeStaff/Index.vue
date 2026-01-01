@@ -1,4 +1,5 @@
 <template>
+    <Head title="Office Staff" />
     <div class="py-6 space-y-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -78,7 +79,7 @@
 
 <script setup>
 import { computed } from "vue";
-import { Link, router, usePage } from "@inertiajs/vue3";
+import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import IconButton from "@/Components/Buttons/IconButton.vue";
 
 const props = defineProps({

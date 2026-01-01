@@ -48,13 +48,6 @@
                     </Link>
                 </li>
 
-                <li v-if="hasPermission('expense.view')">
-                    <Link href="/expenses" :class="linkClass('/expenses')">
-                        <font-awesome-icon icon="receipt" class="w-5 h-5" />
-                        <span class="ml-3">Expenses</span>
-                    </Link>
-                </li>
-
                 <li>
                     <button
                         type="button"

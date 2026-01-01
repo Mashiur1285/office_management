@@ -1,4 +1,5 @@
 <template>
+    <Head title="Foreign Companies" />
     <div class="py-6 space-y-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -71,7 +72,7 @@
 </template>
 
 <script setup>
-import { Link, router } from "@inertiajs/vue3";
+import { Head, Link, router } from "@inertiajs/vue3";
 import IconButton from "@/Components/Buttons/IconButton.vue";
 
 const props = defineProps({
@@ -83,7 +84,7 @@ const props = defineProps({
 
 const money = (value) => {
     if (value === null || value === undefined || value === "") return "—";
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "BDT" }).format(Number(value || 0));
+    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(value || 0));
 };
 
 const companies = props.companies || [];
