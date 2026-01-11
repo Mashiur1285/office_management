@@ -60,7 +60,20 @@ class ForeignCompanyController extends Controller
             'per_client_fee' => ['nullable', 'numeric', 'min:0'],
         ]);
 
-        ForeignCompany::create($data);
+        $company = ForeignCompany::create($data);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'foreignCompany' => $company->only([
+                    'id',
+                    'name',
+                    'country',
+                    'contact_person_phone',
+                    'owner_phone',
+                    'contact_person_name',
+                ]),
+            ], 201);
+        }
 
         return redirect()->route('foreign-companies.index')->with('success', 'Foreign company added.');
     }

@@ -16,6 +16,8 @@ class UpdateClientRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'organization_name' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
             'photo' => ['nullable', 'image', 'max:2048'],
             'nid_number' => ['required', 'string', 'max:100', Rule::unique('clients', 'nid_number')->ignore($this->client->id)],
             'nid_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
@@ -33,7 +35,7 @@ class UpdateClientRequest extends FormRequest
             'foreign_company_phone' => ['nullable', 'string', 'max:50'],
             'agent_mobile' => ['nullable', 'string', 'max:50'],
             'agent_address' => ['nullable', 'string'],
-            'agent_id' => ['required', 'integer', 'exists:agents,id'],
+            'agent_id' => ['nullable', 'integer', 'exists:agents,id'],
             'bd_company_id' => ['nullable', 'integer', 'exists:bd_companies,id'],
             'foreign_company_id' => ['nullable', 'integer', 'exists:foreign_companies,id'],
             'medical_fee' => ['nullable', 'numeric', 'min:0'],

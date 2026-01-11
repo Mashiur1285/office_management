@@ -10,11 +10,19 @@
                         <p class="text-sm text-gray-600 mt-1">Profitability Analysis - {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium">
+                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
+                        <a :href="route('accounting.gross-profit.report')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i>
+                            Download Report
+                        </a>
+                        <a :href="route('accounting.gross-profit.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            Download PDF
+                        </a>
                     </div>
                 </div>
             </div>

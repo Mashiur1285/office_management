@@ -45,6 +45,16 @@ class AccountingPeriod extends Model
         return $this->hasMany(TaxEntry::class);
     }
 
+    public function vatPayments()
+    {
+        return $this->hasMany(VATPayment::class);
+    }
+
+    public function taxPayments()
+    {
+        return $this->hasMany(TaxPayment::class);
+    }
+
     // Calculations
     public function getTotalIncomeAttribute()
     {
@@ -109,5 +119,25 @@ class AccountingPeriod extends Model
     public function getNetProfitAfterTaxAttribute()
     {
         return $this->net_profit_before_tax - $this->total_tax;
+    }
+
+    public function getTotalVatPaymentsAttribute()
+    {
+        return $this->vatPayments()->sum('payment_amount');
+    }
+
+    public function getVatBalanceAttribute()
+    {
+        return $this->total_vat - $this->total_vat_payments;
+    }
+
+    public function getTotalTaxPaymentsAttribute()
+    {
+        return $this->taxPayments()->sum('payment_amount');
+    }
+
+    public function getTaxBalanceAttribute()
+    {
+        return $this->total_tax - $this->total_tax_payments;
     }
 }

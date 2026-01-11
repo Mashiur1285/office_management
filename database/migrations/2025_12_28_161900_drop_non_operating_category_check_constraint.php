@@ -11,7 +11,19 @@ return new class extends Migration
     public function up(): void
     {
         // Drop the CHECK constraint on category column
-        DB::statement('ALTER TABLE non_operating_entries DROP CONSTRAINT IF EXISTS non_operating_entries_category_check');
+        $driver = DB::getDriverName();
+
+        if ($driver === 'mysql') {
+            // MySQL: Check if constraint exists before dropping
+            try {
+                DB::statement('ALTER TABLE non_operating_entries DROP CHECK non_operating_entries_category_check');
+            } catch (\Exception $e) {
+                // Constraint doesn't exist, which is fine
+            }
+        } else {
+            // PostgreSQL
+            DB::statement('ALTER TABLE non_operating_entries DROP CONSTRAINT IF EXISTS non_operating_entries_category_check');
+        }
     }
 
     /**

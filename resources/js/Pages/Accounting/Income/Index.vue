@@ -10,12 +10,20 @@
                         <p class="text-sm text-gray-600 mt-1">Income Management - {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium">
+                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
-                        <button @click="showAddModal = true" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm">
+                        <a :href="route('accounting.income.export', { category: category, type: 'excel' })" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-excel"></i>
+                            Export to Excel
+                        </a>
+                        <button @click="exportPdf" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            Export to PDF
+                        </button>
+                        <button @click="showAddModal = true" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
                             + Add Entry
                         </button>
                     </div>
@@ -78,12 +86,18 @@
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ entry.created_at }}</td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        <button @click="editEntry(entry)" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                            Edit
-                                        </button>
-                                        <button @click="deleteEntry(entry)" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                                            Delete
-                                        </button>
+                                        <IconButton
+                                            icon="fa-solid fa-pen-to-square"
+                                            class="bg-blue-600 text-white hover:bg-blue-700"
+                                            tooltip="Edit entry"
+                                            @click="editEntry(entry)"
+                                        />
+                                        <IconButton
+                                            icon="fa-solid fa-trash"
+                                            class="bg-red-600 text-white hover:bg-red-700"
+                                            tooltip="Delete entry"
+                                            @click="deleteEntry(entry)"
+                                        />
                                     </div>
                                 </td>
                             </tr>
@@ -94,8 +108,8 @@
         </div>
 
         <!-- Add/Edit Modal -->
-        <div v-if="showAddModal || editingEntry" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4">
+        <div v-if="showAddModal || editingEntry" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="p-6 border-b border-gray-200">
                     <h2 class="text-2xl font-bold text-gray-900">
                         {{ editingEntry ? 'Edit Income Entry' : 'Add Income Entry' }}
@@ -103,13 +117,14 @@
                 </div>
                 <form @submit.prevent="submitForm" class="p-6 space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Client (Optional)</label>
-                        <div class="relative">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Client *</label>
+                        <div class="relative" ref="clientDropdownRef">
                             <input
                                 v-model="clientSearch"
                                 @input="filterClients"
                                 @focus="showClientDropdown = true"
                                 type="text"
+                                required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 placeholder="Search by name or phone number..."
                             />
@@ -117,12 +132,6 @@
                                 v-if="showClientDropdown"
                                 class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
                             >
-                                <div
-                                    @click="selectClient(null)"
-                                    class="px-4 py-2 hover:bg-green-50 cursor-pointer text-sm"
-                                >
-                                    No Client (Organization-wide)
-                                </div>
                                 <div
                                     v-for="client in filteredClients"
                                     :key="client.id"
@@ -141,24 +150,19 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Subcategory *</label>
-                        <select
+                        <SubcategorySelector
                             v-model="form.subcategory"
-                            @change="updateVatRate"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        >
-                            <option value="">Select subcategory</option>
-                            <option v-for="sub in subcategories" :key="sub.name" :value="sub.name">
-                                {{ sub.name }} (VAT: {{ sub.vat_rate }}%)
-                            </option>
-                        </select>
+                            :subcategories="subcategories"
+                            type="income"
+                            :category="category"
+                            @update:vatRate="form.vat_rate = $event"
+                        />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <textarea
                             v-model="form.description"
-                            required
                             rows="3"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             placeholder="Enter detailed description"
@@ -233,8 +237,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { Head, router, Link } from '@inertiajs/vue3';
+import IconButton from '@/Components/Buttons/IconButton.vue';
+import SubcategorySelector from '@/Components/SubcategorySelector.vue';
 
 const props = defineProps({
     category: String,
@@ -246,55 +252,18 @@ const props = defineProps({
     totalVat: Number,
     totalWithVat: Number,
     clients: Array,
+    subcategories: Array,
 });
-
-// Define subcategories with predefined VAT rates based on category
-const subcategoryDefinitions = {
-    travel_tourism: [
-        { name: 'Air Ticket Service Charge', vat_rate: 15 },
-        { name: 'Airline Commission', vat_rate: 0 },
-        { name: 'Tour Package Sale - Inbound', vat_rate: 15 },
-        { name: 'Tour Package Sale - Outbound', vat_rate: 15 },
-        { name: 'Umrah/Hajj Service Costs', vat_rate: 0 },
-        { name: 'Hotel Booking Commission', vat_rate: 0 },
-        { name: 'Visa Processing Fee', vat_rate: 15 },
-        { name: 'Travel Insurance Commission', vat_rate: 0 },
-        { name: 'Re-issue & Cancellation Charge', vat_rate: 15 },
-    ],
-    manpower_exporting: [
-        { name: 'Manpower Training Service Charge', vat_rate: 15 },
-        { name: 'Recruitment Service Fee', vat_rate: 15 },
-        { name: 'Processing Fees', vat_rate: 0 },
-        { name: 'Medical Application Fee', vat_rate: 0 },
-        { name: 'Employer/Foreign Agent Commission', vat_rate: 15 },
-        { name: 'Document/Foreign Agent Commission', vat_rate: 15 },
-        { name: 'Visa Endorsement Service Charge', vat_rate: 15 },
-        { name: 'Other Income Service Charge', vat_rate: 15 },
-    ],
-    student_package: [
-        { name: 'Student File Opening Fee', vat_rate: 15 },
-        { name: 'Admission & Application Fees', vat_rate: 15 },
-        { name: 'University/College Commission', vat_rate: 0 },
-        { name: 'Document Visa Processing Fees', vat_rate: 15 },
-        { name: 'Student Visa Fee', vat_rate: 15 },
-        { name: 'IELTS Reference Commission', vat_rate: 0 },
-        { name: 'Other Reference Commission', vat_rate: 15 },
-        { name: 'Other Commission', vat_rate: 15 },
-    ],
-    other_income: [
-        { name: 'Courier or Documentation Charges', vat_rate: 15 },
-        { name: 'Forex Gain/Loss', vat_rate: 0 },
-        { name: 'Miscellaneous Service Income', vat_rate: 15 },
-    ],
-};
-
-const subcategories = computed(() => subcategoryDefinitions[props.category] || []);
 
 const showAddModal = ref(false);
 const editingEntry = ref(null);
 const clientSearch = ref('');
 const filteredClients = ref(props.clients || []);
 const showClientDropdown = ref(false);
+const clientDropdownRef = ref(null);
+const setBodyScrollLock = (locked) => {
+    document.body.style.overflow = locked ? 'hidden' : '';
+};
 
 const form = ref({
     client_id: null,
@@ -304,6 +273,27 @@ const form = ref({
     vat_rate: 0,
     notes: '',
 });
+
+// Close dropdown when clicking outside
+const handleClickOutside = (event) => {
+    if (clientDropdownRef.value && !clientDropdownRef.value.contains(event.target)) {
+        showClientDropdown.value = false;
+    }
+};
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+    setBodyScrollLock(false);
+});
+
+watch(
+    () => showAddModal.value || !!editingEntry.value,
+    (isOpen) => setBodyScrollLock(isOpen)
+);
 
 const calculatedVat = computed(() => {
     if (!form.value.amount || !form.value.vat_rate) return 0;
@@ -317,13 +307,6 @@ const totalWithVatPreview = computed(() => {
 const money = (value) => {
     if (value === null || value === undefined) return '৳0.00';
     return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-};
-
-const updateVatRate = () => {
-    const selected = subcategories.value.find(sub => sub.name === form.value.subcategory);
-    if (selected) {
-        form.value.vat_rate = selected.vat_rate;
-    }
 };
 
 const filterClients = () => {
@@ -350,6 +333,12 @@ const selectClient = (client) => {
 };
 
 const submitForm = () => {
+    // Validate client is selected
+    if (!form.value.client_id) {
+        alert('Please select a client');
+        return;
+    }
+
     const data = {
         ...form.value,
         accounting_period_id: props.period.id,
@@ -380,11 +369,7 @@ const editEntry = (entry) => {
     // Set client search value
     if (entry.client) {
         clientSearch.value = `${entry.client.name} (${entry.client.phone_number})`;
-    } else {
-        clientSearch.value = 'No Client (Organization-wide)';
     }
-    // Update VAT rate based on subcategory
-    updateVatRate();
 };
 
 const deleteEntry = (entry) => {
@@ -406,5 +391,10 @@ const closeModal = () => {
         vat_rate: 0,
         notes: '',
     };
+};
+
+const exportPdf = () => {
+    const url = route('accounting.income.export', { category: props.category, type: 'pdf' });
+    window.open(url, '_blank');
 };
 </script>

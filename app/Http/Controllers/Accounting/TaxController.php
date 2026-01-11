@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\TaxEntry;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class TaxController extends Controller
 {
@@ -116,7 +117,7 @@ class TaxController extends Controller
             'accounting_period_id' => 'required|exists:accounting_periods,id',
             'client_id' => 'nullable|exists:clients,id',
             'tax_type' => 'required|in:current,deferred',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
@@ -130,7 +131,7 @@ class TaxController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'nullable|exists:clients,id',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
@@ -145,5 +146,91 @@ class TaxController extends Controller
         $taxEntry->delete();
 
         return redirect()->back()->with('success', 'Tax entry deleted successfully.');
+    }
+
+    public function report(Request $request)
+    {
+        $period = AccountingPeriod::where('status', 'active')
+            ->orWhere('status', 'draft')
+            ->latest()
+            ->first();
+
+        $entries = TaxEntry::where('accounting_period_id', $period->id)
+            ->with('client:id,name,mobile')
+            ->orderBy('tax_type', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $currentTaxEntries = $entries->where('tax_type', 'current');
+        $deferredTaxEntries = $entries->where('tax_type', 'deferred');
+        $totalCurrentTax = $currentTaxEntries->sum('amount');
+        $totalDeferredTax = $deferredTaxEntries->sum('amount');
+        $totalTax = $totalCurrentTax + $totalDeferredTax;
+
+        $period->load(['incomeEntries', 'costOfSales', 'operatingExpenses', 'nonOperatingEntries']);
+        $netProfitBeforeTax = $period->net_profit_before_tax;
+        $netProfitAfterTax = $netProfitBeforeTax - $totalTax;
+
+        if ($request->query('type') === 'pdf') {
+            $fileName = "tax-management-report-" . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::view('pdfs.tax_report', [
+                'period' => $period,
+                'currentTaxEntries' => $currentTaxEntries,
+                'deferredTaxEntries' => $deferredTaxEntries,
+                'totalCurrentTax' => $totalCurrentTax,
+                'totalDeferredTax' => $totalDeferredTax,
+                'totalTax' => $totalTax,
+                'netProfitBeforeTax' => $netProfitBeforeTax,
+                'netProfitAfterTax' => $netProfitAfterTax,
+            ])->name($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        // Summary
+        fputcsv($handle, ['Tax Management Summary']);
+        fputcsv($handle, ['Metric', 'Amount']);
+        fputcsv($handle, ['Net Profit Before Tax', $netProfitBeforeTax]);
+        fputcsv($handle, ['Total Current Tax', $totalCurrentTax]);
+        fputcsv($handle, ['Total Deferred Tax', $totalDeferredTax]);
+        fputcsv($handle, ['Total Tax', $totalTax]);
+        fputcsv($handle, ['Net Profit After Tax', $netProfitAfterTax]);
+        fputcsv($handle, []);
+
+        // Detailed Entries
+        fputcsv($handle, ['Detailed Tax Entries']);
+        fputcsv($handle, ['Type', 'Description', 'Client', 'Amount', 'Date']);
+
+        foreach ($currentTaxEntries as $entry) {
+            fputcsv($handle, [
+                'Current Tax',
+                $entry->description,
+                $entry->client->name ?? 'N/A',
+                $entry->amount,
+                $entry->created_at->format('Y-m-d H:i'),
+            ]);
+        }
+
+        foreach ($deferredTaxEntries as $entry) {
+            fputcsv($handle, [
+                'Deferred Tax',
+                $entry->description,
+                $entry->client->name ?? 'N/A',
+                $entry->amount,
+                $entry->created_at->format('Y-m-d H:i'),
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = "tax-management-report-" . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
     }
 }

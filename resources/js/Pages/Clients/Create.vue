@@ -73,6 +73,24 @@
                         />
                     </FormGroup>
                     <FormGroup
+                        label="Organization Name"
+                        :error="form.errors.organization_name"
+                    >
+                        <input
+                            v-model="form.organization_name"
+                            :class="inputClass('organization_name')"
+                            placeholder="Ex: ABC Travel & Tours"
+                        />
+                    </FormGroup>
+                    <FormGroup label="Email" :error="form.errors.email">
+                        <input
+                            v-model="form.email"
+                            :class="inputClass('email')"
+                            type="email"
+                            placeholder="Ex: client@email.com"
+                        />
+                    </FormGroup>
+                    <FormGroup
                         label="Mobile Number"
                         :error="form.errors.mobile"
                     >
@@ -269,39 +287,61 @@
                         label="Foreign Company Country"
                         :error="form.errors.foreign_company_country"
                     >
-                        <div class="relative">
-                            <input
-                                v-model="countrySearch"
-                                @focus="showCountryDropdown = true"
-                                @blur="hideCountryDropdown"
-                                type="text"
-                                :class="inputClass('foreign_company_country')"
-                                :placeholder="
-                                    selectedCountry ||
-                                    'Search or select country...'
-                                "
-                            />
-                            <div
-                                v-if="showCountryDropdown"
-                                class="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
-                            >
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <input
+                                    v-model="countrySearch"
+                                    @focus="showCountryDropdown = true"
+                                    @blur="hideCountryDropdown"
+                                    type="text"
+                                    :class="inputClass('foreign_company_country')"
+                                    :placeholder="
+                                        selectedCountry ||
+                                        'Search or select country...'
+                                    "
+                                />
                                 <div
-                                    v-for="country in filteredCountries"
-                                    :key="country"
-                                    @mousedown.prevent="selectCountry(country)"
-                                    class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                                    v-if="showCountryDropdown"
+                                    class="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
                                 >
-                                    <div class="font-medium text-gray-900">
-                                        {{ country }}
+                                    <div
+                                        v-for="country in filteredCountries"
+                                        :key="country"
+                                        @mousedown.prevent="selectCountry(country)"
+                                        class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                                    >
+                                        <div class="font-medium text-gray-900">
+                                            {{ country }}
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-if="filteredCountries.length === 0"
+                                        class="px-4 py-3 text-sm text-gray-500 text-center"
+                                    >
+                                        No countries found
                                     </div>
                                 </div>
-                                <div
-                                    v-if="filteredCountries.length === 0"
-                                    class="px-4 py-3 text-sm text-gray-500 text-center"
-                                >
-                                    No countries found
-                                </div>
                             </div>
+                            <button
+                                type="button"
+                                @click="openAddCountryModal"
+                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-blue-600 p-2.5 text-white hover:bg-blue-700 transition"
+                                title="Add new country"
+                            >
+                                <svg
+                                    class="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 4v16m8-8H4"
+                                    />
+                                </svg>
+                            </button>
                         </div>
                     </FormGroup>
 
@@ -379,50 +419,68 @@
                     </FormGroup>
 
                     <!-- Assign Agent Searchable Dropdown -->
-                    <FormGroup
-                        label="Assign Agent *"
-                        :error="form.errors.agent_id"
-                    >
-                        <div class="relative">
-                            <input
-                                v-model="agentSearch"
-                                @focus="showAgentDropdown = true"
-                                @blur="hideAgentDropdown"
-                                type="text"
-                                :class="inputClass('agent_id')"
-                                :placeholder="
-                                    selectedAgentName ||
-                                    'Search agent by name or phone...'
-                                "
-                                required
-                            />
-                            <div
-                                v-if="showAgentDropdown"
-                                class="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
-                            >
+                    <FormGroup label="Assign Agent" :error="form.errors.agent_id">
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <input
+                                    v-model="agentSearch"
+                                    @focus="showAgentDropdown = true"
+                                    @blur="hideAgentDropdown"
+                                    type="text"
+                                    :class="inputClass('agent_id')"
+                                    :placeholder="
+                                        selectedAgentName ||
+                                        'Search agent by name or phone...'
+                                    "
+                                />
                                 <div
-                                    v-for="agent in filteredAgents"
-                                    :key="agent.id"
-                                    @mousedown.prevent="selectAgent(agent)"
-                                    class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                                    v-if="showAgentDropdown"
+                                    class="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
                                 >
-                                    <div class="font-medium text-gray-900">
-                                        {{ agent.name }}
+                                    <div
+                                        v-for="agent in filteredAgents"
+                                        :key="agent.id"
+                                        @mousedown.prevent="selectAgent(agent)"
+                                        class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                                    >
+                                        <div class="font-medium text-gray-900">
+                                            {{ agent.name }}
+                                        </div>
+                                        <div
+                                            v-if="agent.mobile"
+                                            class="text-xs text-gray-500"
+                                        >
+                                            Mobile: {{ agent.mobile }}
+                                        </div>
                                     </div>
                                     <div
-                                        v-if="agent.mobile"
-                                        class="text-xs text-gray-500"
+                                        v-if="filteredAgents.length === 0"
+                                        class="px-4 py-3 text-sm text-gray-500 text-center"
                                     >
-                                        Mobile: {{ agent.mobile }}
+                                        No agents found
                                     </div>
                                 </div>
-                                <div
-                                    v-if="filteredAgents.length === 0"
-                                    class="px-4 py-3 text-sm text-gray-500 text-center"
-                                >
-                                    No agents found
-                                </div>
                             </div>
+                            <button
+                                type="button"
+                                @click="openAddAgentModal"
+                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-blue-600 p-2.5 text-white hover:bg-blue-700 transition"
+                                title="Add new agent"
+                            >
+                                <svg
+                                    class="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 4v16m8-8H4"
+                                    />
+                                </svg>
+                            </button>
                         </div>
                     </FormGroup>
 
@@ -629,16 +687,15 @@
                 </div>
                 <div class="grid gap-4 p-6 md:grid-cols-2">
                     <FormGroup
-                        label="Current Fee *"
+                        label="Current Fee"
                         :error="form.errors.total_fee"
-                        hint="Total amount to collect"
+                        hint="Total amount to collect (optional)"
                     >
                         <input
                             v-model="form.total_fee"
                             type="number"
                             step="0.01"
                             :class="inputClass('total_fee')"
-                            required
                         />
                     </FormGroup>
                     <FormGroup
@@ -654,7 +711,7 @@
                         />
                     </FormGroup>
                     <FormGroup
-                        label="Current Due *"
+                        label="Current Due"
                         :error="form.errors.current_due"
                         hint="Auto-calculated"
                     >
@@ -664,11 +721,10 @@
                             step="0.01"
                             :class="inputClass('current_due')"
                             readonly
-                            required
                         />
                     </FormGroup>
                     <DateField
-                        label="Date of Partial Payment"
+                        label="Date of Current Payment"
                         v-model="form.partial_payment_date"
                         :error="form.errors.partial_payment_date"
                     />
@@ -914,6 +970,220 @@
                 </div>
             </div>
         </div>
+
+        <!-- Add Country Modal -->
+        <div
+            v-if="showAddCountryModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            @click.self="closeAddCountryModal"
+        >
+            <div
+                class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            >
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-900">
+                        Add New Country
+                    </h3>
+                    <button
+                        @click="closeAddCountryModal"
+                        class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    >
+                        <svg
+                            class="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label
+                            class="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                            Country Name <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            v-model="newCountry.country"
+                            type="text"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            :class="{ 'border-red-500': newCountryError }"
+                            placeholder="e.g., Malaysia"
+                            @keyup.enter="submitNewCountry"
+                        />
+                        <p
+                            v-if="newCountryError"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ newCountryError }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label
+                            class="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                            Company Name
+                            <span class="text-gray-400 text-xs">(Optional)</span>
+                        </label>
+                        <input
+                            v-model="newCountry.companyName"
+                            type="text"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            placeholder="Optional company name for this country"
+                        />
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button
+                        @click="closeAddCountryModal"
+                        type="button"
+                        class="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        @click="submitNewCountry"
+                        type="button"
+                        :disabled="addingCountry"
+                        class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        {{ addingCountry ? "Adding..." : "Add Country" }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Agent Modal -->
+        <div
+            v-if="showAddAgentModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            @click.self="closeAddAgentModal"
+        >
+            <div
+                class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            >
+                <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-900">
+                        Add New Agent
+                    </h3>
+                    <button
+                        @click="closeAddAgentModal"
+                        class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    >
+                        <svg
+                            class="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label
+                            class="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                            Agent Name <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            v-model="newAgent.name"
+                            type="text"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            :class="{ 'border-red-500': newAgentError }"
+                            placeholder="Agent full name"
+                            @keyup.enter="submitNewAgent"
+                        />
+                        <p
+                            v-if="newAgentError"
+                            class="mt-1 text-xs text-red-600"
+                        >
+                            {{ newAgentError }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label
+                            class="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                            Mobile
+                            <span class="text-gray-400 text-xs">(Optional)</span>
+                        </label>
+                        <input
+                            v-model="newAgent.mobile"
+                            type="text"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            placeholder="Agent mobile number"
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            class="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                            District
+                            <span class="text-gray-400 text-xs">(Optional)</span>
+                        </label>
+                        <input
+                            v-model="newAgent.district"
+                            type="text"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            placeholder="Agent district"
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            class="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                            Address
+                            <span class="text-gray-400 text-xs">(Optional)</span>
+                        </label>
+                        <textarea
+                            v-model="newAgent.address"
+                            rows="2"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            placeholder="Agent address"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button
+                        @click="closeAddAgentModal"
+                        type="button"
+                        class="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        @click="submitNewAgent"
+                        type="button"
+                        :disabled="addingAgent"
+                        class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        {{ addingAgent ? "Adding..." : "Add Agent" }}
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -969,6 +1239,8 @@ const statusOptions = [
 
 const buildFormState = () => ({
     name: props.client?.name ?? "",
+    organization_name: props.client?.organization_name ?? "",
+    email: props.client?.email ?? "",
     photo: null,
     nid_number: props.client?.nid_number ?? "",
     nid_file: null,
@@ -997,9 +1269,9 @@ const buildFormState = () => ({
     date_of_submission: props.client?.date_of_submission ?? "",
     expected_date_to_collect: props.client?.expected_date_to_collect ?? "",
     documents_collected_date: props.client?.documents_collected_date ?? "",
-    total_fee: props.client?.total_fee ?? "0",
-    current_due: props.client?.current_due ?? "0",
-    partial_paid_amount: props.client?.partial_paid_amount ?? "0",
+    total_fee: props.client?.total_fee ?? "",
+    current_due: props.client?.current_due ?? "",
+    partial_paid_amount: props.client?.partial_paid_amount ?? "",
     partial_payment_date: props.client?.partial_payment_date ?? "",
     notes: props.client?.notes ?? "",
     online_status: props.client?.online_status ?? "pending",
@@ -1046,6 +1318,22 @@ const newJobSector = ref({
     name: "",
     parent_id: "",
     description: "",
+});
+const showAddCountryModal = ref(false);
+const addingCountry = ref(false);
+const newCountryError = ref("");
+const newCountry = ref({
+    country: "",
+    companyName: "",
+});
+const showAddAgentModal = ref(false);
+const addingAgent = ref(false);
+const newAgentError = ref("");
+const newAgent = ref({
+    name: "",
+    mobile: "",
+    district: "",
+    address: "",
 });
 
 // Filtered job sectors based on search
@@ -1106,6 +1394,91 @@ const closeAddJobSectorModal = () => {
         description: "",
     };
     newJobSectorError.value = "";
+};
+
+const openAddCountryModal = () => {
+    showAddCountryModal.value = true;
+    newCountry.value = {
+        country: countrySearch.value || "",
+        companyName: "",
+    };
+    newCountryError.value = "";
+};
+
+const closeAddCountryModal = () => {
+    showAddCountryModal.value = false;
+    newCountry.value = {
+        country: "",
+        companyName: "",
+    };
+    newCountryError.value = "";
+};
+
+const submitNewCountry = async () => {
+    const countryValue = newCountry.value.country.trim();
+
+    if (!countryValue) {
+        newCountryError.value = "Country name is required";
+        return;
+    }
+
+    addingCountry.value = true;
+    newCountryError.value = "";
+
+    try {
+        const companyName =
+            newCountry.value.companyName.trim() || countryValue;
+
+        const response = await axios.post(
+            "/foreign-companies",
+            {
+                name: companyName,
+                country: countryValue,
+            },
+            {
+                headers: {
+                    Accept: "application/json",
+                },
+            }
+        );
+
+        const company = response.data.foreignCompany;
+        const country = company?.country || countryValue;
+
+        if (country && !props.countries.includes(country)) {
+            props.countries.push(country);
+        }
+
+        if (company) {
+            props.foreignCompanies.push({
+                id: company.id,
+                name: company.name,
+                country: company.country,
+                contact_person_phone: company.contact_person_phone,
+                owner_phone: company.owner_phone,
+                contact_person_name: company.contact_person_name,
+            });
+        }
+
+        selectCountry(countryValue);
+
+        if (company && newCountry.value.companyName.trim()) {
+            selectForeignCompany(company);
+        }
+
+        closeAddCountryModal();
+    } catch (error) {
+        if (error.response?.status === 422) {
+            newCountryError.value =
+                error.response.data.message ||
+                "Failed to add country. Please check the fields.";
+        } else {
+            newCountryError.value =
+                "Failed to add country. Please try again.";
+        }
+    } finally {
+        addingCountry.value = false;
+    }
 };
 
 // Submit new job sector
@@ -1171,6 +1544,82 @@ const submitNewJobSector = async () => {
         }
     } finally {
         addingJobSector.value = false;
+    }
+};
+
+const openAddAgentModal = () => {
+    showAddAgentModal.value = true;
+    newAgent.value = {
+        name: "",
+        mobile: "",
+        district: "",
+        address: "",
+    };
+    newAgentError.value = "";
+};
+
+const closeAddAgentModal = () => {
+    showAddAgentModal.value = false;
+    newAgent.value = {
+        name: "",
+        mobile: "",
+        district: "",
+        address: "",
+    };
+    newAgentError.value = "";
+};
+
+const submitNewAgent = async () => {
+    if (!newAgent.value.name.trim()) {
+        newAgentError.value = "Agent name is required";
+        return;
+    }
+
+    addingAgent.value = true;
+    newAgentError.value = "";
+
+    try {
+        const response = await axios.post(
+            "/agents",
+            {
+                name: newAgent.value.name.trim(),
+                mobile: newAgent.value.mobile.trim() || null,
+                district: newAgent.value.district.trim() || null,
+                address: newAgent.value.address.trim() || null,
+            },
+            {
+                headers: {
+                    Accept: "application/json",
+                },
+            }
+        );
+
+        const agent = response.data.agent;
+
+        if (agent) {
+            props.agents.push({
+                id: agent.id,
+                name: agent.name,
+                mobile: agent.mobile,
+                district: agent.district,
+                address: agent.address,
+            });
+
+            selectAgent(agent);
+        }
+
+        closeAddAgentModal();
+    } catch (error) {
+        if (error.response?.status === 422) {
+            newAgentError.value =
+                error.response.data.message ||
+                "Failed to add agent. Please check the fields.";
+        } else {
+            newAgentError.value =
+                "Failed to add agent. Please try again.";
+        }
+    } finally {
+        addingAgent.value = false;
     }
 };
 
@@ -1440,9 +1889,6 @@ const submit = () => {
         { key: "name", message: "Client name is required." },
         { key: "nid_number", message: "NID number is required." },
         { key: "passport_number", message: "Passport number is required." },
-        { key: "total_fee", message: "Current fee is required." },
-        { key: "current_due", message: "Current due is required." },
-        { key: "agent_id", message: "Agent selection is required." },
     ];
 
     let hasError = false;

@@ -12,11 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // For PostgreSQL, we need to change the column type from enum to string
-        DB::statement('ALTER TABLE non_operating_entries ALTER COLUMN category TYPE VARCHAR(255)');
+        // Change column type from enum to string (MySQL compatible)
+        $driver = DB::getDriverName();
 
-        // Drop the old enum type if it exists
-        DB::statement('DROP TYPE IF EXISTS non_operating_entries_category_old CASCADE');
+        if ($driver === 'mysql') {
+            DB::statement('ALTER TABLE non_operating_entries MODIFY category VARCHAR(255)');
+        } else {
+            // For PostgreSQL
+            DB::statement('ALTER TABLE non_operating_entries ALTER COLUMN category TYPE VARCHAR(255)');
+            DB::statement('DROP TYPE IF EXISTS non_operating_entries_category_old CASCADE');
+        }
     }
 
     /**

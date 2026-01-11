@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
 use App\Models\Client;
+use App\Models\OfficeStaff;
 use App\Models\OperatingExpense;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class OperatingExpensesController extends Controller
 {
@@ -32,7 +34,7 @@ class OperatingExpensesController extends Controller
         // Get operating expenses for this category and period
         $entries = OperatingExpense::where('accounting_period_id', $period->id)
             ->where('category', $category)
-            ->with('client:id,name,mobile')
+            ->with('client:id,name,mobile', 'staff:id,name')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -54,6 +56,16 @@ class OperatingExpensesController extends Controller
 
         // Get all clients for selection dropdown
         $clients = Client::select('id', 'name', 'mobile')
+            ->orderBy('name')
+            ->get();
+
+        $officeStaff = OfficeStaff::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        // Get subcategories for this category
+        $subcategories = \App\Models\Subcategory::where('type', 'operating_expenses')
+            ->where('category', $category)
             ->orderBy('name')
             ->get();
 
@@ -83,13 +95,22 @@ class OperatingExpensesController extends Controller
             'entries' => $entries->map(fn($e) => [
                 'id' => $e->id,
                 'client_id' => $e->client_id,
+                'staff_id' => $e->staff_id,
                 'client' => $e->client ? [
                     'id' => $e->client->id,
                     'name' => $e->client->name,
                     'phone_number' => $e->client->mobile,
                 ] : null,
+                'staff' => $e->staff ? [
+                    'id' => $e->staff->id,
+                    'name' => $e->staff->name,
+                ] : null,
                 'subcategory' => $e->subcategory,
                 'description' => $e->description,
+                'salary_amount' => (float) ($e->salary_amount ?? 0),
+                'bonus_amount' => (float) ($e->bonus_amount ?? 0),
+                'paid_amount' => (float) ($e->paid_amount ?? 0),
+                'due_amount' => (float) ($e->due_amount ?? 0),
                 'amount' => (float) $e->amount,
                 'vat_rate' => (float) $e->vat_rate,
                 'vat_amount' => (float) $e->vat_amount,
@@ -105,6 +126,15 @@ class OperatingExpensesController extends Controller
                 'name' => $c->name,
                 'phone_number' => $c->mobile,
             ]),
+            'officeStaff' => $officeStaff->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+            ]),
+            'subcategories' => $subcategories->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'vat_rate' => (float) $s->vat_rate,
+            ]),
         ]);
     }
 
@@ -112,16 +142,55 @@ class OperatingExpensesController extends Controller
     {
         $validated = $request->validate([
             'accounting_period_id' => 'required|exists:accounting_periods,id',
-            'client_id' => 'nullable|exists:clients,id',
             'category' => 'required|in:employee_manpower,administrative,selling_marketing,general',
+            'client_id' => 'nullable|exists:clients,id',
+            'staff_id' => 'nullable|exists:office_staff,id',
             'subcategory' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
+            'salary_amount' => 'nullable|numeric|min:0',
+            'bonus_amount' => 'nullable|numeric|min:0',
+            'paid_amount' => 'nullable|numeric|min:0',
             'vat_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
         ]);
 
         $validated['vat_rate'] = $validated['vat_rate'] ?? 0;
+
+        if ($validated['category'] === 'employee_manpower') {
+            if (empty($validated['staff_id'])) {
+                return redirect()->back()->withErrors([
+                    'staff_id' => 'Please select a staff member.'
+                ])->withInput();
+            }
+
+            $validated['client_id'] = null;
+
+            if ($this->isSalarySubcategory($validated['subcategory'])) {
+                $salary = (float) ($validated['salary_amount'] ?? 0);
+                $bonus = (float) ($validated['bonus_amount'] ?? 0);
+                $paid = (float) ($validated['paid_amount'] ?? 0);
+                $validated['due_amount'] = max(0, ($salary + $bonus) - $paid);
+                $validated['amount'] = $paid;
+                $validated['vat_rate'] = 0;
+            } else {
+                $validated['salary_amount'] = null;
+                $validated['bonus_amount'] = null;
+                $validated['paid_amount'] = null;
+                $validated['due_amount'] = null;
+            }
+        } else {
+            if (empty($validated['client_id'])) {
+                return redirect()->back()->withErrors([
+                    'client_id' => 'Please select a client.'
+                ])->withInput();
+            }
+            $validated['staff_id'] = null;
+            $validated['salary_amount'] = null;
+            $validated['bonus_amount'] = null;
+            $validated['paid_amount'] = null;
+            $validated['due_amount'] = null;
+        }
 
         OperatingExpense::create($validated);
 
@@ -132,18 +201,63 @@ class OperatingExpensesController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'nullable|exists:clients,id',
+            'staff_id' => 'nullable|exists:office_staff,id',
             'subcategory' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
+            'salary_amount' => 'nullable|numeric|min:0',
+            'bonus_amount' => 'nullable|numeric|min:0',
+            'paid_amount' => 'nullable|numeric|min:0',
             'vat_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
         ]);
 
         $validated['vat_rate'] = $validated['vat_rate'] ?? 0;
 
+        if ($operatingExpense->category === 'employee_manpower') {
+            if (empty($validated['staff_id'])) {
+                return redirect()->back()->withErrors([
+                    'staff_id' => 'Please select a staff member.'
+                ])->withInput();
+            }
+
+            $validated['client_id'] = null;
+
+            if ($this->isSalarySubcategory($validated['subcategory'])) {
+                $salary = (float) ($validated['salary_amount'] ?? 0);
+                $bonus = (float) ($validated['bonus_amount'] ?? 0);
+                $paid = (float) ($validated['paid_amount'] ?? 0);
+                $validated['due_amount'] = max(0, ($salary + $bonus) - $paid);
+                $validated['amount'] = $paid;
+                $validated['vat_rate'] = 0;
+            } else {
+                $validated['salary_amount'] = null;
+                $validated['bonus_amount'] = null;
+                $validated['paid_amount'] = null;
+                $validated['due_amount'] = null;
+            }
+        } else {
+            if (empty($validated['client_id'])) {
+                return redirect()->back()->withErrors([
+                    'client_id' => 'Please select a client.'
+                ])->withInput();
+            }
+            $validated['staff_id'] = null;
+            $validated['salary_amount'] = null;
+            $validated['bonus_amount'] = null;
+            $validated['paid_amount'] = null;
+            $validated['due_amount'] = null;
+        }
+
         $operatingExpense->update($validated);
 
         return redirect()->back()->with('success', 'Operating expense entry updated successfully.');
+    }
+
+    private function isSalarySubcategory(string $subcategory): bool
+    {
+        $normalized = strtolower(str_replace(['&', '  '], ['and', ' '], trim($subcategory)));
+        return $normalized === 'salaries and wages';
     }
 
     public function destroy(OperatingExpense $operatingExpense)
@@ -151,5 +265,72 @@ class OperatingExpensesController extends Controller
         $operatingExpense->delete();
 
         return redirect()->back()->with('success', 'Operating expense entry deleted successfully.');
+    }
+
+    public function report(Request $request, $category)
+    {
+        $period = AccountingPeriod::where('status', 'active')
+            ->orWhere('status', 'draft')
+            ->latest()
+            ->first();
+
+        $entries = OperatingExpense::where('accounting_period_id', $period->id)
+            ->where('category', $category)
+            ->with('client:id,name,mobile', 'staff:id,name')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($request->query('type') === 'pdf') {
+            $categoryNames = [
+                'employee_manpower' => 'Employee & Manpower',
+                'administrative' => 'Administrative',
+                'selling_marketing' => 'Selling & Marketing',
+                'general' => 'General',
+            ];
+
+            $totalAmount = $entries->sum('amount');
+            $totalVat = $entries->sum('vat_amount');
+            $totalWithVat = $totalAmount + $totalVat;
+
+            $fileName = "operating-expenses-report-{$category}-" . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::view('pdfs.operating_expenses_report', [
+                'period' => $period,
+                'category' => $category,
+                'categoryName' => $categoryNames[$category] ?? $category,
+                'entries' => $entries,
+                'totalAmount' => $totalAmount,
+                'totalVat' => $totalVat,
+                'totalWithVat' => $totalWithVat,
+            ])->name($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+        
+        fputcsv($handle, ['Subcategory', 'Client/Staff', 'Description', 'Amount', 'VAT Rate', 'VAT Amount', 'Total', 'Date']);
+
+        foreach ($entries as $entry) {
+            fputcsv($handle, [
+                $entry->subcategory,
+                $entry->staff->name ?? $entry->client->name ?? 'N/A',
+                $entry->description,
+                $entry->amount,
+                $entry->vat_rate,
+                $entry->vat_amount,
+                $entry->amount + $entry->vat_amount,
+                $entry->created_at->format('Y-m-d H:i'),
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = "operating-expenses-report-{$category}-" . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
     }
 }

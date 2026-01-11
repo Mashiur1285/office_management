@@ -92,12 +92,15 @@ const form = useForm({
     permission_ids: [],
 });
 
+// Permissions that should only be visible to superadmin
+const restrictedModules = ['role', 'user', 'permission'];
+
 const groupedPermissions = computed(() => {
     const groups = {};
     // Filter out role, user, and permission permissions - these are only for superadmin
     const filteredPermissions = props.permissions.filter((perm) => {
         const [module] = perm.name.split('.');
-        return module !== 'role' && module !== 'user' && module !== 'permission';
+        return !restrictedModules.includes(module);
     });
 
     filteredPermissions.forEach((perm) => {
@@ -110,7 +113,7 @@ const groupedPermissions = computed(() => {
     return Object.values(groups);
 });
 
-const formatLabel = (key) => key.replace('-', ' ').replace('_', ' ').toUpperCase();
+const formatLabel = (key) => key.replace(/-/g, ' ').replace(/_/g, ' ').toUpperCase();
 
 const togglePermission = (id) => {
     const exists = form.permission_ids.includes(id);
@@ -119,22 +122,11 @@ const togglePermission = (id) => {
         : [...form.permission_ids, id];
 };
 
-const toggleGroup = (perms) => {
-    const ids = perms.map((p) => p.id);
-    const hasAll = ids.every((id) => form.permission_ids.includes(id));
-    if (hasAll) {
-        form.permission_ids = form.permission_ids.filter((id) => !ids.includes(id));
-    } else {
-        const merged = new Set([...form.permission_ids, ...ids]);
-        form.permission_ids = Array.from(merged);
-    }
-};
-
 const allSelected = computed(() => {
-    // Only consider non-restricted permissions (exclude role, user, and permission permissions)
+    // Only consider non-restricted permissions
     const availablePermissions = props.permissions.filter((perm) => {
         const [module] = perm.name.split('.');
-        return module !== 'role' && module !== 'user' && module !== 'permission';
+        return !restrictedModules.includes(module);
     });
     if (!availablePermissions.length) return false;
     return availablePermissions.every((p) => form.permission_ids.includes(p.id));
@@ -144,7 +136,7 @@ const toggleAll = () => {
     // Only toggle non-restricted permissions
     const availablePermissions = props.permissions.filter((perm) => {
         const [module] = perm.name.split('.');
-        return module !== 'role' && module !== 'user' && module !== 'permission';
+        return !restrictedModules.includes(module);
     });
     form.permission_ids = allSelected.value
         ? []

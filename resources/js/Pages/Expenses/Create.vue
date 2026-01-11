@@ -49,7 +49,12 @@
                         <input v-model="form.category" :class="inputClass('category')" placeholder="Ex: Operations" />
                     </FormGroup>
                     <FormGroup label="Paid On" :error="form.errors.paid_on">
-                        <input v-model="form.paid_on" type="date" :class="inputClass('paid_on')" />
+                        <VueDatePicker
+                            v-model="form.paid_on"
+                            :enable-time-picker="false"
+                            model-type="yyyy-MM-dd"
+                            :class="inputClass('paid_on')"
+                        />
                     </FormGroup>
                     <FormGroup label="Vendor" :error="form.errors.vendor">
                         <input v-model="form.vendor" :class="inputClass('vendor')" placeholder="Ex: ABC Travels" />
@@ -90,6 +95,8 @@
 <script setup>
 import { computed, defineComponent, h } from "vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 const props = defineProps({
     expense: {

@@ -10,12 +10,12 @@
                         <p class="text-sm text-gray-600 mt-1">Profit & Loss Overview - {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium">
+                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
-                        <span class="px-3 py-1 rounded-full text-xs font-bold" :class="statusClass(period.status)">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold capitalize" :class="statusClass(period.status)">
                             {{ period.status }}
                         </span>
                     </div>
@@ -417,23 +417,40 @@ const performanceTrendData = computed(() => {
 const pieChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+        animateRotate: true,
+        animateScale: true,
+        duration: 1500,
+        easing: 'easeInOutQuart',
+    },
     plugins: {
         legend: {
             position: 'bottom',
             labels: {
                 padding: 15,
                 font: {
-                    size: 11,
+                    size: 12,
+                    weight: 'bold',
                 },
+                usePointStyle: true,
+                pointStyle: 'circle',
             },
         },
         tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            titleFont: { size: 14, weight: 'bold' },
+            bodyFont: { size: 13 },
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderWidth: 1,
             callbacks: {
                 label: function(context) {
                     const label = context.label || '';
                     const value = context.parsed || 0;
                     const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-                    return `${label}: ${formatted}`;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                    return `${label}: ${formatted} (${percentage}%)`;
                 },
             },
         },
@@ -443,23 +460,41 @@ const pieChartOptions = {
 const doughnutChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+        animateRotate: true,
+        animateScale: true,
+        duration: 1500,
+        easing: 'easeInOutQuart',
+    },
+    cutout: '65%',
     plugins: {
         legend: {
             position: 'bottom',
             labels: {
-                padding: 10,
+                padding: 15,
                 font: {
-                    size: 10,
+                    size: 12,
+                    weight: 'bold',
                 },
+                usePointStyle: true,
+                pointStyle: 'circle',
             },
         },
         tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            titleFont: { size: 14, weight: 'bold' },
+            bodyFont: { size: 13 },
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderWidth: 1,
             callbacks: {
                 label: function(context) {
                     const label = context.label || '';
                     const value = context.parsed || 0;
                     const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-                    return `${label}: ${formatted}`;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                    return `${label}: ${formatted} (${percentage}%)`;
                 },
             },
         },
@@ -469,33 +504,64 @@ const doughnutChartOptions = {
 const lineChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            position: 'bottom',
-            labels: {
-                padding: 15,
-                font: {
-                    size: 11,
+    animation: {
+        duration: 2000,
+        easing: 'easeInOutQuart',
+    },
+    interaction: {
+        mode: 'index',
+        intersect: false,
+    },
+    scales: {
+        y: {
+            beginAtZero: true,
+            grid: {
+                color: 'rgba(0, 0, 0, 0.05)',
+                drawBorder: false,
+            },
+            ticks: {
+                font: { size: 11 },
+                callback: function(value) {
+                    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                 },
             },
         },
+        x: {
+            grid: {
+                display: false,
+                drawBorder: false,
+            },
+            ticks: {
+                font: { size: 11, weight: 'bold' },
+            },
+        },
+    },
+    plugins: {
+        legend: {
+            position: 'top',
+            labels: {
+                font: {
+                    size: 13,
+                    weight: 'bold',
+                },
+                padding: 20,
+                usePointStyle: true,
+                pointStyle: 'circle',
+            },
+        },
         tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            padding: 12,
+            titleFont: { size: 14, weight: 'bold' },
+            bodyFont: { size: 13 },
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderWidth: 1,
             callbacks: {
                 label: function(context) {
                     const label = context.dataset.label || '';
                     const value = context.parsed.y || 0;
                     const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
                     return `${label}: ${formatted}`;
-                },
-            },
-        },
-    },
-    scales: {
-        y: {
-            beginAtZero: true,
-            ticks: {
-                callback: function(value) {
-                    return '৳' + (value / 1000).toFixed(0) + 'K';
                 },
             },
         },

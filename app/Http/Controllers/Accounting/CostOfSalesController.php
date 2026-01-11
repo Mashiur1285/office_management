@@ -8,6 +8,9 @@ use App\Models\Client;
 use App\Models\CostOfSale;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Exports\CostOfSalesExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class CostOfSalesController extends Controller
 {
@@ -48,6 +51,12 @@ class CostOfSalesController extends Controller
 
         // Get all clients for selection dropdown
         $clients = Client::select('id', 'name', 'mobile')
+            ->orderBy('name')
+            ->get();
+
+        // Get subcategories for this category
+        $subcategories = \App\Models\Subcategory::where('type', 'cost_of_sales')
+            ->where('category', $category)
             ->orderBy('name')
             ->get();
 
@@ -94,6 +103,11 @@ class CostOfSalesController extends Controller
                 'name' => $c->name,
                 'phone_number' => $c->mobile,
             ]),
+            'subcategories' => $subcategories->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'vat_rate' => (float) $s->vat_rate,
+            ]),
         ]);
     }
 
@@ -101,10 +115,10 @@ class CostOfSalesController extends Controller
     {
         $validated = $request->validate([
             'accounting_period_id' => 'required|exists:accounting_periods,id',
-            'client_id' => 'nullable|exists:clients,id',
+            'client_id' => 'required|exists:clients,id',
             'category' => 'required|in:travel_tourism,manpower_exporting,student_package',
             'subcategory' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
@@ -117,9 +131,9 @@ class CostOfSalesController extends Controller
     public function update(Request $request, CostOfSale $costOfSale)
     {
         $validated = $request->validate([
-            'client_id' => 'nullable|exists:clients,id',
+            'client_id' => 'required|exists:clients,id',
             'subcategory' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
@@ -134,5 +148,46 @@ class CostOfSalesController extends Controller
         $costOfSale->delete();
 
         return redirect()->back()->with('success', 'Cost of sales entry deleted successfully.');
+    }
+
+    public function export(Request $request, $category, $type = 'excel')
+    {
+        $period = AccountingPeriod::where('status', 'active')
+            ->orWhere('status', 'draft')
+            ->latest()
+            ->first();
+
+        $entries = CostOfSale::where('accounting_period_id', $period->id)
+            ->where('category', $category)
+            ->with('client:id,name,mobile')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $fileName = "cost-of-sales-report-{$category}-" . now()->format('Y-m-d');
+
+        if ($type === 'excel') {
+            $fileName .= '.xlsx';
+            return Excel::download(new CostOfSalesExport($entries), $fileName);
+        }
+
+        if ($type === 'pdf') {
+            $fileName .= '.pdf';
+            $categoryNames = [
+                'travel_tourism' => 'Travel & Tourism',
+                'manpower_exporting' => 'Manpower Exporting',
+                'student_package' => 'Student Package',
+            ];
+            $categoryName = $categoryNames[$category] ?? $category;
+
+            return Pdf::view('pdfs.cost_of_sales_report', [
+                'entries' => $entries,
+                'period' => $period,
+                'categoryName' => $categoryName,
+            ])->name($fileName);
+        }
+
+        // Default to CSV if type is not supported
+        $fileName .= '.csv';
+        return Excel::download(new CostOfSalesExport($entries), $fileName, \Maatwebsite\Excel\Excel::CSV);
     }
 }

@@ -11,6 +11,8 @@ class Client extends Model
 {
     protected $fillable = [
         'name',
+        'organization_name',
+        'email',
         'photo_path',
         'nid_number',
         'nid_file_path',
@@ -55,6 +57,10 @@ class Client extends Model
         'visa_status',
         'visa_stage',
         'notes',
+        'vat_paid',
+        'vat_paid_amount',
+        'vat_chalan_number',
+        'vat_payment_date',
     ];
 
     protected function casts(): array
@@ -67,12 +73,14 @@ class Client extends Model
             'partial_payment_date' => 'date',
             'next_payment_date' => 'date',
             'final_payment_date' => 'date',
+            'vat_payment_date' => 'date',
             'medical_fee' => 'decimal:2',
             'total_fee' => 'decimal:2',
             'current_due' => 'decimal:2',
             'partial_paid_amount' => 'decimal:2',
             'next_payment_amount' => 'decimal:2',
             'final_payment' => 'decimal:2',
+            'vat_paid' => 'boolean',
         ];
     }
 

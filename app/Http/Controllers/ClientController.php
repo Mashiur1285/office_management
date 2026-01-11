@@ -6,6 +6,7 @@ use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
 use App\Models\JobSector;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ClientController extends Controller
@@ -34,6 +35,10 @@ class ClientController extends Controller
                 $vatReceivable = \App\Models\IncomeEntry::where('client_id', $client->id)
                     ->sum('vat_amount');
 
+                // Calculate unpaid VAT amount
+                $vatPaidAmount = (float) $client->vat_paid_amount;
+                $vatUnpaid = max(0, $vatReceivable - $vatPaidAmount);
+
                 return [
                     'id' => $client->id,
                     'name' => $client->name,
@@ -52,7 +57,10 @@ class ClientController extends Controller
                     'status_badge' => $status['badge'],
                     'current_due' => $client->current_due,
                     'vat_receivable' => (float) $vatReceivable,
-                    'vat_paid' => false, // You can add logic to track if VAT is paid
+                    'vat_paid_amount' => $vatPaidAmount,
+                    'vat_unpaid' => $vatUnpaid,
+                    'vat_paid' => $client->vat_paid && $vatUnpaid == 0,
+                    'vat_chalan_number' => $client->vat_chalan_number,
                     'photo_url' => $client->photo_path ? asset('storage/'.$client->photo_path) : null,
                     'current_holder_type' => $holder?->holder_type,
                     'current_holder_label' => $holder?->holder_type ? ($holderLabelMap[$holder->holder_type] ?? $holder->holder_type) : null,
@@ -161,6 +169,14 @@ class ClientController extends Controller
 
         $stageIndex = $currentStageIndex;
 
+        // Calculate VAT receivable for this client
+        $vatReceivable = \App\Models\IncomeEntry::where('client_id', $client->id)
+            ->sum('vat_amount');
+
+        // Calculate unpaid VAT amount
+        $vatPaidAmount = (float) $client->vat_paid_amount;
+        $vatUnpaid = max(0, $vatReceivable - $vatPaidAmount);
+
         return Inertia::render('Clients/Show', [
             'client' => [
                 'id' => $client->id,
@@ -191,6 +207,12 @@ class ClientController extends Controller
             'total_fee' => $totalFee,
             'current_due' => $due,
             'paid_amount' => $paid,
+            'vat_receivable' => (float) $vatReceivable,
+            'vat_paid_amount' => $vatPaidAmount,
+            'vat_unpaid' => $vatUnpaid,
+            'vat_paid' => $client->vat_paid && $vatUnpaid == 0,
+            'vat_chalan_number' => $client->vat_chalan_number,
+            'vat_payment_date' => $client->vat_payment_date?->format('Y-m-d'),
         ],
             'stages' => $stages,
             'currentStageIndex' => $stageIndex === false ? null : $stageIndex,
@@ -249,6 +271,65 @@ class ClientController extends Controller
         return redirect()
             ->route('clients.index')
             ->with('success', 'Client updated successfully.');
+    }
+
+    public function payVat(Request $request, Client $client)
+    {
+        $validated = $request->validate([
+            'vat_chalan_number' => 'required|string|max:255',
+            'vat_payment_date' => 'required|date',
+        ]);
+
+        // Calculate current unpaid VAT
+        $vatReceivable = \App\Models\IncomeEntry::where('client_id', $client->id)
+            ->sum('vat_amount');
+        $vatUnpaid = max(0, $vatReceivable - $client->vat_paid_amount);
+
+        // Get the active accounting period
+        $period = \App\Models\AccountingPeriod::where('status', 'active')
+            ->orWhere('status', 'draft')
+            ->latest()
+            ->first();
+
+        if (!$period) {
+            return redirect()->back()->withErrors(['error' => 'No active accounting period found.']);
+        }
+
+        // Create VAT payment record for the active period
+        $period->vatPayments()->create([
+            'payment_type' => 'individual',
+            'client_id' => $client->id,
+            'payment_amount' => $vatUnpaid,
+            'chalan_number' => $validated['vat_chalan_number'],
+            'payment_date' => $validated['vat_payment_date'],
+            'notes' => 'Paid from client page',
+        ]);
+
+        // Update client VAT status
+        $client->update([
+            'vat_paid' => true,
+            'vat_paid_amount' => $client->vat_paid_amount + $vatUnpaid,
+            'vat_chalan_number' => $validated['vat_chalan_number'],
+            'vat_payment_date' => $validated['vat_payment_date'],
+        ]);
+
+        return redirect()->back()->with('success', 'VAT payment recorded successfully.');
+    }
+
+    public function unpayVat(Client $client)
+    {
+        // Delete any VAT payment records for this client (both bulk and individual)
+        \App\Models\VATPayment::where('client_id', $client->id)->delete();
+
+        // Reset client VAT status
+        $client->update([
+            'vat_paid' => false,
+            'vat_paid_amount' => 0,
+            'vat_chalan_number' => null,
+            'vat_payment_date' => null,
+        ]);
+
+        return redirect()->back()->with('success', 'VAT payment status reset successfully.');
     }
 
     private function formData(): array
@@ -311,6 +392,8 @@ class ClientController extends Controller
         return [
             'id' => $client->id,
             'name' => $client->name,
+            'organization_name' => $client->organization_name,
+            'email' => $client->email,
             'nid_number' => $client->nid_number,
             'passport_number' => $client->passport_number,
             'date_of_birth' => optional($client->date_of_birth)?->toDateString(),

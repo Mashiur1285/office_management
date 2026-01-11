@@ -57,6 +57,7 @@ const state = reactive({
     expensesMonthly: [],
     receivableToday: { total: 0, items: [] },
     payableToday: { total: 0, items: [] },
+    diskUsage: { total: 0, used: 0, free: 0, percent: 0 },
 });
 
 const totals = computed(() => [
@@ -76,6 +77,7 @@ const fetchData = async () => {
         state.expensesMonthly = data.expensesMonthly;
         state.receivableToday = data.receivableToday;
         state.payableToday = data.payableToday;
+        state.diskUsage = data.diskUsage || { total: 0, used: 0, free: 0, percent: 0 };
     } finally {
         state.loading = false;
     }
@@ -338,6 +340,12 @@ const lineChartOptions = {
         },
     },
 };
+
+const formatBytes = (bytes) => {
+    if (!bytes || bytes <= 0) return '0 GB';
+    const gb = bytes / (1024 * 1024 * 1024);
+    return gb.toFixed(2) + ' GB';
+};
 </script>
 
 <template>
@@ -363,6 +371,39 @@ const lineChartOptions = {
                 <div class="text-sm text-gray-500 group-hover:text-blue-600 transition-colors">{{ item.label }}</div>
                 <div class="text-2xl font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">{{ item.value }}</div>
                 <div class="text-xs text-gray-400 mt-1 group-hover:text-blue-500 transition-colors">Click to view details →</div>
+            </div>
+        </div>
+
+        <!-- Server Storage -->
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900">Server Storage</h2>
+                    <p class="text-xs text-gray-500">Live disk usage (auto refresh from server)</p>
+                </div>
+                <div class="text-sm font-semibold text-gray-700">
+                    {{ state.diskUsage.percent }}%
+                </div>
+            </div>
+            <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                    class="h-full bg-blue-600"
+                    :style="{ width: `${Math.min(100, state.diskUsage.percent)}%` }"
+                ></div>
+            </div>
+            <div class="mt-3 grid gap-3 sm:grid-cols-3 text-sm text-gray-600">
+                <div class="flex items-center justify-between">
+                    <span>Total</span>
+                    <span class="font-semibold text-gray-900">{{ formatBytes(state.diskUsage.total) }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>Used</span>
+                    <span class="font-semibold text-gray-900">{{ formatBytes(state.diskUsage.used) }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>Free</span>
+                    <span class="font-semibold text-gray-900">{{ formatBytes(state.diskUsage.free) }}</span>
+                </div>
             </div>
         </div>
 

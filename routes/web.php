@@ -7,12 +7,16 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentLocationController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ForeignCompanyController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JobSectorController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotepadController;
 use App\Http\Controllers\OfficeStaffController;
 use App\Http\Controllers\Acl\RoleController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QuotationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,6 +30,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/data', [DashboardController::class, 'data'])
         ->middleware('permission:dashboard.view')
         ->name('dashboard.data');
+
+    // Notepad routes
+    Route::get('/notepad', [NotepadController::class, 'index'])->name('notepad.index');
+    Route::post('/notepad/setup', [NotepadController::class, 'setup'])->name('notepad.setup');
+    Route::post('/notepad/unlock', [NotepadController::class, 'unlock'])->name('notepad.unlock');
+    Route::post('/notepad/reset', [NotepadController::class, 'resetPassword'])->name('notepad.reset');
+    Route::put('/notepad', [NotepadController::class, 'update'])->name('notepad.update');
+
+    Route::get('/notifications/document-overdue', [NotificationController::class, 'documentOverdue'])
+        ->name('notifications.document-overdue');
 });
 
 Route::middleware('auth')->group(function () {
@@ -37,11 +51,35 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:client.update')->group(function () {
         Route::get('clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit');
         Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
+        Route::post('clients/{client}/pay-vat', [ClientController::class, 'payVat'])->name('clients.pay-vat');
+        Route::post('clients/{client}/unpay-vat', [ClientController::class, 'unpayVat'])->name('clients.unpay-vat');
     });
 
     Route::middleware('permission:client.view')->group(function () {
         Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
         Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
+    });
+
+    Route::middleware('permission:quotation.add')->group(function () {
+        Route::get('quotations/create', [QuotationController::class, 'create'])->name('quotations.create');
+        Route::post('quotations', [QuotationController::class, 'store'])->name('quotations.store');
+    });
+
+    Route::middleware('permission:quotation.view')->group(function () {
+        Route::get('quotations', [QuotationController::class, 'index'])->name('quotations.index');
+        Route::get('quotations/{quotation}', [QuotationController::class, 'show'])->name('quotations.show');
+        Route::get('quotations/{quotation}/download', [QuotationController::class, 'download'])->name('quotations.download');
+    });
+
+    Route::middleware('permission:invoice.add')->group(function () {
+        Route::get('invoices/create', [InvoiceController::class, 'create'])->name('invoices.create');
+        Route::post('invoices', [InvoiceController::class, 'store'])->name('invoices.store');
+    });
+
+    Route::middleware('permission:invoice.view')->group(function () {
+        Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
+        Route::get('invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
     });
 
     Route::middleware('permission:agent.add')->group(function () {
@@ -99,6 +137,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:office-staff.view')->group(function () {
         Route::get('office-staff', [OfficeStaffController::class, 'index'])->name('office-staff.index');
+        Route::get('office-staff/{officeStaff}', [OfficeStaffController::class, 'show'])->name('office-staff.show');
     });
 
     Route::middleware('permission:expense.add')->group(function () {
@@ -179,6 +218,12 @@ Route::middleware('auth')->group(function () {
     Route::prefix('accounting')->name('accounting.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Accounting\AccountingDashboardController::class, 'index'])->name('dashboard');
 
+        // Subcategory Management Routes
+        Route::get('/subcategories', [\App\Http\Controllers\SubcategoryController::class, 'index'])->name('subcategories.index');
+        Route::post('/subcategories', [\App\Http\Controllers\SubcategoryController::class, 'store'])->name('subcategories.store');
+        Route::put('/subcategories/{subcategory}', [\App\Http\Controllers\SubcategoryController::class, 'update'])->name('subcategories.update');
+        Route::delete('/subcategories/{subcategory}', [\App\Http\Controllers\SubcategoryController::class, 'destroy'])->name('subcategories.destroy');
+
         // Income Routes
         Route::get('/income/travel-tourism', [\App\Http\Controllers\Accounting\IncomeController::class, 'showCategory'])->defaults('category', 'travel_tourism')->name('income.travel-tourism');
         Route::get('/income/manpower', [\App\Http\Controllers\Accounting\IncomeController::class, 'showCategory'])->defaults('category', 'manpower_exporting')->name('income.manpower');
@@ -187,6 +232,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/income', [\App\Http\Controllers\Accounting\IncomeController::class, 'store'])->name('income.store');
         Route::put('/income/{incomeEntry}', [\App\Http\Controllers\Accounting\IncomeController::class, 'update'])->name('income.update');
         Route::delete('/income/{incomeEntry}', [\App\Http\Controllers\Accounting\IncomeController::class, 'destroy'])->name('income.destroy');
+        Route::get('/income/{category}/export/{type?}', [\App\Http\Controllers\Accounting\IncomeController::class, 'export'])->name('income.export');
 
         // Cost of Sales Routes
         Route::get('/cost-of-sales/travel-tourism', [\App\Http\Controllers\Accounting\CostOfSalesController::class, 'showCategory'])->defaults('category', 'travel_tourism')->name('cost-of-sales.travel-tourism');
@@ -195,9 +241,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/cost-of-sales', [\App\Http\Controllers\Accounting\CostOfSalesController::class, 'store'])->name('cost-of-sales.store');
         Route::put('/cost-of-sales/{costOfSale}', [\App\Http\Controllers\Accounting\CostOfSalesController::class, 'update'])->name('cost-of-sales.update');
         Route::delete('/cost-of-sales/{costOfSale}', [\App\Http\Controllers\Accounting\CostOfSalesController::class, 'destroy'])->name('cost-of-sales.destroy');
+        Route::get('/cost-of-sales/{category}/export/{type?}', [\App\Http\Controllers\Accounting\CostOfSalesController::class, 'export'])->name('cost-of-sales.export');
 
         // Gross Profit Route
         Route::get('/gross-profit', [\App\Http\Controllers\Accounting\GrossProfitController::class, 'index'])->name('gross-profit');
+        Route::get('/gross-profit/report', [\App\Http\Controllers\Accounting\GrossProfitController::class, 'report'])->name('gross-profit.report');
 
         // Operating Expenses Routes
         Route::get('/operating-expenses', fn() => redirect()->route('accounting.operating-expenses.employee'))->name('operating-expenses.index');
@@ -208,6 +256,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/operating-expenses', [\App\Http\Controllers\Accounting\OperatingExpensesController::class, 'store'])->name('operating-expenses.store');
         Route::put('/operating-expenses/{operatingExpense}', [\App\Http\Controllers\Accounting\OperatingExpensesController::class, 'update'])->name('operating-expenses.update');
         Route::delete('/operating-expenses/{operatingExpense}', [\App\Http\Controllers\Accounting\OperatingExpensesController::class, 'destroy'])->name('operating-expenses.destroy');
+        Route::get('/operating-expenses/{category}/report', [\App\Http\Controllers\Accounting\OperatingExpensesController::class, 'report'])->name('operating-expenses.report');
 
         // Operating Profit Route
         Route::get('/operating-profit', [\App\Http\Controllers\Accounting\OperatingProfitController::class, 'index'])->name('operating-profit');
@@ -217,23 +266,44 @@ Route::middleware('auth')->group(function () {
         Route::post('/non-operating', [\App\Http\Controllers\Accounting\NonOperatingController::class, 'store'])->name('non-operating.store');
         Route::put('/non-operating/{nonOperatingEntry}', [\App\Http\Controllers\Accounting\NonOperatingController::class, 'update'])->name('non-operating.update');
         Route::delete('/non-operating/{nonOperatingEntry}', [\App\Http\Controllers\Accounting\NonOperatingController::class, 'destroy'])->name('non-operating.destroy');
+        Route::get('/non-operating/report', [\App\Http\Controllers\Accounting\NonOperatingController::class, 'report'])->name('non-operating.report');
 
         // Net Profit Before Tax Route
         Route::get('/net-profit-before-tax', [\App\Http\Controllers\Accounting\NetProfitBeforeTaxController::class, 'index'])->name('net-profit-before-tax');
+        Route::get('/net-profit-before-tax/report', [\App\Http\Controllers\Accounting\NetProfitBeforeTaxController::class, 'report'])->name('net-profit-before-tax.report');
 
         // Tax Management Routes
         Route::get('/tax', [\App\Http\Controllers\Accounting\TaxController::class, 'index'])->name('tax');
         Route::post('/tax', [\App\Http\Controllers\Accounting\TaxController::class, 'store'])->name('tax.store');
         Route::put('/tax/{taxEntry}', [\App\Http\Controllers\Accounting\TaxController::class, 'update'])->name('tax.update');
         Route::delete('/tax/{taxEntry}', [\App\Http\Controllers\Accounting\TaxController::class, 'destroy'])->name('tax.destroy');
+        Route::get('/tax/report', [\App\Http\Controllers\Accounting\TaxController::class, 'report'])->name('tax.report');
+
+        // Tax Summary Routes
+        Route::get('/tax-summary', [\App\Http\Controllers\Accounting\TaxSummaryController::class, 'index'])->name('tax-summary');
+        Route::get('/tax-summary/report', [\App\Http\Controllers\Accounting\TaxSummaryController::class, 'report'])->name('tax-summary.report');
+        Route::post('/tax-summary/{period}/payment', [\App\Http\Controllers\Accounting\TaxSummaryController::class, 'storePayment'])->name('tax-summary.payment.store');
+        Route::delete('/tax-payment/{payment}', [\App\Http\Controllers\Accounting\TaxSummaryController::class, 'deletePayment'])->name('tax-payment.delete');
+
+        // Tax Report Route
+        Route::get('/tax-report', [\App\Http\Controllers\Accounting\TaxReportController::class, 'index'])->name('tax-report');
+        Route::get('/tax-report/report', [\App\Http\Controllers\Accounting\TaxReportController::class, 'report'])->name('tax-report.report');
 
         // Net Profit After Tax Route
         Route::get('/net-profit-after-tax', [\App\Http\Controllers\Accounting\NetProfitAfterTaxController::class, 'index'])->name('net-profit-after-tax');
+        Route::get('/net-profit-after-tax/report', [\App\Http\Controllers\Accounting\NetProfitAfterTaxController::class, 'report'])->name('net-profit-after-tax.report');
 
         // VAT Summary Route
         Route::get('/vat-summary', [\App\Http\Controllers\Accounting\VATSummaryController::class, 'index'])->name('vat-summary');
-        Route::post('/vat-summary/{period}/upload', [\App\Http\Controllers\Accounting\VATSummaryController::class, 'uploadVatFile'])->name('vat-summary.upload');
-        Route::delete('/vat-summary/{period}/delete-file', [\App\Http\Controllers\Accounting\VATSummaryController::class, 'deleteVatFile'])->name('vat-summary.delete-file');
+        Route::get('/vat-summary/report', [\App\Http\Controllers\Accounting\VATSummaryController::class, 'report'])->name('vat-summary.report');
+
+        // VAT Payment Routes
+        Route::post('/vat-summary/{period}/payment', [\App\Http\Controllers\Accounting\VATSummaryController::class, 'storePayment'])->name('vat-summary.payment.store');
+        Route::delete('/vat-payment/{payment}', [\App\Http\Controllers\Accounting\VATSummaryController::class, 'deletePayment'])->name('vat-payment.delete');
+
+        // VAT Report Route
+        Route::get('/vat-report', [\App\Http\Controllers\Accounting\VATReportController::class, 'index'])->name('vat-report');
+        Route::get('/vat-report/report', [\App\Http\Controllers\Accounting\VATReportController::class, 'report'])->name('vat-report.report');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

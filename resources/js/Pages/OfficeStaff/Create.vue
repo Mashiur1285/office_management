@@ -83,7 +83,13 @@
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-700">Joining Date</label>
-                        <input v-model="form.joining_date" type="date" class="input" :class="{ 'border-red-500': form.errors.joining_date }" />
+                        <VueDatePicker
+                            v-model="form.joining_date"
+                            :enable-time-picker="false"
+                            model-type="yyyy-MM-dd"
+                            class="input"
+                            :class="{ 'border-red-500': form.errors.joining_date }"
+                        />
                         <p v-if="form.errors.joining_date" class="text-xs text-red-600">{{ form.errors.joining_date }}</p>
                     </div>
 
@@ -140,6 +146,8 @@
 <script setup>
 import { computed } from "vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 const props = defineProps({
     staffMember: {

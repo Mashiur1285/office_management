@@ -10,11 +10,19 @@
                         <p class="text-sm text-gray-600 mt-1">Period: {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium">
+                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
+                        <a :href="route('accounting.tax.report')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i>
+                            Download Report
+                        </a>
+                        <a :href="route('accounting.tax.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            Download PDF
+                        </a>
                     </div>
                 </div>
             </div>
@@ -29,7 +37,7 @@
                         <div class="flex items-center justify-center gap-4 text-lg font-medium">
                             <div class="text-center">
                                 <div class="text-sm text-gray-600 mb-1">Current Tax</div>
-                                <div class="text-2xl font-bold text-orange-700">{{ money(totalCurrentTax) }}</div>
+                                <div class="text-2xl font-bold text-amber-700">{{ money(totalCurrentTax) }}</div>
                             </div>
                             <div class="text-3xl text-gray-400">+</div>
                             <div class="text-center">
@@ -67,10 +75,10 @@
             <!-- Tax Entry Sections -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Current Tax -->
-                <div class="bg-white rounded-xl shadow-sm border-4 border-orange-400 p-6">
+                <div class="bg-white rounded-xl shadow-sm border-4 border-amber-400 p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-orange-700">Current Tax</h3>
-                        <button @click="showAddModal('current')" class="px-3 py-1 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium text-xs">
+                        <h3 class="text-lg font-bold text-amber-700">Current Tax</h3>
+                        <button @click="showAddModal('current')" class="px-3 py-1 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium text-xs">
                             + Add Current Tax
                         </button>
                     </div>
@@ -79,7 +87,7 @@
                         <div v-if="currentTaxEntries.length === 0" class="text-center py-8 text-gray-500 text-sm">
                             No current tax entries yet
                         </div>
-                        <div v-for="entry in currentTaxEntries" :key="entry.id" class="bg-orange-50 rounded-lg p-3 hover:bg-orange-100 transition-colors">
+                        <div v-for="entry in currentTaxEntries" :key="entry.id" class="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors">
                             <div class="flex justify-between items-start">
                                 <div class="flex-1">
                                     <div class="font-medium text-gray-900 text-sm">{{ entry.description }}</div>
@@ -90,20 +98,30 @@
                                     <div v-if="entry.notes" class="text-xs text-gray-600 mt-1">{{ entry.notes }}</div>
                                 </div>
                                 <div class="flex items-center gap-3 ml-4">
-                                    <span class="font-bold text-orange-700">{{ money(entry.amount) }}</span>
+                                    <span class="font-bold text-amber-700">{{ money(entry.amount) }}</span>
                                     <div class="flex gap-1">
-                                        <button @click="editEntry(entry, 'current')" class="text-blue-600 hover:text-blue-800 text-xs">Edit</button>
-                                        <button @click="deleteEntry(entry)" class="text-red-600 hover:text-red-800 text-xs">Delete</button>
+                                        <IconButton
+                                            icon="fa-solid fa-pen-to-square"
+                                            class="bg-blue-600 text-white hover:bg-blue-700"
+                                            tooltip="Edit entry"
+                                            @click="editEntry(entry, 'current')"
+                                        />
+                                        <IconButton
+                                            icon="fa-solid fa-trash"
+                                            class="bg-red-600 text-white hover:bg-red-700"
+                                            tooltip="Delete entry"
+                                            @click="deleteEntry(entry)"
+                                        />
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-4 border-t-2 border-orange-300">
+                    <div class="mt-4 pt-4 border-t-2 border-amber-300">
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-gray-900">Total Current Tax:</span>
-                            <span class="text-xl font-bold text-orange-700">{{ money(totalCurrentTax) }}</span>
+                            <span class="text-xl font-bold text-amber-700">{{ money(totalCurrentTax) }}</span>
                         </div>
                     </div>
                 </div>
@@ -134,8 +152,18 @@
                                 <div class="flex items-center gap-3 ml-4">
                                     <span class="font-bold text-amber-700">{{ money(entry.amount) }}</span>
                                     <div class="flex gap-1">
-                                        <button @click="editEntry(entry, 'deferred')" class="text-blue-600 hover:text-blue-800 text-xs">Edit</button>
-                                        <button @click="deleteEntry(entry)" class="text-red-600 hover:text-red-800 text-xs">Delete</button>
+                                        <IconButton
+                                            icon="fa-solid fa-pen-to-square"
+                                            class="bg-blue-600 text-white hover:bg-blue-700"
+                                            tooltip="Edit entry"
+                                            @click="editEntry(entry, 'deferred')"
+                                        />
+                                        <IconButton
+                                            icon="fa-solid fa-trash"
+                                            class="bg-red-600 text-white hover:bg-red-700"
+                                            tooltip="Delete entry"
+                                            @click="deleteEntry(entry)"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -170,7 +198,7 @@
         </div>
 
         <!-- Add/Edit Modal -->
-        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
                 <div class="p-6 border-b border-gray-200 flex-shrink-0">
                     <h2 class="text-2xl font-bold text-gray-900">
@@ -181,7 +209,7 @@
                     <div class="p-6 space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Client (Optional)</label>
-                            <div class="relative">
+                            <div class="relative" ref="clientDropdownRef">
                                 <input
                                     v-model="clientSearch"
                                     @input="filterClients"
@@ -217,11 +245,10 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Heading</label>
                             <input
                                 v-model="form.description"
                                 type="text"
-                                required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                                 placeholder="e.g., Corporate Income Tax, Tax on Temporary Differences"
                             />
@@ -275,8 +302,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { Head, router, Link } from '@inertiajs/vue3';
+import IconButton from '@/Components/Buttons/IconButton.vue';
 
 const props = defineProps({
     period: Object,
@@ -296,6 +324,10 @@ const editingEntry = ref(null);
 const clientSearch = ref('');
 const filteredClients = ref(props.clients || []);
 const showClientDropdown = ref(false);
+const clientDropdownRef = ref(null);
+const setBodyScrollLock = (locked) => {
+    document.body.style.overflow = locked ? 'hidden' : '';
+};
 
 const form = ref({
     client_id: null,
@@ -303,6 +335,22 @@ const form = ref({
     description: '',
     amount: 0,
     notes: '',
+});
+
+// Close dropdown when clicking outside
+const handleClickOutside = (event) => {
+    if (clientDropdownRef.value && !clientDropdownRef.value.contains(event.target)) {
+        showClientDropdown.value = false;
+    }
+};
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+    setBodyScrollLock(false);
 });
 
 const money = (value) => {
@@ -395,4 +443,9 @@ const closeModal = () => {
     filteredClients.value = props.clients || [];
     showClientDropdown.value = false;
 };
+
+watch(
+    () => showModal.value,
+    (isOpen) => setBodyScrollLock(isOpen)
+);
 </script>

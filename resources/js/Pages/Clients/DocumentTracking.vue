@@ -51,7 +51,7 @@
 
                     <div v-if="current.processing_status" class="rounded-lg border p-3" :class="getStatusClass(current.processing_status)">
                         <p class="text-xs font-semibold uppercase mb-1">Processing Status</p>
-                        <p class="text-sm font-bold">{{ current.processing_status }}</p>
+                        <p class="text-sm font-bold capitalize">{{ formatStatus(current.processing_status) }}</p>
                         <p v-if="current.processing_notes" class="text-xs mt-1 text-gray-600">{{ current.processing_notes }}</p>
                     </div>
 
@@ -132,7 +132,12 @@
 
                     <div v-if="form.to_holder_type && form.to_holder_type !== 'agency_user' && form.to_holder_type !== 'agent' && form.to_holder_type !== 'bd_company' && form.to_holder_type !== 'foreign_company'" class="space-y-2">
                         <label class="text-sm font-medium text-gray-700">Expected Return Date</label>
-                        <input type="date" v-model="form.expected_return_at" class="input" />
+                        <VueDatePicker
+                            v-model="form.expected_return_at"
+                            :enable-time-picker="false"
+                            model-type="yyyy-MM-dd"
+                            class="input"
+                        />
                         <p v-if="form.errors.expected_return_at" class="text-xs text-red-600">{{ form.errors.expected_return_at }}</p>
                     </div>
 
@@ -219,6 +224,8 @@
 <script setup>
 import { computed, watch, onMounted } from "vue";
 import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 const props = defineProps({
     client: Object,
@@ -252,6 +259,18 @@ const props = defineProps({
         default: () => [],
     },
 });
+
+const formatStatus = (value) => {
+    if (!value) return '—';
+    const map = {
+        pending: 'Pending',
+        processing: 'Processing',
+        completed: 'Completed',
+        rejected: 'Rejected',
+        ok: 'Ok',
+    };
+    return map[value] || value.charAt(0).toUpperCase() + value.slice(1);
+};
 
 const flash = computed(() => usePage().props.flash || {});
 

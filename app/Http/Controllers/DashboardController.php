@@ -9,6 +9,7 @@ use App\Models\Expense;
 use App\Models\ForeignCompany;
 use App\Models\OfficeStaff;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
@@ -25,11 +26,11 @@ class DashboardController extends Controller
 
         $monthWindow = collect(range(5, 0))->map(fn ($i) => $now->copy()->subMonths($i));
 
-        $salesRaw = Client::selectRaw("TO_CHAR(created_at, 'YYYY-MM') as ym, COALESCE(SUM(total_fee),0) as total")
+        $salesRaw = Client::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, COALESCE(SUM(total_fee),0) as total")
             ->groupBy('ym')
             ->pluck('total', 'ym');
 
-        $expensesRaw = Expense::selectRaw("TO_CHAR(created_at, 'YYYY-MM') as ym, COALESCE(SUM(amount),0) as total")
+        $expensesRaw = Expense::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, COALESCE(SUM(amount),0) as total")
             ->groupBy('ym')
             ->pluck('total', 'ym');
 
@@ -70,6 +71,31 @@ class DashboardController extends Controller
                 'due_on' => optional($expense->paid_on)?->toDateString(),
             ]);
 
+        $diskUsage = Cache::remember('dashboard.disk_usage', 60, function () {
+            $path = base_path();
+            $total = @disk_total_space($path);
+            $free = @disk_free_space($path);
+
+            if ($total === false || $free === false || $total <= 0) {
+                return [
+                    'total' => 0,
+                    'used' => 0,
+                    'free' => 0,
+                    'percent' => 0,
+                ];
+            }
+
+            $used = max(0, $total - $free);
+            $percent = round(($used / $total) * 100, 1);
+
+            return [
+                'total' => (float) $total,
+                'used' => (float) $used,
+                'free' => (float) $free,
+                'percent' => $percent,
+            ];
+        });
+
         return response()->json([
             'stats' => [
                 'total_clients' => Client::count(),
@@ -88,6 +114,7 @@ class DashboardController extends Controller
                 'total' => $allPayables->sum('amount'),
                 'items' => $allPayables,
             ],
+            'diskUsage' => $diskUsage,
         ]);
     }
 }

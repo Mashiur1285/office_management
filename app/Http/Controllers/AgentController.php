@@ -81,7 +81,13 @@ class AgentController extends Controller
 
         $data['services'] = $data['services'] ?? [];
 
-        Agent::create($data);
+        $agent = Agent::create($data);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'agent' => $agent->only(['id', 'name', 'mobile', 'district', 'address']),
+            ], 201);
+        }
 
         return redirect()->route('agents.index')->with('success', 'Agent created successfully.');
     }

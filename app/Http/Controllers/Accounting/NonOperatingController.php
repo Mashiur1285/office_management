@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
 use App\Models\Client;
 use App\Models\NonOperatingEntry;
+use App\Models\Subcategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class NonOperatingController extends Controller
 {
@@ -60,6 +62,10 @@ class NonOperatingController extends Controller
         $expenseBreakdown = $expenseEntries->groupBy('category')
             ->map(fn($items) => $items->sum('amount'));
 
+        $subcategories = Subcategory::where('type', 'non_operating')
+            ->orderBy('name')
+            ->get();
+
         return Inertia::render('Accounting/NonOperating/Index', [
             'period' => [
                 'id' => $period->id,
@@ -111,6 +117,12 @@ class NonOperatingController extends Controller
                 'name' => $c->name,
                 'phone_number' => $c->mobile,
             ]),
+            'subcategories' => $subcategories->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'category' => $s->category,
+                'vat_rate' => (float) $s->vat_rate,
+            ]),
         ]);
     }
 
@@ -121,7 +133,7 @@ class NonOperatingController extends Controller
             'client_id' => 'nullable|exists:clients,id',
             'type' => 'required|in:income,expense',
             'category' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
@@ -136,7 +148,7 @@ class NonOperatingController extends Controller
         $validated = $request->validate([
             'client_id' => 'nullable|exists:clients,id',
             'category' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
@@ -151,5 +163,85 @@ class NonOperatingController extends Controller
         $nonOperatingEntry->delete();
 
         return redirect()->back()->with('success', 'Non-operating entry deleted successfully.');
+    }
+
+    public function report(Request $request)
+    {
+        $period = AccountingPeriod::where('status', 'active')
+            ->orWhere('status', 'draft')
+            ->latest()
+            ->first();
+
+        $entries = NonOperatingEntry::where('accounting_period_id', $period->id)
+            ->with('client:id,name,mobile')
+            ->orderBy('type', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $incomeEntries = $entries->where('type', 'income');
+        $expenseEntries = $entries->where('type', 'expense');
+        $totalIncome = $incomeEntries->sum('amount');
+        $totalExpenses = $expenseEntries->sum('amount');
+        $netNonOperating = $totalIncome - $totalExpenses;
+
+        if ($request->query('type') === 'pdf') {
+            $fileName = "non-operating-report-" . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::view('pdfs.non_operating_report', [
+                'period' => $period,
+                'incomeEntries' => $incomeEntries,
+                'expenseEntries' => $expenseEntries,
+                'totalIncome' => $totalIncome,
+                'totalExpenses' => $totalExpenses,
+                'netNonOperating' => $netNonOperating,
+            ])->name($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        // Summary
+        fputcsv($handle, ['Non-Operating Summary']);
+        fputcsv($handle, ['Metric', 'Amount']);
+        fputcsv($handle, ['Total Income', $totalIncome]);
+        fputcsv($handle, ['Total Expenses', $totalExpenses]);
+        fputcsv($handle, ['Net Profit/Loss', $netNonOperating]);
+        fputcsv($handle, []);
+
+        // Detailed Entries
+        fputcsv($handle, ['Detailed Entries']);
+        fputcsv($handle, ['Type', 'Subcategory', 'Client', 'Description', 'Amount', 'Date']);
+
+        foreach ($incomeEntries as $entry) {
+            fputcsv($handle, [
+                'Income',
+                $entry->category,
+                $entry->client->name ?? 'N/A',
+                $entry->description,
+                $entry->amount,
+                $entry->created_at->format('Y-m-d H:i'),
+            ]);
+        }
+
+        foreach ($expenseEntries as $entry) {
+            fputcsv($handle, [
+                'Expense',
+                $entry->category,
+                $entry->client->name ?? 'N/A',
+                $entry->description,
+                $entry->amount,
+                $entry->created_at->format('Y-m-d H:i'),
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = "non-operating-report-" . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
     }
 }

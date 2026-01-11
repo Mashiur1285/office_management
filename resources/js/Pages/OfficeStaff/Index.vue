@@ -50,19 +50,27 @@
                             </td>
                             <td class="px-6 py-4">
                                 <span
-                                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize"
                                     :class="member.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-700'"
                                 >
                                     {{ member.status }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <IconButton
-                                    icon="fa-solid fa-pen-to-square"
-                                    class="bg-blue-600 text-white hover:bg-blue-700"
-                                    tooltip="Edit staff"
-                                    @click="router.visit(`/office-staff/${member.id}/edit`)"
-                                />
+                                <div class="flex items-center justify-end gap-2">
+                                    <IconButton
+                                        icon="fa-solid fa-pen-to-square"
+                                        class="bg-blue-600 text-white hover:bg-blue-700"
+                                        tooltip="Edit staff"
+                                        @click="router.visit(`/office-staff/${member.id}/edit`)"
+                                    />
+                                    <IconButton
+                                        icon="fa-solid fa-eye"
+                                        class="bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        tooltip="View salary"
+                                        @click="router.visit(`/office-staff/${member.id}`)"
+                                    />
+                                </div>
                             </td>
                         </tr>
                         <tr v-if="staff.length === 0">

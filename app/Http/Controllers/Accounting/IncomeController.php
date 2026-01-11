@@ -8,6 +8,9 @@ use App\Models\Client;
 use App\Models\IncomeEntry;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Exports\IncomeReportExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class IncomeController extends Controller
 {
@@ -54,6 +57,12 @@ class IncomeController extends Controller
 
         // Get all clients for selection dropdown
         $clients = Client::select('id', 'name', 'mobile')
+            ->orderBy('name')
+            ->get();
+
+        // Get subcategories for this category
+        $subcategories = \App\Models\Subcategory::where('type', 'income')
+            ->where('category', $category)
             ->orderBy('name')
             ->get();
 
@@ -105,6 +114,11 @@ class IncomeController extends Controller
                 'name' => $c->name,
                 'phone_number' => $c->mobile,
             ]),
+            'subcategories' => $subcategories->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'vat_rate' => (float) $s->vat_rate,
+            ]),
         ]);
     }
 
@@ -112,10 +126,10 @@ class IncomeController extends Controller
     {
         $validated = $request->validate([
             'accounting_period_id' => 'required|exists:accounting_periods,id',
-            'client_id' => 'nullable|exists:clients,id',
+            'client_id' => 'required|exists:clients,id',
             'category' => 'required|in:travel_tourism,manpower_exporting,student_package,other_income',
             'subcategory' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'vat_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
@@ -131,9 +145,9 @@ class IncomeController extends Controller
     public function update(Request $request, IncomeEntry $incomeEntry)
     {
         $validated = $request->validate([
-            'client_id' => 'nullable|exists:clients,id',
+            'client_id' => 'required|exists:clients,id',
             'subcategory' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'vat_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
@@ -151,5 +165,47 @@ class IncomeController extends Controller
         $incomeEntry->delete();
 
         return redirect()->back()->with('success', 'Income entry deleted successfully.');
+    }
+
+    public function export(Request $request, $category, $type = 'excel')
+    {
+        $period = AccountingPeriod::where('status', 'active')
+            ->orWhere('status', 'draft')
+            ->latest()
+            ->first();
+
+        $entries = IncomeEntry::where('accounting_period_id', $period->id)
+            ->where('category', $category)
+            ->with('client:id,name,mobile')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $fileName = "income-report-{$category}-" . now()->format('Y-m-d');
+
+        if ($type === 'excel') {
+            $fileName .= '.xlsx';
+            return Excel::download(new IncomeReportExport($entries), $fileName);
+        }
+
+        if ($type === 'pdf') {
+            $fileName .= '.pdf';
+            $categoryNames = [
+                'travel_tourism' => 'Travel & Tourism',
+                'manpower_exporting' => 'Manpower Exporting',
+                'student_package' => 'Student Package',
+                'other_income' => 'Other Income',
+            ];
+            $categoryName = $categoryNames[$category] ?? $category;
+
+            return Pdf::view('pdfs.income_report', [
+                'entries' => $entries,
+                'period' => $period,
+                'categoryName' => $categoryName,
+            ])->name($fileName);
+        }
+
+        // Default to CSV if type is not supported
+        $fileName .= '.csv';
+        return Excel::download(new IncomeReportExport($entries), $fileName, \Maatwebsite\Excel\Excel::CSV);
     }
 }

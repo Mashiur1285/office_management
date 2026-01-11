@@ -46,4 +46,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the user's notepad.
+     */
+    public function notepad()
+    {
+        return $this->hasOne(Notepad::class);
+    }
 }

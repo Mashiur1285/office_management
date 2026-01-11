@@ -1,14 +1,28 @@
 <template>
     <Head title="Create Foreign Company" />
     <div class="py-8 space-y-6">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">Foreign Companies</p>
+                <p
+                    class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-500"
+                >
+                    Foreign Companies
+                </p>
                 <h1 class="text-2xl font-bold text-gray-900">
-                    {{ isEdit ? "Edit overseas company" : "Add an overseas company" }}
+                    {{
+                        isEdit
+                            ? "Edit overseas company"
+                            : "Add an overseas company"
+                    }}
                 </h1>
                 <p class="text-sm text-gray-600">
-                    {{ isEdit ? "Update partner abroad details." : "Partners abroad receiving your clients." }}
+                    {{
+                        isEdit
+                            ? "Update partner abroad details."
+                            : "Partners abroad receiving your clients."
+                    }}
                 </p>
             </div>
             <div class="flex gap-3">
@@ -30,49 +44,117 @@
                                 ? "Updating..."
                                 : "Saving..."
                             : isEdit
-                              ? "Update Company"
-                              : "Save Company"
+                            ? "Update Company"
+                            : "Save Company"
                     }}
                 </button>
             </div>
         </div>
 
         <form @submit.prevent="submit" class="space-y-6">
-            <section class="rounded-xl border border-gray-100 bg-white shadow-sm">
-                <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+            <section
+                class="rounded-xl border border-gray-100 bg-white shadow-sm"
+            >
+                <div
+                    class="flex items-center justify-between border-b border-gray-100 px-6 py-4"
+                >
                     <div>
-                        <h2 class="text-lg font-semibold text-gray-900">Company Details</h2>
-                        <p class="text-sm text-gray-600">Name, country, and contacts.</p>
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            Company Details
+                        </h2>
+                        <p class="text-sm text-gray-600">
+                            Name, country, and contacts.
+                        </p>
                     </div>
-                    <p class="text-xs text-gray-500">Fields with * are required.</p>
+                    <p class="text-xs text-gray-500">
+                        Fields with * are required.
+                    </p>
                 </div>
                 <div class="grid gap-4 p-6 md:grid-cols-2">
                     <FormGroup label="Company Name *" :error="form.errors.name">
-                        <input v-model="form.name" :class="inputClass('name')" placeholder="Ex: XYZ Intl" required />
+                        <input
+                            v-model="form.name"
+                            :class="inputClass('name')"
+                            placeholder="Ex: XYZ Intl"
+                            required
+                        />
                     </FormGroup>
                     <FormGroup label="Country" :error="form.errors.country">
-                        <input v-model="form.country" :class="inputClass('country')" placeholder="Ex: UAE, Saudi Arabia" />
+                        <input
+                            v-model="form.country"
+                            :class="inputClass('country')"
+                            placeholder="Ex: UAE, Saudi Arabia"
+                        />
                     </FormGroup>
-                    <FormGroup label="Job Categories" :error="form.errors.job_categories">
-                        <input v-model="form.job_categories" :class="inputClass('job_categories')" placeholder="Ex: Construction, Agriculture" />
+
+                    <FormGroup
+                        label="Owner Name"
+                        :error="form.errors.owner_name"
+                    >
+                        <input
+                            v-model="form.owner_name"
+                            :class="inputClass('owner_name')"
+                        />
                     </FormGroup>
-                    <FormGroup label="Owner Name" :error="form.errors.owner_name">
-                        <input v-model="form.owner_name" :class="inputClass('owner_name')" />
+                    <FormGroup
+                        label="Owner Phone"
+                        :error="form.errors.owner_phone"
+                    >
+                        <input
+                            v-model="form.owner_phone"
+                            :class="inputClass('owner_phone')"
+                        />
                     </FormGroup>
-                    <FormGroup label="Owner Phone" :error="form.errors.owner_phone">
-                        <input v-model="form.owner_phone" :class="inputClass('owner_phone')" />
+                    <FormGroup
+                        label="Contact Person Name"
+                        :error="form.errors.contact_person_name"
+                    >
+                        <input
+                            v-model="form.contact_person_name"
+                            :class="inputClass('contact_person_name')"
+                        />
                     </FormGroup>
-                    <FormGroup label="Contact Person Name" :error="form.errors.contact_person_name">
-                        <input v-model="form.contact_person_name" :class="inputClass('contact_person_name')" />
+                    <FormGroup
+                        label="Contact Person Phone"
+                        :error="form.errors.contact_person_phone"
+                    >
+                        <input
+                            v-model="form.contact_person_phone"
+                            :class="inputClass('contact_person_phone')"
+                        />
                     </FormGroup>
-                    <FormGroup label="Contact Person Phone" :error="form.errors.contact_person_phone">
-                        <input v-model="form.contact_person_phone" :class="inputClass('contact_person_phone')" />
+                    <FormGroup
+                        label="Job Categories"
+                        :error="form.errors.job_categories"
+                    >
+                        <input
+                            v-model="form.job_categories"
+                            :class="inputClass('job_categories')"
+                            placeholder="Ex: Construction, Agriculture"
+                        />
                     </FormGroup>
-                    <FormGroup label="Office Address" :error="form.errors.office_address" class="md:col-span-2">
-                        <textarea v-model="form.office_address" rows="2" :class="textareaClass" placeholder="Street, City, Country"></textarea>
+                    <FormGroup
+                        label="Per Client Fee"
+                        :error="form.errors.per_client_fee"
+                    >
+                        <input
+                            v-model="form.per_client_fee"
+                            type="number"
+                            step="0.01"
+                            :class="inputClass('per_client_fee')"
+                        />
                     </FormGroup>
-                    <FormGroup label="Per Client Fee" :error="form.errors.per_client_fee">
-                        <input v-model="form.per_client_fee" type="number" step="0.01" :class="inputClass('per_client_fee')" />
+                    <FormGroup
+                        label="Office Address"
+                        :error="form.errors.office_address"
+                        class="md:col-span-2"
+                    >
+                        <textarea
+                            v-model="form.office_address"
+                            rows="2"
+                            :class="textareaClass"
+                            placeholder="Street, City, Country"
+                        ></textarea>
                     </FormGroup>
                 </div>
             </section>
@@ -95,8 +177,8 @@
                                 ? "Updating..."
                                 : "Saving..."
                             : isEdit
-                              ? "Update Company"
-                              : "Save Company"
+                            ? "Update Company"
+                            : "Save Company"
                     }}
                 </button>
             </div>
@@ -143,7 +225,9 @@ const baseTextarea =
 const inputClass = (field) =>
     [
         baseInput,
-        form.errors[field] ? "border-red-400 focus:border-red-500 focus:ring-red-500" : "",
+        form.errors[field]
+            ? "border-red-400 focus:border-red-500 focus:ring-red-500"
+            : "",
     ]
         .filter(Boolean)
         .join(" ");
@@ -180,10 +264,18 @@ const FormGroup = defineComponent({
                 "div",
                 { class: "space-y-2", role: "group" },
                 [
-                    h("label", { class: "text-sm font-medium text-gray-700" }, props.label),
+                    h(
+                        "label",
+                        { class: "text-sm font-medium text-gray-700" },
+                        props.label
+                    ),
                     slots.default ? slots.default() : null,
-                    props.hint ? h("p", { class: "text-xs text-gray-500" }, props.hint) : null,
-                    props.error ? h("p", { class: "text-xs text-red-600" }, props.error) : null,
+                    props.hint
+                        ? h("p", { class: "text-xs text-gray-500" }, props.hint)
+                        : null,
+                    props.error
+                        ? h("p", { class: "text-xs text-red-600" }, props.error)
+                        : null,
                 ].filter(Boolean)
             );
     },

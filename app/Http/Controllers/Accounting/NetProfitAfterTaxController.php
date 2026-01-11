@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class NetProfitAfterTaxController extends Controller
 {
@@ -82,6 +84,75 @@ class NetProfitAfterTaxController extends Controller
             'deferredTax' => (float) $deferredTax,
             'totalTax' => (float) $totalTax,
             'netProfitAfterTax' => (float) $netProfitAfterTax,
+        ]);
+    }
+
+    public function report(Request $request)
+    {
+        $period = AccountingPeriod::where('status', 'active')
+            ->orWhere('status', 'draft')
+            ->latest()
+            ->first();
+
+        $period->load(['incomeEntries', 'costOfSales', 'operatingExpenses', 'nonOperatingEntries', 'taxEntries']);
+
+        $totalIncome = $period->total_income;
+        $totalCostOfSales = $period->total_cost_of_sales;
+        $grossProfit = $period->gross_profit;
+        $operatingProfit = $period->operating_profit;
+        $netNonOperating = $period->net_non_operating;
+        $netProfitBeforeTax = $period->net_profit_before_tax;
+        $totalTax = $period->total_tax;
+        $netProfitAfterTax = $period->net_profit_after_tax;
+
+        if ($request->query('type') === 'pdf') {
+            $fileName = "profit-and-loss-report-" . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::view('pdfs.net_profit_after_tax_report', [
+                'period' => $period,
+                'totalIncome' => $totalIncome,
+                'totalCostOfSales' => $totalCostOfSales,
+                'grossProfit' => $grossProfit,
+                'operatingProfit' => $operatingProfit,
+                'totalOperatingExpenses' => $period->total_operating_expenses,
+                'netNonOperating' => $netNonOperating,
+                'netProfitBeforeTax' => $netProfitBeforeTax,
+                'totalTax' => $totalTax,
+                'netProfitAfterTax' => $netProfitAfterTax,
+            ])->name($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        fputcsv($handle, ['Profit & Loss Statement for ' . $period->name]);
+        fputcsv($handle, ['Metric', 'Amount']);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Total Income', $totalIncome]);
+        fputcsv($handle, ['Less: Cost of Sales', $totalCostOfSales]);
+        fputcsv($handle, ['Gross Profit', $grossProfit]);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Less: Operating Expenses', $period->total_operating_expenses]);
+        fputcsv($handle, ['Operating Profit', $operatingProfit]);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Add/Less: Net Non-Operating', $netNonOperating]);
+        fputcsv($handle, ['Net Profit Before Tax', $netProfitBeforeTax]);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Less: Total Tax Expenses', $totalTax]);
+        fputcsv($handle, ['Net Profit After Tax', $netProfitAfterTax]);
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = "profit-and-loss-report-" . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 }

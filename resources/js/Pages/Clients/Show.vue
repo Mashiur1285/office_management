@@ -32,7 +32,7 @@
                                         </svg>
                                         {{ client.nid_number }}
                                     </span>
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold" :class="client.status_badge">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold capitalize" :class="client.status_badge">
                                         {{ client.status }}
                                     </span>
                                 </div>
@@ -57,7 +57,7 @@
             </div>
 
             <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
                         <div class="p-3 bg-emerald-50 rounded-xl">
@@ -107,6 +107,24 @@
                         <div>
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</p>
                             <p class="text-xl font-bold text-gray-900">{{ progressText }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow" :class="client.vat_paid ? 'ring-2 ring-green-200' : ''">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 rounded-xl" :class="client.vat_paid ? 'bg-green-50' : 'bg-orange-50'">
+                            <svg class="h-6 w-6" :class="client.vat_paid ? 'text-green-600' : 'text-orange-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">VAT Unpaid</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-xl font-bold text-gray-900">{{ money(client.vat_unpaid) }}</p>
+                                <svg v-if="client.vat_paid" class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -210,6 +228,85 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- VAT Payment -->
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6" :class="client.vat_paid ? 'ring-2 ring-green-200' : ''">
+                                <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                    <div class="h-8 w-1 bg-gradient-to-b from-orange-600 to-orange-400 rounded-full"></div>
+                                    VAT Payment
+                                </h2>
+
+                                <!-- VAT Paid Status -->
+                                <div v-if="client.vat_paid" class="space-y-3">
+                                    <div class="flex items-center gap-2 p-3 bg-green-50 rounded-xl">
+                                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span class="text-sm font-semibold text-green-700">VAT Paid</span>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs font-semibold text-gray-500 uppercase">Chalan Number</p>
+                                                <p class="text-sm font-medium text-gray-900">{{ client.vat_chalan_number }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs font-semibold text-gray-500 uppercase">Payment Date</p>
+                                                <p class="text-sm font-medium text-gray-900">{{ formatDate(client.vat_payment_date) }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs font-semibold text-gray-500 uppercase">Paid Amount</p>
+                                                <p class="text-sm font-medium text-gray-900">{{ money(client.vat_paid_amount) }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button
+                                        @click="showUnpayConfirm = true"
+                                        class="w-full px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
+                                    >
+                                        Reset Payment Status
+                                    </button>
+                                </div>
+
+                                <!-- VAT Payment Form -->
+                                <form v-else @submit.prevent="submitVatPayment" class="space-y-4">
+                                    <div class="p-3 bg-orange-50 rounded-xl space-y-1">
+                                        <p class="text-sm font-medium text-orange-800">Total VAT: <span class="font-bold">{{ money(client.vat_receivable) }}</span></p>
+                                        <p v-if="client.vat_paid_amount > 0" class="text-sm font-medium text-gray-600">Already Paid: <span class="font-bold">{{ money(client.vat_paid_amount) }}</span></p>
+                                        <p class="text-sm font-medium text-orange-800">Amount to Pay: <span class="font-bold">{{ money(client.vat_unpaid) }}</span></p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Chalan Number</label>
+                                        <input
+                                            v-model="vatForm.vat_chalan_number"
+                                            type="text"
+                                            required
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Enter chalan number"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Date</label>
+                                        <VueDatePicker
+                                            v-model="vatForm.vat_payment_date"
+                                            :enable-time-picker="false"
+                                            model-type="yyyy-MM-dd"
+                                            required
+                                            class="w-full"
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                                    >
+                                        Mark as Paid
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
                         <!-- Right Column -->
@@ -225,7 +322,7 @@
                                     <div class="flex-1">
                                         <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">Current Document Holder</p>
                                         <p class="text-xl font-bold text-gray-900 mb-2">{{ client.current_holder_name || client.current_holder_label || "Not Assigned" }}</p>
-                                        <p v-if="client.processing_status" class="text-sm text-gray-600">Processing: <span class="font-semibold">{{ client.processing_status }}</span></p>
+                                        <p v-if="client.processing_status" class="text-sm text-gray-600">Processing: <span class="font-semibold capitalize">{{ statusLabel(client.processing_status) }}</span></p>
                                         <div v-if="client.notes" class="mt-3 p-3 bg-white/60 rounded-lg">
                                             <p class="text-xs font-semibold text-gray-500 mb-1">Notes:</p>
                                             <p class="text-sm text-gray-700">{{ client.notes }}</p>
@@ -440,13 +537,46 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Unpay Confirmation Modal -->
+            <div v-if="showUnpayConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="showUnpayConfirm = false">
+                <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6" @click.stop>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-3 bg-red-100 rounded-full">
+                            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Reset VAT Payment Status?</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-6">
+                        Are you sure you want to reset the VAT payment status? This will clear the chalan number and payment date.
+                    </p>
+                    <div class="flex gap-3">
+                        <button
+                            @click="showUnpayConfirm = false"
+                            class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            @click="unpayVat"
+                            class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                        >
+                            Reset Status
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
 import { computed, ref } from "vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, router } from "@inertiajs/vue3";
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 const props = defineProps({
     client: {
@@ -463,8 +593,47 @@ const props = defineProps({
     },
 });
 
-const client = props.client;
+// Use computed to maintain reactivity
+const client = computed(() => props.client);
+
 const activeTab = ref('overview');
+
+// VAT Payment Form
+const vatForm = ref({
+    vat_chalan_number: '',
+    vat_payment_date: new Date().toISOString().split('T')[0],
+});
+
+const showUnpayConfirm = ref(false);
+
+const submitVatPayment = () => {
+    router.post(`/clients/${client.value.id}/pay-vat`, vatForm.value, {
+        preserveScroll: true,
+        onSuccess: () => {
+            vatForm.value = {
+                vat_chalan_number: '',
+                vat_payment_date: new Date().toISOString().split('T')[0],
+            };
+            router.reload({ only: ['client'] });
+        },
+    });
+};
+
+const unpayVat = () => {
+    router.post(`/clients/${client.value.id}/unpay-vat`, {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showUnpayConfirm.value = false;
+            router.reload({ only: ['client'] });
+        },
+    });
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '—';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-BD', { year: 'numeric', month: 'short', day: 'numeric' });
+};
 
 const money = (value) => {
     if (value === null || value === undefined || value === "") return "—";
@@ -472,8 +641,8 @@ const money = (value) => {
 };
 
 const progressText = computed(() => {
-    const total = Number(client.total_fee || 0);
-    const paid = Number(client.paid_amount || 0);
+    const total = Number(client.value.total_fee || 0);
+    const paid = Number(client.value.paid_amount || 0);
     if (!total) return "No total set";
     const pct = Math.min(100, Math.max(0, Math.round((paid / total) * 100)));
     return `${pct}%`;

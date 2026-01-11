@@ -10,11 +10,19 @@
                         <p class="text-sm text-gray-600 mt-1">Period: {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium">
+                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
+                        <a :href="route('accounting.non-operating.report')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i>
+                            Download Report
+                        </a>
+                        <a :href="route('accounting.non-operating.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            Download PDF
+                        </a>
                     </div>
                 </div>
             </div>
@@ -149,7 +157,7 @@
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
@@ -160,7 +168,7 @@
                         <tbody class="divide-y divide-gray-200">
                             <tr v-if="filteredEntries.length === 0">
                                 <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                                    {{ filterActive ? 'No entries found for this category.' : 'No non-operating entries yet. Click "Add Income" or "Add Expense" to create one.' }}
+                                    {{ filterActive ? 'No entries found for this subcategory.' : 'No non-operating entries yet. Click "Add Income" or "Add Expense" to create one.' }}
                                 </td>
                             </tr>
                             <tr v-for="entry in filteredEntries" :key="entry.id" class="hover:bg-gray-50 transition-colors">
@@ -184,12 +192,18 @@
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ entry.created_at }}</td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        <button @click="editEntry(entry)" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                            Edit
-                                        </button>
-                                        <button @click="deleteEntry(entry)" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                                            Delete
-                                        </button>
+                                        <IconButton
+                                            icon="fa-solid fa-pen-to-square"
+                                            class="bg-blue-600 text-white hover:bg-blue-700"
+                                            tooltip="Edit entry"
+                                            @click="editEntry(entry)"
+                                        />
+                                        <IconButton
+                                            icon="fa-solid fa-trash"
+                                            class="bg-red-600 text-white hover:bg-red-700"
+                                            tooltip="Delete entry"
+                                            @click="deleteEntry(entry)"
+                                        />
                                     </div>
                                 </td>
                             </tr>
@@ -200,7 +214,7 @@
         </div>
 
         <!-- Add/Edit Modal -->
-        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
                 <div class="p-6 border-b border-gray-200 flex-shrink-0">
                     <h2 class="text-2xl font-bold text-gray-900">
@@ -211,7 +225,7 @@
                     <div class="p-6 space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Client (Optional)</label>
-                        <div class="relative">
+                        <div class="relative" ref="clientDropdownRef">
                             <input
                                 v-model="clientSearch"
                                 @input="filterClients"
@@ -247,24 +261,19 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                        <select
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Subcategory *</label>
+                        <SubcategorySelector
                             v-model="form.category"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                        >
-                            <option value="">Select category</option>
-                            <option v-for="cat in (form.type === 'income' ? incomeCategories : expenseCategories)" :key="cat" :value="cat">
-                                {{ cat }}
-                            </option>
-                        </select>
+                            :subcategories="form.type === 'income' ? incomeSubcategoryObjects : expenseSubcategoryObjects"
+                            type="non_operating"
+                            :category="form.type"
+                        />
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <textarea
                             v-model="form.description"
-                            required
                             rows="3"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                             placeholder="Enter detailed description"
@@ -320,8 +329,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { ref, computed, watch, onUnmounted, onMounted } from 'vue';
+import { Head, router, Link } from '@inertiajs/vue3';
+import IconButton from '@/Components/Buttons/IconButton.vue';
+import SubcategorySelector from '@/Components/SubcategorySelector.vue';
 
 const props = defineProps({
     period: Object,
@@ -334,18 +345,27 @@ const props = defineProps({
     incomeBreakdown: Object,
     expenseBreakdown: Object,
     clients: Array,
+    subcategories: {
+        type: Array,
+        default: () => [],
+    },
 });
 
-const incomeCategories = [
-    'Interest Income',
-    'Foreign Exchange Gain',
-];
+const incomeSubcategoryObjects = computed(() =>
+    (props.subcategories || []).filter((sub) => sub.category === 'income')
+);
 
-const expenseCategories = [
-    'Interest on Bank Loan',
-    'Foreign Exchange Loss',
-    'Penalties & Legal Fees',
-];
+const expenseSubcategoryObjects = computed(() =>
+    (props.subcategories || []).filter((sub) => sub.category === 'expense')
+);
+
+const incomeCategories = computed(() =>
+    incomeSubcategoryObjects.value.map((sub) => sub.name)
+);
+
+const expenseCategories = computed(() =>
+    expenseSubcategoryObjects.value.map((sub) => sub.name)
+);
 
 const showModal = ref(false);
 const showDetails = ref(false);
@@ -355,6 +375,20 @@ const filterCategory = ref(null);
 const clientSearch = ref('');
 const filteredClients = ref(props.clients || []);
 const showClientDropdown = ref(false);
+const clientDropdownRef = ref(null);
+const setBodyScrollLock = (locked) => {
+    document.body.style.overflow = locked ? 'hidden' : '';
+};
+
+const handleClickOutside = (event) => {
+    if (clientDropdownRef.value && !clientDropdownRef.value.contains(event.target)) {
+        showClientDropdown.value = false;
+    }
+};
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
 
 const form = ref({
     client_id: null,
@@ -489,4 +523,14 @@ const closeModal = () => {
         notes: '',
     };
 };
+
+watch(
+    () => showModal.value,
+    (isOpen) => setBodyScrollLock(isOpen)
+);
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+    setBodyScrollLock(false);
+});
 </script>

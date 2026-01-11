@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineProps({
     canResetPassword: {
@@ -15,6 +16,12 @@ const form = useForm({
     password: '',
     remember: false,
 });
+
+const showPassword = ref(false);
+
+const togglePasswordVisibility = () => {
+    showPassword.value = !showPassword.value;
+};
 
 const submit = () => {
     form.post(route('login'), {
@@ -56,17 +63,21 @@ const submit = () => {
             <div class="relative z-10">
                 <!-- Login Form Header -->
                 <div class="text-center">
-                    <h2 class="text-3xl font-semibold text-gray-800 flex items-center justify-center mb-6">
-                        <div class="p-2 mr-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center shadow-lg">
-                            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                            </svg>
+                    <div class="flex flex-col items-center gap-3">
+                        <img
+                            src="/images/mtt-logo.png"
+                            alt="Mefway InterNational Travel & Tours"
+                            class="h-16 w-16 object-contain"
+                        />
+                        <div>
+                            <h2 class="text-2xl font-semibold text-gray-900">
+                                Mefway InterNational Travel & Tours
+                            </h2>
+                            <p class="text-sm text-gray-600">
+                                Sign in to continue
+                            </p>
                         </div>
-                        Sign in to your account
-                    </h2>
-                    <p class="text-sm text-gray-600">
-                        Enter your email and password to access the dashboard
-                    </p>
+                    </div>
                 </div>
 
                 <!-- Status Message -->
@@ -118,23 +129,58 @@ const submit = () => {
                                 <input
                                     id="password"
                                     v-model="form.password"
-                                    type="password"
+                                    :type="showPassword ? 'text' : 'password'"
                                     autocomplete="current-password"
                                     required
                                     :class="[
-                                        'appearance-none block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                                        'appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
                                         form.errors.password ? 'border-red-300' : 'border-gray-300',
                                     ]"
                                     placeholder="Enter your password"
                                 />
-                                <div
-                                    v-if="form.errors.password"
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
+                                <button
+                                    type="button"
+                                    @click="togglePasswordVisibility"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:text-indigo-600 transition-colors"
+                                    :class="form.errors.password ? 'text-red-500' : 'text-gray-400'"
                                 >
-                                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    <!-- Eye Icon (Show) -->
+                                    <svg
+                                        v-if="!showPassword"
+                                        class="h-5 w-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                        />
                                     </svg>
-                                </div>
+                                    <!-- Eye Slash Icon (Hide) -->
+                                    <svg
+                                        v-else
+                                        class="h-5 w-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                                        />
+                                    </svg>
+                                </button>
                             </div>
                             <p v-if="form.errors.password" class="mt-2 text-sm text-red-600">
                                 {{ form.errors.password }}
@@ -171,7 +217,7 @@ const submit = () => {
                         <button
                             type="submit"
                             :disabled="form.processing"
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 disabled:opacity-50"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-300 disabled:opacity-50"
                         >
                             <span v-if="!form.processing">Sign in</span>
                             <span v-else class="flex items-center gap-2">
