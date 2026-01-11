@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             JobSectorSeeder::class,
             SettingsSeeder::class,
+            SubcategorySeeder::class,
         ]);
     }
 }

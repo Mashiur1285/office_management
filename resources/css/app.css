@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
 /* Light theme overrides for Flowbite inputs/selects/pagination */
 .fwb-input input,
 .fwb-input input:focus {

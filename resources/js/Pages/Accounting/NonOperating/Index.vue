@@ -224,7 +224,7 @@
                 <form @submit.prevent="submitForm" class="flex-1 overflow-y-auto">
                     <div class="p-6 space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Client (Optional)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Client *</label>
                         <div class="relative" ref="clientDropdownRef">
                             <input
                                 v-model="clientSearch"
@@ -238,12 +238,6 @@
                                 v-if="showClientDropdown"
                                 class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
                             >
-                                <div
-                                    @click="selectClient(null)"
-                                    class="px-4 py-2 hover:bg-cyan-50 cursor-pointer text-sm"
-                                >
-                                    No Client (Organization-wide)
-                                </div>
                                 <div
                                     v-for="client in filteredClients"
                                     :key="client.id"
@@ -457,17 +451,17 @@ const filterClients = () => {
 };
 
 const selectClient = (client) => {
-    if (client) {
-        form.value.client_id = client.id;
-        clientSearch.value = `${client.name} (${client.phone_number})`;
-    } else {
-        form.value.client_id = null;
-        clientSearch.value = 'No Client (Organization-wide)';
-    }
+    if (!client) return;
+    form.value.client_id = client.id;
+    clientSearch.value = `${client.name} (${client.phone_number})`;
     showClientDropdown.value = false;
 };
 
 const submitForm = () => {
+    if (!form.value.client_id) {
+        alert('Please select a client.');
+        return;
+    }
     const data = {
         ...form.value,
         accounting_period_id: props.period.id,
@@ -498,7 +492,7 @@ const editEntry = (entry) => {
     if (entry.client) {
         clientSearch.value = `${entry.client.name} (${entry.client.phone_number})`;
     } else {
-        clientSearch.value = 'No Client (Organization-wide)';
+        clientSearch.value = '';
     }
     showModal.value = true;
 };

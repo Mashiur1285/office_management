@@ -57,7 +57,8 @@ const state = reactive({
     expensesMonthly: [],
     receivableToday: { total: 0, items: [] },
     payableToday: { total: 0, items: [] },
-    diskUsage: { total: 0, used: 0, free: 0, percent: 0 },
+    salesSummary: { total: 0, paid: 0, due: 0, expenses: 0 },
+    appUsage: { total: 0, path: '' },
 });
 
 const totals = computed(() => [
@@ -77,7 +78,8 @@ const fetchData = async () => {
         state.expensesMonthly = data.expensesMonthly;
         state.receivableToday = data.receivableToday;
         state.payableToday = data.payableToday;
-        state.diskUsage = data.diskUsage || { total: 0, used: 0, free: 0, percent: 0 };
+        state.salesSummary = data.salesSummary || { total: 0, paid: 0, due: 0, expenses: 0 };
+        state.appUsage = data.appUsage || { total: 0, path: '' };
     } finally {
         state.loading = false;
     }
@@ -131,24 +133,11 @@ const receivablePayableData = computed(() => ({
     }],
 }));
 
-// Sales vs Expenses Sine Wave Line Chart with enhanced smooth curves
+// Sales vs Expenses Line Chart (raw monthly data)
 const salesExpensesTrendData = computed(() => {
     const labels = state.salesMonthly.map(m => m.label);
-    const salesData = [];
-    const expensesData = [];
-
-    // Generate smooth sine wave pattern based on actual data
-    for (let i = 0; i < state.salesMonthly.length; i++) {
-        const baseSales = state.salesMonthly[i]?.amount || 0;
-        const baseExpenses = state.expensesMonthly[i]?.amount || 0;
-
-        // Create smoother sine wave with multiple frequencies for realistic pattern
-        const salesWave = baseSales * (1 + 0.2 * Math.sin(i * Math.PI / 2.5) + 0.1 * Math.cos(i * Math.PI / 4));
-        const expensesWave = baseExpenses * (1 + 0.18 * Math.sin((i + 1.5) * Math.PI / 2.8) + 0.08 * Math.cos(i * Math.PI / 3.5));
-
-        salesData.push(salesWave);
-        expensesData.push(expensesWave);
-    }
+    const salesData = state.salesMonthly.map(m => m.amount || 0);
+    const expensesData = state.expensesMonthly.map(m => m.amount || 0);
 
     return {
         labels,
@@ -374,36 +363,19 @@ const formatBytes = (bytes) => {
             </div>
         </div>
 
-        <!-- Server Storage -->
+        <!-- App Storage Usage -->
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-2">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900">Server Storage</h2>
-                    <p class="text-xs text-gray-500">Live disk usage (auto refresh from server)</p>
+                    <h2 class="text-lg font-semibold text-gray-900">App Storage Usage</h2>
+                    <p class="text-xs text-gray-500">Only this project size (app folder)</p>
                 </div>
                 <div class="text-sm font-semibold text-gray-700">
-                    {{ state.diskUsage.percent }}%
+                    {{ formatBytes(state.appUsage.total) }}
                 </div>
             </div>
-            <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                    class="h-full bg-blue-600"
-                    :style="{ width: `${Math.min(100, state.diskUsage.percent)}%` }"
-                ></div>
-            </div>
-            <div class="mt-3 grid gap-3 sm:grid-cols-3 text-sm text-gray-600">
-                <div class="flex items-center justify-between">
-                    <span>Total</span>
-                    <span class="font-semibold text-gray-900">{{ formatBytes(state.diskUsage.total) }}</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span>Used</span>
-                    <span class="font-semibold text-gray-900">{{ formatBytes(state.diskUsage.used) }}</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span>Free</span>
-                    <span class="font-semibold text-gray-900">{{ formatBytes(state.diskUsage.free) }}</span>
-                </div>
+            <div class="text-xs text-gray-500">
+                Path: {{ state.appUsage.path || '—' }}
             </div>
         </div>
 
@@ -417,6 +389,24 @@ const formatBytes = (bytes) => {
                         Sales vs Expenses Trend
                     </h2>
                     <div class="text-xs text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">Last 6 months (Sine Wave)</div>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-4 text-sm text-gray-700 mb-4">
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2">
+                        <div class="text-xs text-gray-500">Total Sales</div>
+                        <div class="font-semibold text-gray-900">{{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesSummary.total) }}</div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2">
+                        <div class="text-xs text-gray-500">Paid</div>
+                        <div class="font-semibold text-green-700">{{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesSummary.paid) }}</div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2">
+                        <div class="text-xs text-gray-500">Due</div>
+                        <div class="font-semibold text-orange-700">{{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesSummary.due) }}</div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2">
+                        <div class="text-xs text-gray-500">Total Expense</div>
+                        <div class="font-semibold text-red-700">{{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesSummary.expenses) }}</div>
+                    </div>
                 </div>
                 <div class="h-80 bg-white rounded-lg p-2">
                     <Line :data="salesExpensesTrendData" :options="lineChartOptions" />
@@ -454,77 +444,50 @@ const formatBytes = (bytes) => {
                 </div>
             </div>
 
-            <!-- Total Receivable Details -->
+            <!-- Client Advance -->
             <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
                 <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-green-700">Total Receivable</h2>
+                    <h2 class="text-lg font-semibold text-green-700">Client Advance</h2>
                     <div class="text-2xl font-bold text-green-600">
                         {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.receivableToday.total) }}
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">Money to receive from clients</div>
+                    <div class="text-xs text-gray-500 mt-1">Extra paid amount over total fee</div>
                 </div>
                 <ul class="space-y-2 max-h-60 overflow-y-auto">
                     <li
                         v-for="item in state.receivableToday.items"
-                        :key="item.name + item.due_on"
+                        :key="item.name"
                         class="flex justify-between text-sm text-gray-800 border-b pb-2 hover:bg-gray-50 px-2 -mx-2 rounded"
                     >
                         <span class="font-medium">{{ item.name }}</span>
                         <span class="text-green-600">{{ item.amount }}</span>
                     </li>
-                    <li v-if="!state.receivableToday.items.length" class="text-sm text-gray-500 text-center py-4">No receivables</li>
+                    <li v-if="!state.receivableToday.items.length" class="text-sm text-gray-500 text-center py-4">No advance payments</li>
                 </ul>
             </div>
 
-            <!-- Total Payable Details -->
+            <!-- Client Due -->
             <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
                 <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-red-700">Total Payable</h2>
+                    <h2 class="text-lg font-semibold text-red-700">Client Due</h2>
                     <div class="text-2xl font-bold text-red-600">
                         {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.payableToday.total) }}
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">Money to pay to clients</div>
+                    <div class="text-xs text-gray-500 mt-1">Total due amount from clients</div>
                 </div>
                 <ul class="space-y-2 max-h-60 overflow-y-auto">
                     <li
                         v-for="item in state.payableToday.items"
-                        :key="item.name + item.due_on"
+                        :key="item.name"
                         class="flex justify-between text-sm text-gray-800 border-b pb-2 hover:bg-gray-50 px-2 -mx-2 rounded"
                     >
                         <span class="font-medium">{{ item.name }}</span>
                         <span class="text-red-600">{{ item.amount }}</span>
                     </li>
-                    <li v-if="!state.payableToday.items.length" class="text-sm text-gray-500 text-center py-4">No payables</li>
+                    <li v-if="!state.payableToday.items.length" class="text-sm text-gray-500 text-center py-4">No due entries</li>
                 </ul>
             </div>
         </div>
 
-        <!-- Performance Insights -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg shadow-sm p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Performance Insights</h2>
-            <div class="grid gap-4 md:grid-cols-3">
-                <div class="bg-white rounded-lg p-4 shadow-sm">
-                    <div class="text-sm text-gray-600 mb-1">Net Position</div>
-                    <div class="text-xl font-bold" :class="state.receivableToday.total - state.payableToday.total >= 0 ? 'text-green-600' : 'text-red-600'">
-                        {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.receivableToday.total - state.payableToday.total) }}
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">Receivable - Payable</div>
-                </div>
-                <div class="bg-white rounded-lg p-4 shadow-sm">
-                    <div class="text-sm text-gray-600 mb-1">Total Entities</div>
-                    <div class="text-xl font-bold text-blue-600">
-                        {{ state.stats.total_clients + state.stats.total_agents + state.stats.total_bd_companies + state.stats.total_foreign_companies + state.stats.total_staff }}
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">Combined Count</div>
-                </div>
-                <div class="bg-white rounded-lg p-4 shadow-sm">
-                    <div class="text-sm text-gray-600 mb-1">Average Monthly Sales</div>
-                    <div class="text-xl font-bold text-indigo-600">
-                        {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesMonthly.reduce((acc, m) => acc + m.amount, 0) / (state.salesMonthly.length || 1)) }}
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">Last 6 Months</div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>

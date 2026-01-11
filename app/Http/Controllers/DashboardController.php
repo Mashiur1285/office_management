@@ -7,7 +7,9 @@ use App\Models\BdCompany;
 use App\Models\Client;
 use App\Models\Expense;
 use App\Models\ForeignCompany;
+use App\Models\NonOperatingEntry;
 use App\Models\OfficeStaff;
+use App\Models\OperatingExpense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
@@ -30,7 +32,12 @@ class DashboardController extends Controller
             ->groupBy('ym')
             ->pluck('total', 'ym');
 
-        $expensesRaw = Expense::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, COALESCE(SUM(amount),0) as total")
+        $operatingRaw = OperatingExpense::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, COALESCE(SUM(amount),0) as total")
+            ->groupBy('ym')
+            ->pluck('total', 'ym');
+
+        $nonOperatingRaw = NonOperatingEntry::where('type', 'expense')
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, COALESCE(SUM(amount),0) as total")
             ->groupBy('ym')
             ->pluck('total', 'ym');
 
@@ -42,57 +49,66 @@ class DashboardController extends Controller
             ];
         })->values();
 
-        $expensesMonthly = $monthWindow->map(function ($month) use ($expensesRaw) {
+        $expensesMonthly = $monthWindow->map(function ($month) use ($operatingRaw, $nonOperatingRaw) {
             $key = $month->format('Y-m');
             return [
                 'label' => $month->format('M'),
-                'amount' => (float) ($expensesRaw[$key] ?? 0),
+                'amount' => (float) ($operatingRaw[$key] ?? 0) + (float) ($nonOperatingRaw[$key] ?? 0),
             ];
         })->values();
 
-        // Total Receivable - All money to be received from clients
+        // Receivable = client advance (extra paid over total fee)
         $allReceivables = Client::query()
-            ->whereNotNull('next_payment_amount')
-            ->where('next_payment_amount', '>', 0)
+            ->whereNotNull('total_fee')
             ->get()
             ->map(fn ($client) => [
                 'name' => $client->name,
-                'amount' => (float) ($client->next_payment_amount ?? 0),
-                'due_on' => optional($client->next_payment_date)?->toDateString(),
-            ]);
+                'amount' => max(0, (float) ($client->partial_paid_amount ?? 0) - (float) ($client->total_fee ?? 0)),
+            ])
+            ->filter(fn ($item) => $item['amount'] > 0)
+            ->values();
 
-        // Total Payable - All unpaid expenses
-        $allPayables = Expense::query()
-            ->where('amount', '>', 0)
+        // Payable = client due amounts
+        $allPayables = Client::query()
+            ->whereNotNull('current_due')
             ->get()
-            ->map(fn ($expense) => [
-                'name' => $expense->vendor ?? $expense->title,
-                'amount' => (float) ($expense->amount ?? 0),
-                'due_on' => optional($expense->paid_on)?->toDateString(),
-            ]);
+            ->map(fn ($client) => [
+                'name' => $client->name,
+                'amount' => (float) ($client->current_due ?? 0),
+            ])
+            ->filter(fn ($item) => $item['amount'] > 0)
+            ->values();
 
-        $diskUsage = Cache::remember('dashboard.disk_usage', 60, function () {
+        $salesTotals = Client::selectRaw('COALESCE(SUM(total_fee),0) as total, COALESCE(SUM(current_due),0) as due')
+            ->first();
+        $totalSales = (float) ($salesTotals->total ?? 0);
+        $totalDue = (float) ($salesTotals->due ?? 0);
+        $totalPaid = max(0, $totalSales - $totalDue);
+        $totalOperatingExpenses = (float) OperatingExpense::sum('amount');
+        $totalNonOperatingExpenses = (float) NonOperatingEntry::where('type', 'expense')->sum('amount');
+        $totalExpenses = $totalOperatingExpenses + $totalNonOperatingExpenses;
+
+        $appUsage = Cache::remember('dashboard.app_usage', 300, function () {
             $path = base_path();
-            $total = @disk_total_space($path);
-            $free = @disk_free_space($path);
+            $size = 0;
 
-            if ($total === false || $free === false || $total <= 0) {
-                return [
-                    'total' => 0,
-                    'used' => 0,
-                    'free' => 0,
-                    'percent' => 0,
-                ];
+            try {
+                $iterator = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS)
+                );
+
+                foreach ($iterator as $file) {
+                    if ($file->isFile()) {
+                        $size += $file->getSize();
+                    }
+                }
+            } catch (\Throwable $e) {
+                $size = 0;
             }
 
-            $used = max(0, $total - $free);
-            $percent = round(($used / $total) * 100, 1);
-
             return [
-                'total' => (float) $total,
-                'used' => (float) $used,
-                'free' => (float) $free,
-                'percent' => $percent,
+                'total' => (float) $size,
+                'path' => $path,
             ];
         });
 
@@ -114,7 +130,13 @@ class DashboardController extends Controller
                 'total' => $allPayables->sum('amount'),
                 'items' => $allPayables,
             ],
-            'diskUsage' => $diskUsage,
+            'salesSummary' => [
+                'total' => $totalSales,
+                'paid' => $totalPaid,
+                'due' => $totalDue,
+                'expenses' => $totalExpenses,
+            ],
+            'appUsage' => $appUsage,
         ]);
     }
 }

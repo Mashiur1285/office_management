@@ -48,13 +48,6 @@
                     </div>
                 </div>
 
-                <!-- Performance Trend -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Performance Trend</h3>
-                    <div class="h-64">
-                        <Line :data="performanceTrendData" :options="lineChartOptions" />
-                    </div>
-                </div>
             </div>
 
             <!-- Key Metrics Grid -->
@@ -372,47 +365,6 @@ const plOverviewChartData = computed(() => ({
         borderWidth: 2,
     }],
 }));
-
-// Performance Trend with Wave Pattern
-const performanceTrendData = computed(() => {
-    const months = 12;
-    const labels = [];
-    const revenueData = [];
-    const profitData = [];
-
-    // Generate wave pattern data
-    for (let i = 0; i < months; i++) {
-        labels.push(`Month ${i + 1}`);
-        // Create sine wave pattern for revenue
-        const revenue = props.period.total_income * (1 + 0.3 * Math.sin(i * Math.PI / 6));
-        revenueData.push(revenue);
-        // Create wave pattern for profit with phase shift
-        const profit = props.period.net_profit_after_tax * (1 + 0.4 * Math.sin((i + 2) * Math.PI / 6));
-        profitData.push(profit);
-    }
-
-    return {
-        labels,
-        datasets: [
-            {
-                label: 'Revenue Trend',
-                data: revenueData,
-                borderColor: 'rgb(34, 197, 94)',
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                tension: 0.4,
-                fill: true,
-            },
-            {
-                label: 'Profit Trend',
-                data: profitData,
-                borderColor: 'rgb(139, 92, 246)',
-                backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                tension: 0.4,
-                fill: true,
-            },
-        ],
-    };
-});
 
 const pieChartOptions = {
     responsive: true,

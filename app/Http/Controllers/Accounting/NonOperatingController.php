@@ -130,7 +130,7 @@ class NonOperatingController extends Controller
     {
         $validated = $request->validate([
             'accounting_period_id' => 'required|exists:accounting_periods,id',
-            'client_id' => 'nullable|exists:clients,id',
+            'client_id' => 'required|exists:clients,id',
             'type' => 'required|in:income,expense',
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -146,7 +146,7 @@ class NonOperatingController extends Controller
     public function update(Request $request, NonOperatingEntry $nonOperatingEntry)
     {
         $validated = $request->validate([
-            'client_id' => 'nullable|exists:clients,id',
+            'client_id' => 'required|exists:clients,id',
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
