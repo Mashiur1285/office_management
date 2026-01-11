@@ -88,7 +88,7 @@ class DashboardController extends Controller
         $totalNonOperatingExpenses = (float) NonOperatingEntry::where('type', 'expense')->sum('amount');
         $totalExpenses = $totalOperatingExpenses + $totalNonOperatingExpenses;
 
-        $appUsage = Cache::remember('dashboard.app_usage', 300, function () {
+        $appUsage = Cache::remember('dashboard.app_usage.v2', 300, function () {
             $path = base_path();
             $size = 0;
 
@@ -98,8 +98,13 @@ class DashboardController extends Controller
                 );
 
                 foreach ($iterator as $file) {
-                    if ($file->isFile()) {
+                    if (! $file->isFile()) {
+                        continue;
+                    }
+                    try {
                         $size += $file->getSize();
+                    } catch (\Throwable $e) {
+                        continue;
                     }
                 }
             } catch (\Throwable $e) {
