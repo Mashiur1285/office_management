@@ -11,11 +11,41 @@ use Inertia\Inertia;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::query()
+        $bdCompanyStatus = $request->input('bd_company_status');
+        $bdCompanyScope = $request->boolean('bd_company_scope');
+        $agencyScope = $request->boolean('agency_scope');
+
+        $query = Client::query()
             ->with(['bdCompany', 'foreignCompany', 'agent', 'documentLocation'])
-            ->latest()
+            ->latest();
+
+        if ($agencyScope) {
+            $query->where(function ($scope) {
+                $scope->doesntHave('documentLocation')
+                    ->orWhereHas('documentLocation', function ($q) {
+                        $q->whereIn('holder_type', ['agency', 'agency_user'])
+                            ->whereNull('returned_at');
+                    });
+            });
+        } elseif ($bdCompanyScope || $bdCompanyStatus) {
+            $query->whereHas('documentLocation', function ($q) use ($bdCompanyStatus) {
+                $q->where('holder_type', 'bd_company');
+                if ($bdCompanyStatus && $bdCompanyStatus !== 'all') {
+                    if ($bdCompanyStatus === 'pending') {
+                        $q->where(function ($inner) {
+                            $inner->whereNull('processing_status')
+                                ->orWhere('processing_status', 'pending');
+                        });
+                    } else {
+                        $q->where('processing_status', $bdCompanyStatus);
+                    }
+                }
+            });
+        }
+
+        $clients = $query
             ->get()
             ->map(function (Client $client) {
                 $holder = $client->documentLocation;
@@ -73,6 +103,11 @@ class ClientController extends Controller
 
         return Inertia::render('Clients/Index', [
             'clients' => $clients,
+            'filters' => [
+                'bd_company_status' => $bdCompanyStatus,
+                'bd_company_scope' => $bdCompanyScope,
+                'agency_scope' => $agencyScope,
+            ],
         ]);
     }
 

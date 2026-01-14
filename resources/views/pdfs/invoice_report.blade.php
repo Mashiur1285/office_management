@@ -12,6 +12,7 @@
         .summary { width: 100%; margin-top: 16px; }
         .summary td { border: none; padding: 4px 0; }
         .right { text-align: right; }
+        .terms { white-space: pre-line; }
     </style>
 </head>
 <body>
@@ -68,6 +69,9 @@
                 <th>Service Description</th>
                 <th class="right">Qty</th>
                 <th class="right">Unit Price</th>
+                <th class="right">Discount</th>
+                <th class="right">VAT %</th>
+                <th class="right">VAT Amt</th>
                 <th class="right">Line Total</th>
             </tr>
         </thead>
@@ -78,11 +82,14 @@
                     <td>{{ $item->service_description }}</td>
                     <td class="right">{{ number_format($item->quantity, 2) }}</td>
                     <td class="right">{{ number_format($item->unit_price, 2) }}</td>
+                    <td class="right">{{ number_format($item->discount_amount ?? 0, 2) }}</td>
+                    <td class="right">{{ number_format($item->vat_rate ?? 0, 2) }}%</td>
+                    <td class="right">{{ number_format($item->vat_amount ?? 0, 2) }}</td>
                     <td class="right">{{ number_format($item->line_total, 2) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="right">No items found.</td>
+                    <td colspan="8" class="right">No items found.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -98,7 +105,7 @@
             <td class="right">{{ number_format($invoice->discount_amount, 2) }}</td>
         </tr>
         <tr>
-            <td>VAT ({{ number_format($invoice->vat_rate, 2) }}%)</td>
+            <td>VAT Amount</td>
             <td class="right">{{ number_format($invoice->vat_amount, 2) }}</td>
         </tr>
         <tr>
@@ -115,10 +122,8 @@
         </tr>
     </table>
 
-    <h2>Company Contact</h2>
-    <p><strong>Phone:</strong> {{ $invoice->company_phone ?? '—' }}</p>
-    <p><strong>Email:</strong> {{ $invoice->company_email ?? '—' }}</p>
-    <p><strong>Address:</strong> {{ $invoice->company_address ?? '—' }}</p>
+    <h2>Terms & Conditions</h2>
+    <div class="terms">{{ $invoice->terms_text ?: $defaultTerms }}</div>
 
     @include('pdfs.partials.report_footer')
 </body>

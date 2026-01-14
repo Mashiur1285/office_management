@@ -1,11 +1,11 @@
 <template>
-    <Head title="Create Invoice" />
+    <Head title="Edit Invoice" />
 
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Create Invoice</h1>
-                <p class="text-sm text-gray-600">Generate a client invoice with payment details.</p>
+                <h1 class="text-2xl font-bold text-gray-900">Edit Invoice</h1>
+                <p class="text-sm text-gray-600">Update invoice details and regenerate PDF.</p>
             </div>
             <Link
                 :href="route('invoices.index')"
@@ -19,13 +19,20 @@
             <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Invoice Info</h2>
                 <div class="grid gap-4 md:grid-cols-2">
-                    <FormGroup label="Invoice Date">
-                        <input
-                            :value="invoiceDate"
-                            readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
-                        />
-                    </FormGroup>
+                    <FormGroup label="Invoice Number">
+                    <input
+                        :value="props.invoice.invoice_no"
+                        readonly
+                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 font-semibold"
+                    />
+                </FormGroup>
+                <FormGroup label="Invoice Date">
+                    <input
+                        :value="props.invoice.invoice_date"
+                        readonly
+                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                    />
+                </FormGroup>
                     <FormGroup label="Payment Method" :error="form.errors.payment_method">
                         <select
                             v-model="form.payment_method"
@@ -325,8 +332,8 @@
                     class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                     :disabled="form.processing"
                 >
-                    <span v-if="!form.processing">Save & Generate PDF</span>
-                    <span v-else>Saving...</span>
+                    <span v-if="!form.processing">Update & Regenerate PDF</span>
+                    <span v-else>Updating...</span>
                 </button>
             </div>
         </form>
@@ -339,35 +346,27 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import SubcategorySelector from '@/Components/SubcategorySelector.vue';
 
 const props = defineProps({
+    invoice: Object,
     clients: Array,
     subcategories: Array,
     defaultTerms: String,
 });
 
-const invoiceDate = new Date().toISOString().split('T')[0];
-
 const form = useForm({
-    client_id: '',
-    organization_name: '',
-    client_mobile: '',
-    client_email: '',
-    service_category: 'travel_tourism',
-    service_type: '',
-    description: '',
-    terms_type: 'default',
-    terms_text: props.defaultTerms,
-    paid_amount: '',
-    payment_date: '',
-    payment_method: '',
-    items: [
-        {
-            service_description: '',
-            quantity: '1',
-            unit_price: '',
-            discount_type: 'percent',
-            discount_value: '',
-            vat_rate: '',
-        },
+    client_id: props.invoice.client_id,
+    organization_name: props.invoice.organization_name || '',
+    client_mobile: props.invoice.client_mobile || '',
+    client_email: props.invoice.client_email || '',
+    service_category: props.invoice.service_category,
+    service_type: props.invoice.service_type,
+    description: props.invoice.description || '',
+    terms_type: props.invoice.terms_type || 'default',
+    terms_text: props.invoice.terms_text || props.defaultTerms,
+    paid_amount: props.invoice.paid_amount || '',
+    payment_date: props.invoice.payment_date || '',
+    payment_method: props.invoice.payment_method || '',
+    items: props.invoice.items.length > 0 ? props.invoice.items : [
+        { service_description: '', quantity: '1', unit_price: '', discount_type: 'percent', discount_value: '', vat_rate: '' },
     ],
 });
 
@@ -452,7 +451,7 @@ const removeItem = (index) => {
 };
 
 const submit = () => {
-    form.post(route('invoices.store'));
+    form.put(route('invoices.update', props.invoice.id));
 };
 
 watch(

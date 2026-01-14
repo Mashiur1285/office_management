@@ -102,13 +102,17 @@
     </div>
 
     <div class="section">
-        <h2>Quotation Details</h2>
+        <h2>Items</h2>
         <table class="items">
             <thead>
                 <tr>
                     <th style="width: 40px;">SL</th>
                     <th>Service Description</th>
-                    <th class="right" style="width: 120px;">Price</th>
+                    <th class="right" style="width: 90px;">Price</th>
+                    <th class="right" style="width: 90px;">Discount</th>
+                    <th class="right" style="width: 70px;">VAT %</th>
+                    <th class="right" style="width: 90px;">VAT Amt</th>
+                    <th class="right" style="width: 110px;">Line Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -117,9 +121,35 @@
                         <td>{{ $item->sl }}</td>
                         <td>{{ $item->service_description }}</td>
                         <td class="right">৳{{ number_format($item->price, 2) }}</td>
+                        <td class="right">৳{{ number_format($item->discount_amount ?? 0, 2) }}</td>
+                        <td class="right">{{ number_format($item->vat_rate ?? 0, 2) }}%</td>
+                        <td class="right">৳{{ number_format($item->vat_amount ?? 0, 2) }}</td>
+                        <td class="right">৳{{ number_format($item->line_total ?? 0, 2) }}</td>
                     </tr>
                 @endforeach
             </tbody>
+        </table>
+    </div>
+
+    <div class="section card">
+        <h2>Payment Summary</h2>
+        <table class="info-grid">
+            <tr>
+                <td class="label">Subtotal</td>
+                <td>৳{{ number_format($summary['subtotal'], 2) }}</td>
+            </tr>
+            <tr>
+                <td class="label">Discount Total</td>
+                <td>৳{{ number_format($summary['discount_amount'], 2) }}</td>
+            </tr>
+            <tr>
+                <td class="label">VAT Amount</td>
+                <td>৳{{ number_format($summary['vat_amount'], 2) }}</td>
+            </tr>
+            <tr>
+                <td class="label">Total Amount</td>
+                <td>৳{{ number_format($summary['total_amount'], 2) }}</td>
+            </tr>
         </table>
     </div>
 

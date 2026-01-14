@@ -94,19 +94,12 @@
                         </select>
                     </FormGroup>
                     <FormGroup label="Service Type" :error="form.errors.service_type">
-                        <select
+                        <SubcategorySelector
                             v-model="form.service_type"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
-                        >
-                            <option value="" disabled>Select subcategory</option>
-                            <option
-                                v-for="item in serviceTypes"
-                                :key="item"
-                                :value="item"
-                            >
-                                {{ item }}
-                            </option>
-                        </select>
+                            :subcategories="subcategoryOptions"
+                            type="income"
+                            :category="form.service_category"
+                        />
                     </FormGroup>
                 </div>
                 <div class="mt-4">
@@ -126,7 +119,7 @@
 
             <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Quotation Details</h2>
+                    <h2 class="text-lg font-semibold text-gray-900">Items</h2>
                     <button
                         type="button"
                         class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
@@ -143,6 +136,10 @@
                                 <th class="px-3 py-2">SL</th>
                                 <th class="px-3 py-2">Service Description</th>
                                 <th class="px-3 py-2">Price</th>
+                                <th class="px-3 py-2">Discount</th>
+                                <th class="px-3 py-2">VAT %</th>
+                                <th class="px-3 py-2 text-right">VAT Amt</th>
+                                <th class="px-3 py-2 text-right">Line Total</th>
                                 <th class="px-3 py-2"></th>
                             </tr>
                         </thead>
@@ -166,6 +163,44 @@
                                         placeholder="0.00"
                                     />
                                 </td>
+                                <td class="px-3 py-2">
+                                    <div class="flex items-center gap-2">
+                                        <select
+                                            v-model="item.discount_type"
+                                            class="w-24 rounded-lg border border-gray-200 px-2 py-2 text-sm"
+                                        >
+                                            <option value="percent">%</option>
+                                            <option value="amount">৳</option>
+                                        </select>
+                                        <input
+                                            v-model="item.discount_value"
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                            placeholder="0"
+                                        />
+                                    </div>
+                                    <div class="mt-1 text-xs text-gray-500">
+                                        {{ money(itemCalculations[index].discountAmount) }}
+                                    </div>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <input
+                                        v-model="item.vat_rate"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                        placeholder="0"
+                                    />
+                                </td>
+                                <td class="px-3 py-2 text-right text-gray-700">
+                                    {{ money(itemCalculations[index].vatAmount) }}
+                                </td>
+                                <td class="px-3 py-2 text-right font-semibold text-gray-900">
+                                    {{ money(itemCalculations[index].lineTotal) }}
+                                </td>
                                 <td class="px-3 py-2 text-right">
                                     <button
                                         type="button"
@@ -179,6 +214,40 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </section>
+
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Summary</h2>
+                <div class="grid gap-4 md:grid-cols-3">
+                    <FormGroup label="Subtotal">
+                        <input
+                            :value="money(subtotal)"
+                            readonly
+                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                        />
+                    </FormGroup>
+                    <FormGroup label="Discount Total">
+                        <input
+                            :value="money(discountTotal)"
+                            readonly
+                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                        />
+                    </FormGroup>
+                    <FormGroup label="VAT Amount">
+                        <input
+                            :value="money(vatAmount)"
+                            readonly
+                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                        />
+                    </FormGroup>
+                    <FormGroup label="Total Amount">
+                        <input
+                            :value="money(totalAmount)"
+                            readonly
+                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-900 font-semibold"
+                        />
+                    </FormGroup>
                 </div>
             </section>
 
@@ -266,11 +335,12 @@
 <script setup>
 import { computed, defineComponent, h, onMounted, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import SubcategorySelector from '@/Components/SubcategorySelector.vue';
 
 const props = defineProps({
     clients: Array,
     officeStaff: Array,
-    subcategories: Object,
+    subcategories: Array,
     defaultTerms: String,
     companyDefaults: Object,
 });
@@ -293,7 +363,13 @@ const form = useForm({
     company_email: props.companyDefaults?.email || '',
     company_address: props.companyDefaults?.address || '',
     items: [
-        { service_description: '', price: '' },
+        {
+            service_description: '',
+            price: '',
+            discount_type: 'percent',
+            discount_value: '',
+            vat_rate: '',
+        },
     ],
 });
 
@@ -303,8 +379,46 @@ const descriptionWordCount = computed(() => {
     return text.split(/\s+/u).filter(Boolean).length;
 });
 
-const serviceTypes = computed(() => {
-    return (props.subcategories?.[form.service_category] || []).map(item => item.name);
+const subcategoryOptions = computed(() => {
+    return (props.subcategories || []).filter((item) => item.category === form.service_category);
+});
+
+const itemCalculations = computed(() => {
+    return form.items.map(item => {
+        const price = parseFloat(item.price) || 0;
+        const discountValue = parseFloat(item.discount_value) || 0;
+        const discountAmount = item.discount_type === 'amount'
+            ? discountValue
+            : (price * discountValue) / 100;
+        const safeDiscount = Math.min(price, Math.max(0, discountAmount));
+        const taxable = Math.max(0, price - safeDiscount);
+        const vatRate = parseFloat(item.vat_rate) || 0;
+        const vatAmount = (taxable * vatRate) / 100;
+        const lineTotal = taxable + vatAmount;
+
+        return {
+            baseAmount: price,
+            discountAmount: safeDiscount,
+            vatAmount,
+            lineTotal,
+        };
+    });
+});
+
+const subtotal = computed(() => {
+    return itemCalculations.value.reduce((sum, item) => sum + item.baseAmount, 0);
+});
+
+const discountTotal = computed(() => {
+    return itemCalculations.value.reduce((sum, item) => sum + item.discountAmount, 0);
+});
+
+const vatAmount = computed(() => {
+    return itemCalculations.value.reduce((sum, item) => sum + item.vatAmount, 0);
+});
+
+const totalAmount = computed(() => {
+    return itemCalculations.value.reduce((sum, item) => sum + item.lineTotal, 0);
 });
 
 const handleClientChange = () => {
@@ -320,7 +434,13 @@ const handleServiceCategoryChange = () => {
 };
 
 const addItem = () => {
-    form.items.push({ service_description: '', price: '' });
+    form.items.push({
+        service_description: '',
+        price: '',
+        discount_type: 'percent',
+        discount_value: '',
+        vat_rate: '',
+    });
 };
 
 const removeItem = (index) => {
@@ -350,6 +470,11 @@ onMounted(() => {
         form.quotation_maker_id = props.officeStaff[0].id;
     }
 });
+
+const money = (value) => {
+    if (value === null || value === undefined) return '৳0.00';
+    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+};
 
 const FormGroup = defineComponent({
     name: 'FormGroup',

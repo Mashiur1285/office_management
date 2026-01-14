@@ -1,11 +1,12 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
-import axios from 'axios';
-import { onMounted, reactive, computed } from 'vue';
-import { Pie, Doughnut, Line } from 'vue-chartjs';
+import { Head, Link, router } from "@inertiajs/vue3";
+import axios from "axios";
+import { onMounted, reactive, computed } from "vue";
+import { Pie, Doughnut, Line, Bar } from "vue-chartjs";
 import {
     Chart as ChartJS,
     ArcElement,
+    BarElement,
     CategoryScale,
     LinearScale,
     PointElement,
@@ -13,11 +14,12 @@ import {
     Title,
     Tooltip,
     Legend,
-    Filler
-} from 'chart.js';
+    Filler,
+} from "chart.js";
 
 ChartJS.register(
     ArcElement,
+    BarElement,
     CategoryScale,
     LinearScale,
     PointElement,
@@ -30,11 +32,11 @@ ChartJS.register(
 
 // Route mapping for stat cards
 const routeMap = {
-    'Clients': '/clients',
-    'Agents': '/agents',
-    'BD Companies': '/bd-companies',
-    'Foreign Companies': '/foreign-companies',
-    'Staff': '/office-staff'
+    Clients: "/clients",
+    Agents: "/agents",
+    "BD Companies": "/bd-companies",
+    "Foreign Companies": "/foreign-companies",
+    Staff: "/office-staff",
 };
 
 const navigateTo = (label) => {
@@ -58,28 +60,51 @@ const state = reactive({
     receivableToday: { total: 0, items: [] },
     payableToday: { total: 0, items: [] },
     salesSummary: { total: 0, paid: 0, due: 0, expenses: 0 },
-    appUsage: { total: 0, path: '' },
+    appUsage: { total: 0, path: "" },
+    bdCompanyFiles: {
+        agency_total: 0,
+        total: 0,
+        pending: 0,
+        accepted: 0,
+        rejected: 0,
+        completed: 0,
+    },
+    appName: "",
 });
 
 const totals = computed(() => [
-    { label: 'Clients', value: state.stats.total_clients },
-    { label: 'Agents', value: state.stats.total_agents },
-    { label: 'BD Companies', value: state.stats.total_bd_companies },
-    { label: 'Foreign Companies', value: state.stats.total_foreign_companies },
-    { label: 'Staff', value: state.stats.total_staff },
+    { label: "Clients", value: state.stats.total_clients },
+    { label: "Agents", value: state.stats.total_agents },
+    { label: "BD Companies", value: state.stats.total_bd_companies },
+    { label: "Foreign Companies", value: state.stats.total_foreign_companies },
+    { label: "Staff", value: state.stats.total_staff },
 ]);
 
 const fetchData = async () => {
     state.loading = true;
     try {
-        const { data } = await axios.get('/dashboard/data');
+        const { data } = await axios.get("/dashboard/data");
         state.stats = data.stats;
         state.salesMonthly = data.salesMonthly;
         state.expensesMonthly = data.expensesMonthly;
         state.receivableToday = data.receivableToday;
         state.payableToday = data.payableToday;
-        state.salesSummary = data.salesSummary || { total: 0, paid: 0, due: 0, expenses: 0 };
-        state.appUsage = data.appUsage || { total: 0, path: '' };
+        state.salesSummary = data.salesSummary || {
+            total: 0,
+            paid: 0,
+            due: 0,
+            expenses: 0,
+        };
+        state.appUsage = data.appUsage || { total: 0, path: "" };
+        state.bdCompanyFiles = data.bdCompanyFiles || {
+            agency_total: 0,
+            total: 0,
+            pending: 0,
+            accepted: 0,
+            rejected: 0,
+            completed: 0,
+        };
+        state.appName = data.appName || "";
     } finally {
         state.loading = false;
     }
@@ -89,86 +114,87 @@ onMounted(fetchData);
 
 // Entity Distribution Pie Chart with gradient colors
 const entityDistributionData = computed(() => ({
-    labels: ['Clients', 'Agents', 'BD Companies', 'Foreign Companies', 'Staff'],
-    datasets: [{
-        data: [
-            state.stats.total_clients,
-            state.stats.total_agents,
-            state.stats.total_bd_companies,
-            state.stats.total_foreign_companies,
-            state.stats.total_staff,
-        ],
-        backgroundColor: [
-            'rgba(59, 130, 246, 0.9)',   // Blue for Clients
-            'rgba(34, 197, 94, 0.9)',    // Green for Agents
-            'rgba(249, 115, 22, 0.9)',   // Orange for BD Companies
-            'rgba(168, 85, 247, 0.9)',   // Purple for Foreign Companies
-            'rgba(236, 72, 153, 0.9)',   // Pink for Staff
-        ],
-        borderColor: '#ffffff',
-        borderWidth: 3,
-        hoverOffset: 15,
-        hoverBorderWidth: 4,
-        hoverBorderColor: '#ffffff',
-    }],
+    labels: ["Clients", "Agents", "BD Companies", "Foreign Companies", "Staff"],
+    datasets: [
+        {
+            data: [
+                state.stats.total_clients,
+                state.stats.total_agents,
+                state.stats.total_bd_companies,
+                state.stats.total_foreign_companies,
+                state.stats.total_staff,
+            ],
+            backgroundColor: [
+                "rgba(59, 130, 246, 0.9)", // Blue for Clients
+                "rgba(34, 197, 94, 0.9)", // Green for Agents
+                "rgba(249, 115, 22, 0.9)", // Orange for BD Companies
+                "rgba(168, 85, 247, 0.9)", // Purple for Foreign Companies
+                "rgba(236, 72, 153, 0.9)", // Pink for Staff
+            ],
+            borderColor: "#ffffff",
+            borderWidth: 3,
+            hoverOffset: 15,
+            hoverBorderWidth: 4,
+            hoverBorderColor: "#ffffff",
+        },
+    ],
 }));
 
 // Receivable vs Payable Doughnut Chart with enhanced styling
 const receivablePayableData = computed(() => ({
-    labels: ['Total Receivable', 'Total Payable'],
-    datasets: [{
-        data: [
-            state.receivableToday.total,
-            state.payableToday.total,
-        ],
-        backgroundColor: [
-            'rgba(34, 197, 94, 0.9)',    // Green for Receivable
-            'rgba(239, 68, 68, 0.9)',    // Red for Payable
-        ],
-        borderColor: '#ffffff',
-        borderWidth: 4,
-        hoverOffset: 20,
-        hoverBorderWidth: 5,
-        hoverBorderColor: '#ffffff',
-    }],
+    labels: ["Total Receivable", "Total Payable"],
+    datasets: [
+        {
+            data: [state.receivableToday.total, state.payableToday.total],
+            backgroundColor: [
+                "rgba(34, 197, 94, 0.9)", // Green for Receivable
+                "rgba(239, 68, 68, 0.9)", // Red for Payable
+            ],
+            borderColor: "#ffffff",
+            borderWidth: 4,
+            hoverOffset: 20,
+            hoverBorderWidth: 5,
+            hoverBorderColor: "#ffffff",
+        },
+    ],
 }));
 
 // Sales vs Expenses Line Chart (raw monthly data)
 const salesExpensesTrendData = computed(() => {
-    const labels = state.salesMonthly.map(m => m.label);
-    const salesData = state.salesMonthly.map(m => m.amount || 0);
-    const expensesData = state.expensesMonthly.map(m => m.amount || 0);
+    const labels = state.salesMonthly.map((m) => m.label);
+    const salesData = state.salesMonthly.map((m) => m.amount || 0);
+    const expensesData = state.expensesMonthly.map((m) => m.amount || 0);
 
     return {
         labels,
         datasets: [
             {
-                label: 'Sales',
+                label: "Sales",
                 data: salesData,
-                borderColor: 'rgba(59, 130, 246, 1)',
-                backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                borderColor: "rgba(59, 130, 246, 1)",
+                backgroundColor: "rgba(59, 130, 246, 0.15)",
                 borderWidth: 4,
                 fill: true,
                 tension: 0.45,
                 pointRadius: 6,
                 pointHoverRadius: 9,
-                pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-                pointBorderColor: '#ffffff',
+                pointBackgroundColor: "rgba(59, 130, 246, 1)",
+                pointBorderColor: "#ffffff",
                 pointBorderWidth: 2,
                 pointHoverBorderWidth: 3,
             },
             {
-                label: 'Expenses',
+                label: "Expenses",
                 data: expensesData,
-                borderColor: 'rgba(239, 68, 68, 1)',
-                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                borderColor: "rgba(239, 68, 68, 1)",
+                backgroundColor: "rgba(239, 68, 68, 0.15)",
                 borderWidth: 4,
                 fill: true,
                 tension: 0.45,
                 pointRadius: 6,
                 pointHoverRadius: 9,
-                pointBackgroundColor: 'rgba(239, 68, 68, 1)',
-                pointBorderColor: '#ffffff',
+                pointBackgroundColor: "rgba(239, 68, 68, 1)",
+                pointBorderColor: "#ffffff",
                 pointBorderWidth: 2,
                 pointHoverBorderWidth: 3,
             },
@@ -184,34 +210,38 @@ const pieChartOptions = {
         animateRotate: true,
         animateScale: true,
         duration: 1500,
-        easing: 'easeInOutQuart',
+        easing: "easeInOutQuart",
     },
     plugins: {
         legend: {
-            position: 'bottom',
+            position: "bottom",
             labels: {
                 padding: 15,
                 font: {
                     size: 12,
-                    weight: 'bold',
+                    weight: "bold",
                 },
                 usePointStyle: true,
-                pointStyle: 'circle',
+                pointStyle: "circle",
             },
         },
         tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
             padding: 12,
-            titleFont: { size: 14, weight: 'bold' },
+            titleFont: { size: 14, weight: "bold" },
             bodyFont: { size: 13 },
-            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderColor: "rgba(255, 255, 255, 0.3)",
             borderWidth: 1,
             callbacks: {
-                label: function(context) {
-                    const label = context.label || '';
+                label: function (context) {
+                    const label = context.label || "";
                     const value = context.parsed || 0;
-                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                    const total = context.dataset.data.reduce(
+                        (a, b) => a + b,
+                        0
+                    );
+                    const percentage =
+                        total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                     return `${label}: ${value} (${percentage}%)`;
                 },
             },
@@ -226,36 +256,45 @@ const doughnutChartOptions = {
         animateRotate: true,
         animateScale: true,
         duration: 1500,
-        easing: 'easeInOutQuart',
+        easing: "easeInOutQuart",
     },
-    cutout: '65%',
+    cutout: "65%",
     plugins: {
         legend: {
-            position: 'bottom',
+            position: "bottom",
             labels: {
                 padding: 15,
                 font: {
                     size: 12,
-                    weight: 'bold',
+                    weight: "bold",
                 },
                 usePointStyle: true,
-                pointStyle: 'circle',
+                pointStyle: "circle",
             },
         },
         tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
             padding: 12,
-            titleFont: { size: 14, weight: 'bold' },
+            titleFont: { size: 14, weight: "bold" },
             bodyFont: { size: 13 },
-            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderColor: "rgba(255, 255, 255, 0.3)",
             borderWidth: 1,
             callbacks: {
-                label: function(context) {
-                    const label = context.label || '';
+                label: function (context) {
+                    const label = context.label || "";
                     const value = context.parsed || 0;
-                    const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                    const formatted =
+                        "৳" +
+                        new Intl.NumberFormat("en-BD", {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                        }).format(value);
+                    const total = context.dataset.data.reduce(
+                        (a, b) => a + b,
+                        0
+                    );
+                    const percentage =
+                        total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                     return `${label}: ${formatted} (${percentage}%)`;
                 },
             },
@@ -268,23 +307,29 @@ const lineChartOptions = {
     maintainAspectRatio: false,
     animation: {
         duration: 2000,
-        easing: 'easeInOutQuart',
+        easing: "easeInOutQuart",
     },
     interaction: {
-        mode: 'index',
+        mode: "index",
         intersect: false,
     },
     scales: {
         y: {
             beginAtZero: true,
             grid: {
-                color: 'rgba(0, 0, 0, 0.05)',
+                color: "rgba(0, 0, 0, 0.05)",
                 drawBorder: false,
             },
             ticks: {
                 font: { size: 11 },
-                callback: function(value) {
-                    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+                callback: function (value) {
+                    return (
+                        "৳" +
+                        new Intl.NumberFormat("en-BD", {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                        }).format(value)
+                    );
                 },
             },
         },
@@ -294,35 +339,40 @@ const lineChartOptions = {
                 drawBorder: false,
             },
             ticks: {
-                font: { size: 11, weight: 'bold' },
+                font: { size: 11, weight: "bold" },
             },
         },
     },
     plugins: {
         legend: {
-            position: 'top',
+            position: "top",
             labels: {
                 font: {
                     size: 13,
-                    weight: 'bold',
+                    weight: "bold",
                 },
                 padding: 20,
                 usePointStyle: true,
-                pointStyle: 'circle',
+                pointStyle: "circle",
             },
         },
         tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
             padding: 12,
-            titleFont: { size: 14, weight: 'bold' },
+            titleFont: { size: 14, weight: "bold" },
             bodyFont: { size: 13 },
-            borderColor: 'rgba(255, 255, 255, 0.3)',
+            borderColor: "rgba(255, 255, 255, 0.3)",
             borderWidth: 1,
             callbacks: {
-                label: function(context) {
-                    const label = context.dataset.label || '';
+                label: function (context) {
+                    const label = context.dataset.label || "";
                     const value = context.parsed.y;
-                    const formatted = '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+                    const formatted =
+                        "৳" +
+                        new Intl.NumberFormat("en-BD", {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                        }).format(value);
                     return `${label}: ${formatted}`;
                 },
             },
@@ -330,10 +380,117 @@ const lineChartOptions = {
     },
 };
 
+const bdCompanyFilesData = computed(() => ({
+    labels: [
+        "Files at Agency",
+        "Total Files at Bd Company",
+        "Pending at Bd Company",
+        "Accepted at Bd Company",
+        "Rejected at Bd Company",
+        "Completed at Bd Company",
+    ],
+    datasets: [
+        {
+            data: [
+                state.bdCompanyFiles.agency_total,
+                state.bdCompanyFiles.total,
+                state.bdCompanyFiles.pending,
+                state.bdCompanyFiles.accepted,
+                state.bdCompanyFiles.rejected,
+                state.bdCompanyFiles.completed,
+            ],
+            backgroundColor: [
+                "rgba(99, 102, 241, 0.85)",
+                "rgba(59, 130, 246, 0.8)",
+                "rgba(251, 191, 36, 0.85)",
+                "rgba(34, 197, 94, 0.85)",
+                "rgba(239, 68, 68, 0.85)",
+                "rgba(14, 116, 144, 0.85)",
+            ],
+            borderRadius: 8,
+            maxBarThickness: 48,
+        },
+    ],
+}));
+
+const bdCompanyFilesOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: { display: false },
+        tooltip: {
+            backgroundColor: "rgba(15, 23, 42, 0.9)",
+            padding: 10,
+            titleFont: { size: 13, weight: "bold" },
+            bodyFont: { size: 12 },
+        },
+    },
+    scales: {
+        y: {
+            beginAtZero: true,
+            ticks: { precision: 0, font: { size: 11 } },
+            grid: { color: "rgba(15, 23, 42, 0.06)" },
+        },
+        x: {
+            ticks: { font: { size: 11, weight: "bold" } },
+            grid: { display: false },
+        },
+    },
+};
+
+const bdCompanyTiles = computed(() => [
+    {
+        key: "total",
+        label: "Total Files at Bd Company",
+        value: state.bdCompanyFiles.total,
+        tone: "blue",
+        query: { bd_company_scope: 1 },
+    },
+    {
+        key: "pending",
+        label: "Pending at Bd Company",
+        value: state.bdCompanyFiles.pending,
+        tone: "amber",
+        query: { bd_company_status: "pending" },
+    },
+    {
+        key: "accepted",
+        label: "Accepted at Bd Company",
+        value: state.bdCompanyFiles.accepted,
+        tone: "green",
+        query: { bd_company_status: "accepted" },
+    },
+    {
+        key: "rejected",
+        label: "Rejected at Bd Company",
+        value: state.bdCompanyFiles.rejected,
+        tone: "red",
+        query: { bd_company_status: "rejected" },
+    },
+    {
+        key: "completed",
+        label: "Completed at Bd Company",
+        value: state.bdCompanyFiles.completed,
+        tone: "teal",
+        query: { bd_company_status: "completed" },
+    },
+    {
+        key: "agency",
+        label: "Files at Agency",
+        value: state.bdCompanyFiles.agency_total,
+        tone: "indigo",
+        query: { agency_scope: 1 },
+    },
+]);
+
+const goToClients = (query) => {
+    router.visit("/clients", { data: query });
+};
+
 const formatBytes = (bytes) => {
-    if (!bytes || bytes <= 0) return '0 GB';
+    if (!bytes || bytes <= 0) return "0 GB";
     const gb = bytes / (1024 * 1024 * 1024);
-    return gb.toFixed(2) + ' GB';
+    return gb.toFixed(2) + " GB";
 };
 </script>
 
@@ -344,9 +501,14 @@ const formatBytes = (bytes) => {
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                <p class="text-sm text-gray-600">Overview of sales, expenses, and payables/receivables with smart analytics.</p>
+                <p class="text-sm text-gray-600">
+                    Overview of sales, expenses, and payables/receivables with
+                    smart analytics.
+                </p>
             </div>
-            <div v-if="state.loading" class="text-sm text-gray-500">Loading...</div>
+            <div v-if="state.loading" class="text-sm text-gray-500">
+                Loading...
+            </div>
         </div>
 
         <!-- Stats Cards - Clickable -->
@@ -357,9 +519,98 @@ const formatBytes = (bytes) => {
                 @click="navigateTo(item.label)"
                 class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 hover:shadow-lg hover:border-blue-400 hover:scale-105 transition-all duration-300 cursor-pointer group"
             >
-                <div class="text-sm text-gray-500 group-hover:text-blue-600 transition-colors">{{ item.label }}</div>
-                <div class="text-2xl font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">{{ item.value }}</div>
-                <div class="text-xs text-gray-400 mt-1 group-hover:text-blue-500 transition-colors">Click to view details →</div>
+                <div
+                    class="text-sm text-gray-500 group-hover:text-blue-600 transition-colors"
+                >
+                    {{ item.label }}
+                </div>
+                <div
+                    class="text-2xl font-semibold text-gray-900 group-hover:text-blue-700 transition-colors"
+                >
+                    {{ item.value }}
+                </div>
+                <div
+                    class="text-xs text-gray-400 mt-1 group-hover:text-blue-500 transition-colors"
+                >
+                    Click to view details →
+                </div>
+            </div>
+        </div>
+
+        <!-- BD Company Files Section -->
+        <div
+            class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100/70 shadow-sm p-6"
+        >
+            <div
+                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+                <div>
+                    <div
+                        class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white"
+                    >
+                        File Tracking
+                    </div>
+                    <p class="mt-1 text-sm text-slate-600">
+                        Smart snapshot of BD company pipeline and agency
+                        handover
+                    </p>
+                </div>
+                <div
+                    class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm"
+                >
+                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                    Live counts
+                </div>
+            </div>
+            <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+                <button
+                    v-for="tile in bdCompanyTiles"
+                    :key="tile.key"
+                    type="button"
+                    @click="goToClients(tile.query)"
+                    class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white/80 px-4 py-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                    <div
+                        :class="[
+                            'absolute left-0 top-0 h-full w-1.5',
+                            tile.tone === 'blue' && 'bg-blue-500',
+                            tile.tone === 'amber' && 'bg-amber-500',
+                            tile.tone === 'green' && 'bg-green-500',
+                            tile.tone === 'red' && 'bg-red-500',
+                            tile.tone === 'teal' && 'bg-teal-500',
+                            tile.tone === 'indigo' && 'bg-indigo-500',
+                        ]"
+                    ></div>
+                    <div
+                        :class="[
+                            'text-[11px] font-semibold uppercase tracking-wide',
+                            tile.tone === 'blue' && 'text-blue-600',
+                            tile.tone === 'amber' && 'text-amber-600',
+                            tile.tone === 'green' && 'text-green-600',
+                            tile.tone === 'red' && 'text-red-600',
+                            tile.tone === 'teal' && 'text-teal-600',
+                            tile.tone === 'indigo' && 'text-indigo-600',
+                        ]"
+                    >
+                        {{ tile.label }}
+                    </div>
+                    <div
+                        class="mt-2 text-3xl font-bold text-slate-900 group-hover:text-slate-950"
+                    >
+                        {{ tile.value }}
+                    </div>
+                    <div
+                        class="mt-1 text-xs text-slate-400 group-hover:text-slate-500"
+                    >
+                        View list →
+                    </div>
+                </button>
+            </div>
+            <div class="mt-6 h-64 rounded-2xl bg-white p-3 shadow-sm">
+                <Bar
+                    :data="bdCompanyFilesData"
+                    :options="bdCompanyFilesOptions"
+                />
             </div>
         </div>
 
@@ -367,63 +618,131 @@ const formatBytes = (bytes) => {
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
             <div class="flex items-center justify-between mb-2">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900">App Storage Usage</h2>
-                    <p class="text-xs text-gray-500">Only this project size (app folder)</p>
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        App Storage Usage
+                    </h2>
+                    <p class="text-xs text-gray-500">
+                        Only this project size (app folder)
+                    </p>
                 </div>
                 <div class="text-sm font-semibold text-gray-700">
                     {{ formatBytes(state.appUsage.total) }}
                 </div>
             </div>
             <div class="text-xs text-gray-500">
-                Path: {{ state.appUsage.path || '—' }}
+                Path: {{ state.appUsage.path || "—" }}
             </div>
         </div>
 
         <!-- Charts Section -->
         <div class="grid gap-4 lg:grid-cols-3">
             <!-- Sales vs Expenses Sine Wave Chart -->
-            <div class="lg:col-span-2 bg-gradient-to-br from-white to-blue-50 border border-blue-100 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6">
+            <div
+                class="lg:col-span-2 bg-gradient-to-br from-white to-blue-50 border border-blue-100 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6"
+            >
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <h2
+                        class="text-lg font-semibold text-gray-900 flex items-center gap-2"
+                    >
                         <span class="w-1 h-6 bg-blue-500 rounded-full"></span>
                         Sales vs Expenses Trend
                     </h2>
-                    <div class="text-xs text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">Last 6 months (Sine Wave)</div>
+                    <div
+                        class="text-xs text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm"
+                    >
+                        Last 6 months (Sine Wave)
+                    </div>
                 </div>
-                <div class="grid gap-3 sm:grid-cols-4 text-sm text-gray-700 mb-4">
-                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2">
+                <div
+                    class="grid gap-3 sm:grid-cols-4 text-sm text-gray-700 mb-4"
+                >
+                    <div
+                        class="bg-white border border-gray-200 rounded-lg px-4 py-2"
+                    >
                         <div class="text-xs text-gray-500">Total Sales</div>
-                        <div class="font-semibold text-gray-900">{{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesSummary.total) }}</div>
+                        <div class="font-semibold text-gray-900">
+                            {{
+                                "৳" +
+                                new Intl.NumberFormat("en-BD", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                }).format(state.salesSummary.total)
+                            }}
+                        </div>
                     </div>
-                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2">
+                    <div
+                        class="bg-white border border-gray-200 rounded-lg px-4 py-2"
+                    >
                         <div class="text-xs text-gray-500">Paid</div>
-                        <div class="font-semibold text-green-700">{{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesSummary.paid) }}</div>
+                        <div class="font-semibold text-green-700">
+                            {{
+                                "৳" +
+                                new Intl.NumberFormat("en-BD", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                }).format(state.salesSummary.paid)
+                            }}
+                        </div>
                     </div>
-                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2">
+                    <div
+                        class="bg-white border border-gray-200 rounded-lg px-4 py-2"
+                    >
                         <div class="text-xs text-gray-500">Due</div>
-                        <div class="font-semibold text-orange-700">{{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesSummary.due) }}</div>
+                        <div class="font-semibold text-orange-700">
+                            {{
+                                "৳" +
+                                new Intl.NumberFormat("en-BD", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                }).format(state.salesSummary.due)
+                            }}
+                        </div>
                     </div>
-                    <div class="bg-white border border-gray-200 rounded-lg px-4 py-2">
+                    <div
+                        class="bg-white border border-gray-200 rounded-lg px-4 py-2"
+                    >
                         <div class="text-xs text-gray-500">Total Expense</div>
-                        <div class="font-semibold text-red-700">{{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.salesSummary.expenses) }}</div>
+                        <div class="font-semibold text-red-700">
+                            {{
+                                "৳" +
+                                new Intl.NumberFormat("en-BD", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                }).format(state.salesSummary.expenses)
+                            }}
+                        </div>
                     </div>
                 </div>
                 <div class="h-80 bg-white rounded-lg p-2">
-                    <Line :data="salesExpensesTrendData" :options="lineChartOptions" />
+                    <Line
+                        :data="salesExpensesTrendData"
+                        :options="lineChartOptions"
+                    />
                 </div>
             </div>
 
             <!-- Receivable vs Payable Doughnut Chart -->
-            <div class="bg-gradient-to-br from-white to-green-50 border border-green-100 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6">
+            <div
+                class="bg-gradient-to-br from-white to-green-50 border border-green-100 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6"
+            >
                 <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <h2
+                        class="text-lg font-semibold text-gray-900 flex items-center gap-2"
+                    >
                         <span class="w-1 h-6 bg-green-500 rounded-full"></span>
                         Receivable vs Payable
                     </h2>
-                    <div class="text-xs text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm inline-block mt-1">Total Outstanding</div>
+                    <div
+                        class="text-xs text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm inline-block mt-1"
+                    >
+                        Total Outstanding
+                    </div>
                 </div>
                 <div class="h-72 bg-white rounded-lg p-2">
-                    <Doughnut :data="receivablePayableData" :options="doughnutChartOptions" />
+                    <Doughnut
+                        :data="receivablePayableData"
+                        :options="doughnutChartOptions"
+                    />
                 </div>
             </div>
         </div>
@@ -431,27 +750,50 @@ const formatBytes = (bytes) => {
         <!-- Entity Distribution and Details -->
         <div class="grid gap-4 lg:grid-cols-3">
             <!-- Entity Distribution Pie Chart -->
-            <div class="bg-gradient-to-br from-white to-purple-50 border border-purple-100 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6">
+            <div
+                class="bg-gradient-to-br from-white to-purple-50 border border-purple-100 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6"
+            >
                 <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <h2
+                        class="text-lg font-semibold text-gray-900 flex items-center gap-2"
+                    >
                         <span class="w-1 h-6 bg-purple-500 rounded-full"></span>
                         Entity Distribution
                     </h2>
-                    <div class="text-xs text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm inline-block mt-1">Organization Overview</div>
+                    <div
+                        class="text-xs text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm inline-block mt-1"
+                    >
+                        Organization Overview
+                    </div>
                 </div>
                 <div class="h-72 bg-white rounded-lg p-2">
-                    <Pie :data="entityDistributionData" :options="pieChartOptions" />
+                    <Pie
+                        :data="entityDistributionData"
+                        :options="pieChartOptions"
+                    />
                 </div>
             </div>
 
             <!-- Client Advance -->
-            <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+            <div
+                class="bg-white border border-gray-200 rounded-lg shadow-sm p-4"
+            >
                 <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-green-700">Client Advance</h2>
+                    <h2 class="text-lg font-semibold text-green-700">
+                        Client Advance
+                    </h2>
                     <div class="text-2xl font-bold text-green-600">
-                        {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.receivableToday.total) }}
+                        {{
+                            "৳" +
+                            new Intl.NumberFormat("en-BD", {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                            }).format(state.receivableToday.total)
+                        }}
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">Extra paid amount over total fee</div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        Extra paid amount over total fee
+                    </div>
                 </div>
                 <ul class="space-y-2 max-h-60 overflow-y-auto">
                     <li
@@ -462,18 +804,35 @@ const formatBytes = (bytes) => {
                         <span class="font-medium">{{ item.name }}</span>
                         <span class="text-green-600">{{ item.amount }}</span>
                     </li>
-                    <li v-if="!state.receivableToday.items.length" class="text-sm text-gray-500 text-center py-4">No advance payments</li>
+                    <li
+                        v-if="!state.receivableToday.items.length"
+                        class="text-sm text-gray-500 text-center py-4"
+                    >
+                        No advance payments
+                    </li>
                 </ul>
             </div>
 
             <!-- Client Due -->
-            <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+            <div
+                class="bg-white border border-gray-200 rounded-lg shadow-sm p-4"
+            >
                 <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-red-700">Client Due</h2>
+                    <h2 class="text-lg font-semibold text-red-700">
+                        Client Due
+                    </h2>
                     <div class="text-2xl font-bold text-red-600">
-                        {{ '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(state.payableToday.total) }}
+                        {{
+                            "৳" +
+                            new Intl.NumberFormat("en-BD", {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                            }).format(state.payableToday.total)
+                        }}
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">Total due amount from clients</div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        Total due amount from clients
+                    </div>
                 </div>
                 <ul class="space-y-2 max-h-60 overflow-y-auto">
                     <li
@@ -484,10 +843,14 @@ const formatBytes = (bytes) => {
                         <span class="font-medium">{{ item.name }}</span>
                         <span class="text-red-600">{{ item.amount }}</span>
                     </li>
-                    <li v-if="!state.payableToday.items.length" class="text-sm text-gray-500 text-center py-4">No due entries</li>
+                    <li
+                        v-if="!state.payableToday.items.length"
+                        class="text-sm text-gray-500 text-center py-4"
+                    >
+                        No due entries
+                    </li>
                 </ul>
             </div>
         </div>
-
     </div>
 </template>

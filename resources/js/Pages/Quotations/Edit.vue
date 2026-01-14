@@ -1,14 +1,16 @@
 <template>
-    <Head title="Create Invoice" />
+    <Head title="Edit Quotation" />
 
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Create Invoice</h1>
-                <p class="text-sm text-gray-600">Generate a client invoice with payment details.</p>
+                <h1 class="text-2xl font-bold text-gray-900">Edit Quotation</h1>
+                <p class="text-sm text-gray-600">
+                    Update quotation details and regenerate PDF.
+                </p>
             </div>
             <Link
-                :href="route('invoices.index')"
+                :href="route('quotations.index')"
                 class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
             >
                 Back to list
@@ -17,25 +19,28 @@
 
         <form @submit.prevent="submit" class="space-y-6">
             <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Invoice Info</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Quotation Info</h2>
                 <div class="grid gap-4 md:grid-cols-2">
-                    <FormGroup label="Invoice Date">
+                <FormGroup label="Quotation Number">
+                    <input
+                        :value="props.quotation.quotation_no"
+                        readonly
+                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 font-semibold"
+                    />
+                </FormGroup>
+                <FormGroup label="Quotation Date">
+                    <input
+                        :value="props.quotation.quotation_date"
+                        readonly
+                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                    />
+                </FormGroup>
+                    <FormGroup label="Quotation Valid Until" :error="form.errors.valid_until">
                         <input
-                            :value="invoiceDate"
-                            readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
-                        />
-                    </FormGroup>
-                    <FormGroup label="Payment Method" :error="form.errors.payment_method">
-                        <select
-                            v-model="form.payment_method"
+                            v-model="form.valid_until"
+                            type="date"
                             class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
-                        >
-                            <option value="" disabled>Select method</option>
-                            <option value="Cash">Cash</option>
-                            <option value="Bank">Bank</option>
-                            <option value="Mobile">Mobile</option>
-                        </select>
+                        />
                     </FormGroup>
                 </div>
             </section>
@@ -105,20 +110,23 @@
                     </FormGroup>
                 </div>
                 <div class="mt-4">
-                    <FormGroup label="Description (Optional)" :error="form.errors.description">
+                    <FormGroup label="Description" :error="form.errors.description">
                         <textarea
                             v-model="form.description"
-                            rows="5"
+                            rows="8"
                             class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
-                            placeholder="Service details or notes"
+                            placeholder="Write detailed description (maximum 350 words)"
                         ></textarea>
+                        <p class="mt-2 text-xs text-gray-500">
+                            Word count: {{ descriptionWordCount }} / 350
+                        </p>
                     </FormGroup>
                 </div>
             </section>
 
             <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">Invoice Items</h2>
+                    <h2 class="text-lg font-semibold text-gray-900">Items</h2>
                     <button
                         type="button"
                         class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
@@ -134,8 +142,7 @@
                             <tr>
                                 <th class="px-3 py-2">SL</th>
                                 <th class="px-3 py-2">Service Description</th>
-                                <th class="px-3 py-2">Qty</th>
-                                <th class="px-3 py-2">Unit Price</th>
+                                <th class="px-3 py-2">Price</th>
                                 <th class="px-3 py-2">Discount</th>
                                 <th class="px-3 py-2">VAT %</th>
                                 <th class="px-3 py-2 text-right">VAT Amt</th>
@@ -155,17 +162,7 @@
                                 </td>
                                 <td class="px-3 py-2">
                                     <input
-                                        v-model="item.quantity"
-                                        type="number"
-                                        min="0.01"
-                                        step="0.01"
-                                        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                                        placeholder="1"
-                                    />
-                                </td>
-                                <td class="px-3 py-2">
-                                    <input
-                                        v-model="item.unit_price"
+                                        v-model="item.price"
                                         type="number"
                                         min="0"
                                         step="0.01"
@@ -258,42 +255,51 @@
                             class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-900 font-semibold"
                         />
                     </FormGroup>
-                    <FormGroup
-                        label="Paid Amount"
-                        :error="form.errors.paid_amount"
-                        labelClass="text-sm font-semibold text-blue-700"
+                </div>
+            </section>
+
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Quotation Maker</h2>
+                <FormGroup label="Office Staff" :error="form.errors.quotation_maker_id">
+                    <select
+                        v-model="form.quotation_maker_id"
+                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
                     >
+                        <option value="" disabled>Select staff</option>
+                        <option v-for="staff in officeStaff" :key="staff.id" :value="staff.id">
+                            {{ staff.name }}
+                        </option>
+                    </select>
+                </FormGroup>
+            </section>
+
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Company Contact</h2>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <FormGroup label="Phone" :error="form.errors.company_phone">
                         <input
-                            v-model="form.paid_amount"
-                            type="number"
-                            min="0"
-                            step="0.01"
+                            v-model="form.company_phone"
                             class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
-                            placeholder="0.00"
+                            placeholder="Phone number"
                         />
                     </FormGroup>
-                    <FormGroup label="Due Amount">
+                    <FormGroup label="Email" :error="form.errors.company_email">
                         <input
-                            :value="money(dueAmount)"
-                            readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
-                        />
-                    </FormGroup>
-                    <FormGroup label="Payment Date" :error="form.errors.payment_date">
-                        <input
-                            v-model="form.payment_date"
-                            type="date"
+                            v-model="form.company_email"
+                            type="email"
                             class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
-                        />
-                    </FormGroup>
-                    <FormGroup label="Status">
-                        <input
-                            :value="paymentStatusLabel"
-                            readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            placeholder="Company email"
                         />
                     </FormGroup>
                 </div>
+                <FormGroup label="Address" :error="form.errors.company_address" class="mt-4">
+                    <textarea
+                        v-model="form.company_address"
+                        rows="3"
+                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                        placeholder="Company address"
+                    ></textarea>
+                </FormGroup>
             </section>
 
             <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -325,8 +331,8 @@
                     class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                     :disabled="form.processing"
                 >
-                    <span v-if="!form.processing">Save & Generate PDF</span>
-                    <span v-else>Saving...</span>
+                    <span v-if="!form.processing">Update & Regenerate PDF</span>
+                    <span v-else>Updating...</span>
                 </button>
             </div>
         </form>
@@ -334,41 +340,43 @@
 </template>
 
 <script setup>
-import { computed, defineComponent, h, watch } from 'vue';
+import { computed, defineComponent, h, onMounted, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import SubcategorySelector from '@/Components/SubcategorySelector.vue';
 
 const props = defineProps({
+    quotation: Object,
     clients: Array,
+    officeStaff: Array,
     subcategories: Array,
     defaultTerms: String,
+    companyDefaults: Object,
 });
 
-const invoiceDate = new Date().toISOString().split('T')[0];
-
 const form = useForm({
-    client_id: '',
-    organization_name: '',
-    client_mobile: '',
-    client_email: '',
-    service_category: 'travel_tourism',
-    service_type: '',
-    description: '',
-    terms_type: 'default',
-    terms_text: props.defaultTerms,
-    paid_amount: '',
-    payment_date: '',
-    payment_method: '',
-    items: [
-        {
-            service_description: '',
-            quantity: '1',
-            unit_price: '',
-            discount_type: 'percent',
-            discount_value: '',
-            vat_rate: '',
-        },
+    client_id: props.quotation.client_id,
+    organization_name: props.quotation.organization_name || '',
+    client_mobile: props.quotation.client_mobile || '',
+    client_email: props.quotation.client_email || '',
+    service_category: props.quotation.service_category,
+    service_type: props.quotation.service_type,
+    description: props.quotation.description || '',
+    quotation_maker_id: props.quotation.quotation_maker_id,
+    terms_type: props.quotation.terms_type,
+    terms_text: props.quotation.terms_text,
+    valid_until: props.quotation.valid_until,
+    company_phone: props.quotation.company_phone || '',
+    company_email: props.quotation.company_email || '',
+    company_address: props.quotation.company_address || '',
+    items: props.quotation.items.length > 0 ? props.quotation.items : [
+        { service_description: '', price: '', discount_type: 'percent', discount_value: '', vat_rate: '' },
     ],
+});
+
+const descriptionWordCount = computed(() => {
+    const text = form.description.trim();
+    if (!text) return 0;
+    return text.split(/\s+/u).filter(Boolean).length;
 });
 
 const subcategoryOptions = computed(() => {
@@ -377,21 +385,19 @@ const subcategoryOptions = computed(() => {
 
 const itemCalculations = computed(() => {
     return form.items.map(item => {
-        const qty = parseFloat(item.quantity) || 0;
-        const price = parseFloat(item.unit_price) || 0;
-        const baseAmount = qty * price;
+        const price = parseFloat(item.price) || 0;
         const discountValue = parseFloat(item.discount_value) || 0;
         const discountAmount = item.discount_type === 'amount'
             ? discountValue
-            : (baseAmount * discountValue) / 100;
-        const safeDiscount = Math.min(baseAmount, Math.max(0, discountAmount));
-        const taxable = Math.max(0, baseAmount - safeDiscount);
+            : (price * discountValue) / 100;
+        const safeDiscount = Math.min(price, Math.max(0, discountAmount));
+        const taxable = Math.max(0, price - safeDiscount);
         const vatRate = parseFloat(item.vat_rate) || 0;
         const vatAmount = (taxable * vatRate) / 100;
         const lineTotal = taxable + vatAmount;
 
         return {
-            baseAmount,
+            baseAmount: price,
             discountAmount: safeDiscount,
             vatAmount,
             lineTotal,
@@ -415,15 +421,6 @@ const totalAmount = computed(() => {
     return itemCalculations.value.reduce((sum, item) => sum + item.lineTotal, 0);
 });
 
-const paidAmount = computed(() => parseFloat(form.paid_amount) || 0);
-const dueAmount = computed(() => Math.max(0, totalAmount.value - paidAmount.value));
-
-const paymentStatusLabel = computed(() => {
-    if (paidAmount.value <= 0) return 'Unpaid';
-    if (dueAmount.value <= 0) return 'Paid';
-    return 'Partial';
-});
-
 const handleClientChange = () => {
     const client = props.clients.find(item => item.id === form.client_id);
     if (!client) return;
@@ -439,8 +436,7 @@ const handleServiceCategoryChange = () => {
 const addItem = () => {
     form.items.push({
         service_description: '',
-        quantity: '1',
-        unit_price: '',
+        price: '',
         discount_type: 'percent',
         discount_value: '',
         vat_rate: '',
@@ -452,13 +448,13 @@ const removeItem = (index) => {
 };
 
 const submit = () => {
-    form.post(route('invoices.store'));
-};
+    if (descriptionWordCount.value > 350) {
+        form.setError('description', 'Description must be within 350 words.');
+        return;
+    }
 
-watch(
-    () => form.client_id,
-    () => handleClientChange()
-);
+    form.put(route('quotations.update', props.quotation.id));
+};
 
 watch(
     () => form.terms_type,
@@ -468,6 +464,12 @@ watch(
         }
     }
 );
+
+onMounted(() => {
+    if (props.officeStaff?.length) {
+        form.quotation_maker_id = props.officeStaff[0].id;
+    }
+});
 
 const money = (value) => {
     if (value === null || value === undefined) return '৳0.00';
@@ -480,17 +482,15 @@ const FormGroup = defineComponent({
         label: { type: String, default: '' },
         error: { type: String, default: '' },
         hint: { type: String, default: '' },
-        labelClass: { type: String, default: '' },
     },
     setup(props, { slots }) {
-        const labelClass = props.labelClass || 'text-sm font-medium text-gray-700';
         return () =>
             h(
                 'div',
                 { class: 'space-y-2', role: 'group' },
                 [
                     props.label
-                        ? h('label', { class: labelClass }, props.label)
+                        ? h('label', { class: 'text-sm font-medium text-gray-700' }, props.label)
                         : null,
                     slots.default ? slots.default() : null,
                     props.hint ? h('p', { class: 'text-xs text-gray-500' }, props.hint) : null,

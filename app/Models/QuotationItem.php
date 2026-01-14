@@ -12,10 +12,21 @@ class QuotationItem extends Model
         'sl',
         'service_description',
         'price',
+        'discount_type',
+        'discount_value',
+        'discount_amount',
+        'vat_rate',
+        'vat_amount',
+        'line_total',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'discount_value' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'vat_rate' => 'decimal:2',
+        'vat_amount' => 'decimal:2',
+        'line_total' => 'decimal:2',
     ];
 
     public function quotation(): BelongsTo

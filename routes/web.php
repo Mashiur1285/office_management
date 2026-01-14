@@ -65,6 +65,11 @@ Route::middleware('auth')->group(function () {
         Route::post('quotations', [QuotationController::class, 'store'])->name('quotations.store');
     });
 
+    Route::middleware('permission:quotation.update')->group(function () {
+        Route::get('quotations/{quotation}/edit', [QuotationController::class, 'edit'])->name('quotations.edit');
+        Route::put('quotations/{quotation}', [QuotationController::class, 'update'])->name('quotations.update');
+    });
+
     Route::middleware('permission:quotation.view')->group(function () {
         Route::get('quotations', [QuotationController::class, 'index'])->name('quotations.index');
         Route::get('quotations/{quotation}', [QuotationController::class, 'show'])->name('quotations.show');
@@ -74,6 +79,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:invoice.add')->group(function () {
         Route::get('invoices/create', [InvoiceController::class, 'create'])->name('invoices.create');
         Route::post('invoices', [InvoiceController::class, 'store'])->name('invoices.store');
+    });
+
+    Route::middleware('permission:invoice.update')->group(function () {
+        Route::get('invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
+        Route::put('invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
     });
 
     Route::middleware('permission:invoice.view')->group(function () {

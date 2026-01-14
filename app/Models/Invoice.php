@@ -24,6 +24,8 @@ class Invoice extends Model
         'company_phone',
         'company_email',
         'company_address',
+        'terms_type',
+        'terms_text',
         'subtotal',
         'discount_amount',
         'vat_rate',

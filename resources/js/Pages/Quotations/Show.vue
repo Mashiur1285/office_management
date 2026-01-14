@@ -51,24 +51,42 @@
         </div>
 
         <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-semibold text-gray-900 mb-3">Quotation Details</h2>
+            <h2 class="text-lg font-semibold text-gray-900 mb-3">Items</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-xs font-semibold uppercase text-gray-600">
                         <tr>
                             <th class="px-3 py-2">SL</th>
                             <th class="px-3 py-2">Service Description</th>
-                            <th class="px-3 py-2">Price</th>
+                            <th class="px-3 py-2 text-right">Price</th>
+                            <th class="px-3 py-2 text-right">Discount</th>
+                            <th class="px-3 py-2 text-right">VAT %</th>
+                            <th class="px-3 py-2 text-right">VAT Amt</th>
+                            <th class="px-3 py-2 text-right">Line Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="item in quotation.items" :key="item.id" class="border-b">
                             <td class="px-3 py-2 font-semibold text-gray-700">{{ item.sl }}</td>
                             <td class="px-3 py-2">{{ item.service_description }}</td>
-                            <td class="px-3 py-2">{{ money(item.price) }}</td>
+                            <td class="px-3 py-2 text-right">{{ money(item.price) }}</td>
+                            <td class="px-3 py-2 text-right">{{ money(item.discount_amount) }}</td>
+                            <td class="px-3 py-2 text-right">{{ item.vat_rate }}%</td>
+                            <td class="px-3 py-2 text-right">{{ money(item.vat_amount) }}</td>
+                            <td class="px-3 py-2 text-right font-semibold text-gray-900">{{ money(item.line_total) }}</td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Summary</h2>
+            <div class="grid gap-4 md:grid-cols-3">
+                <InfoRow label="Subtotal" :value="money(quotation.subtotal)" />
+                <InfoRow label="Discount Total" :value="money(quotation.discount_amount)" />
+                <InfoRow label="VAT Amount" :value="money(quotation.vat_amount)" />
+                <InfoRow label="Total Amount" :value="money(quotation.total_amount)" />
             </div>
         </div>
 

@@ -51,6 +51,9 @@
                             <th class="px-3 py-2">Service Description</th>
                             <th class="px-3 py-2 text-right">Qty</th>
                             <th class="px-3 py-2 text-right">Unit Price</th>
+                            <th class="px-3 py-2 text-right">Discount</th>
+                            <th class="px-3 py-2 text-right">VAT %</th>
+                            <th class="px-3 py-2 text-right">VAT Amt</th>
                             <th class="px-3 py-2 text-right">Line Total</th>
                         </tr>
                     </thead>
@@ -60,6 +63,9 @@
                             <td class="px-3 py-2 text-gray-700">{{ item.service_description }}</td>
                             <td class="px-3 py-2 text-right">{{ item.quantity }}</td>
                             <td class="px-3 py-2 text-right">{{ money(item.unit_price) }}</td>
+                            <td class="px-3 py-2 text-right">{{ money(item.discount_amount) }}</td>
+                            <td class="px-3 py-2 text-right">{{ item.vat_rate }}%</td>
+                            <td class="px-3 py-2 text-right">{{ money(item.vat_amount) }}</td>
                             <td class="px-3 py-2 text-right font-semibold text-gray-900">{{ money(item.line_total) }}</td>
                         </tr>
                     </tbody>
@@ -71,8 +77,7 @@
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Summary</h2>
             <div class="grid gap-4 md:grid-cols-3">
                 <InfoRow label="Subtotal" :value="money(invoice.subtotal)" />
-                <InfoRow label="Discount" :value="money(invoice.discount_amount)" />
-                <InfoRow label="VAT Rate" :value="`${invoice.vat_rate}%`" />
+                <InfoRow label="Discount Total" :value="money(invoice.discount_amount)" />
                 <InfoRow label="VAT Amount" :value="money(invoice.vat_amount)" />
                 <InfoRow label="Total Amount" :value="money(invoice.total_amount)" />
                 <InfoRow label="Paid Amount" :value="money(invoice.paid_amount)" />
@@ -83,14 +88,10 @@
         </section>
 
         <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Company Contact</h2>
-            <div class="grid gap-4 md:grid-cols-2">
-                <InfoRow label="Phone" :value="invoice.company_phone || '—'" />
-                <InfoRow label="Email" :value="invoice.company_email || '—'" />
-            </div>
-            <div class="mt-4">
-                <InfoRow label="Address" :value="invoice.company_address || '—'" />
-            </div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-3">Terms & Conditions</h2>
+            <p class="whitespace-pre-line text-sm text-gray-700">
+                {{ invoice.terms_text }}
+            </p>
         </section>
     </div>
 </template>

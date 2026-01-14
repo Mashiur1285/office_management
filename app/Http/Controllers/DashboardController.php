@@ -10,6 +10,7 @@ use App\Models\ForeignCompany;
 use App\Models\NonOperatingEntry;
 use App\Models\OfficeStaff;
 use App\Models\OperatingExpense;
+use App\Models\DocumentLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
@@ -117,6 +118,26 @@ class DashboardController extends Controller
             ];
         });
 
+        $bdCompanyBase = DocumentLocation::where('holder_type', 'bd_company')
+            ->whereNull('returned_at');
+        $bdCompanyTotal = (clone $bdCompanyBase)->count();
+        $bdCompanyPending = (clone $bdCompanyBase)->where(function ($query) {
+            $query->whereNull('processing_status')->orWhere('processing_status', 'pending');
+        })->count();
+        $bdCompanyAccepted = (clone $bdCompanyBase)->where('processing_status', 'accepted')->count();
+        $bdCompanyRejected = (clone $bdCompanyBase)->where('processing_status', 'rejected')->count();
+        $bdCompanyCompleted = (clone $bdCompanyBase)->where('processing_status', 'completed')->count();
+
+        $agencyTotal = Client::query()
+            ->where(function ($query) {
+                $query->doesntHave('documentLocation')
+                    ->orWhereHas('documentLocation', function ($subQuery) {
+                        $subQuery->whereIn('holder_type', ['agency', 'agency_user'])
+                            ->whereNull('returned_at');
+                    });
+            })
+            ->count();
+
         return response()->json([
             'stats' => [
                 'total_clients' => Client::count(),
@@ -142,6 +163,15 @@ class DashboardController extends Controller
                 'expenses' => $totalExpenses,
             ],
             'appUsage' => $appUsage,
+            'bdCompanyFiles' => [
+                'agency_total' => $agencyTotal,
+                'total' => $bdCompanyTotal,
+                'pending' => $bdCompanyPending,
+                'accepted' => $bdCompanyAccepted,
+                'rejected' => $bdCompanyRejected,
+                'completed' => $bdCompanyCompleted,
+            ],
+            'appName' => config('app.name'),
         ]);
     }
 }
