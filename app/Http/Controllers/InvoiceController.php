@@ -510,13 +510,12 @@ class InvoiceController extends Controller
     {
         $path = 'invoices/' . $invoice->invoice_date->format('Y/m') . '/' . $invoice->invoice_no . '.pdf';
 
-        Pdf::view('pdfs.invoice_report', [
+        $pdf = Pdf::loadView('pdfs.invoice_report', [
             'invoice' => $invoice,
             'defaultTerms' => self::DEFAULT_TERMS,
-        ])
-            ->format('A4')
-            ->disk('public', 'public')
-            ->save($path);
+        ])->setPaper('A4');
+
+        Storage::disk('public')->put($path, $pdf->output());
 
         return $path;
     }

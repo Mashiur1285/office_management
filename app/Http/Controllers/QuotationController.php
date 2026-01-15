@@ -426,13 +426,12 @@ class QuotationController extends Controller
 
         $summary = $this->computeQuotationSummary($quotation);
 
-        Pdf::view('pdfs.quotation_report', [
+        $pdf = Pdf::loadView('pdfs.quotation_report', [
             'quotation' => $quotation,
             'summary' => $summary,
-        ])
-            ->format('A4')
-            ->disk('public', 'public')
-            ->save($path);
+        ])->setPaper('A4');
+
+        Storage::disk('public')->put($path, $pdf->output());
 
         return $path;
     }
