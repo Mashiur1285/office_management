@@ -15,6 +15,14 @@
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
+                        <a :href="route('accounting.operating-profit.report')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-excel"></i>
+                            Export to Excel
+                        </a>
+                        <a :href="route('accounting.operating-profit.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            Export to PDF
+                        </a>
                     </div>
                 </div>
             </div>

@@ -20,6 +20,7 @@
                 color="default"
                 prefix-icon="fa-solid fa-plus"
                 :pill="true"
+                btnClass="bg-blue-600 text-white hover:bg-blue-700"
                 @onClick="router.visit(route('roles.create'))"
                 v-if="canCreate"
             />
@@ -42,7 +43,6 @@ const props = defineProps({
 });
 
 const page = usePage();
-
 const state = reactive({
     search: props.filters?.name || '',
     isSearching: false,
@@ -59,7 +59,6 @@ const columns = [
 const permissions = computed(() => page.props.userPermissions || []);
 const hasPermission = (permission) =>
     permissions.value?.includes('role.*') || permissions.value?.includes(permission);
-
 const canCreate = computed(() => hasPermission('role.add'));
 
 const onSearch = (value) => {

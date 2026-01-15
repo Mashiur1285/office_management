@@ -270,6 +270,7 @@ Route::middleware('auth')->group(function () {
 
         // Operating Profit Route
         Route::get('/operating-profit', [\App\Http\Controllers\Accounting\OperatingProfitController::class, 'index'])->name('operating-profit');
+        Route::get('/operating-profit/report', [\App\Http\Controllers\Accounting\OperatingProfitController::class, 'report'])->name('operating-profit.report');
 
         // Non-Operating Routes
         Route::get('/non-operating', [\App\Http\Controllers\Accounting\NonOperatingController::class, 'index'])->name('non-operating');

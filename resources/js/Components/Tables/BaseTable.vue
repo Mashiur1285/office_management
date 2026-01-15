@@ -1,39 +1,41 @@
 <template>
-    <div class="flex justify-between space-x-4 items-center">
-        <div class="text-2xl font-semibold leading-6 text-gray-900" :class="tableTitleClass">
-            <slot name="title">
-                {{ title }}
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="text-2xl font-semibold leading-6 text-gray-900" :class="tableTitleClass">
+                <slot name="title">
+                    {{ title }}
+                </slot>
+            </div>
+            <div class="shrink-0">
+                <slot name="action"></slot>
+            </div>
+        </div>
+
+        <div class="mt-4 flex w-full flex-wrap items-center justify-between gap-3">
+            <slot name="filters" />
+            <slot v-if="showSearch" name="search">
+                <div class="w-[250px]">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                            <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" />
+                        </span>
+                        <input
+                            :placeholder="searchPlaceHolder"
+                            :value="searchValue"
+                            @input="$emit('search', $event.target.value)"
+                            type="search"
+                            class="pl-9 pr-3 py-2 w-full border border-gray-300 rounded-lg text-sm text-gray-800 bg-white focus:border-blue-500 focus:ring-blue-500"
+                        />
+                        <span v-if="isSearching" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
+                            <FontAwesomeIcon icon="fa-solid fa-rotate-right" class="animate-spin" />
+                        </span>
+                    </div>
+                </div>
             </slot>
         </div>
-        <div>
-            <slot name="action"></slot>
-        </div>
     </div>
 
-    <div class="mt-3 flex w-full justify-between items-center">
-        <slot name="filters" />
-        <slot v-if="showSearch" name="search">
-            <div class="w-[250px]">
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                        <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" />
-                    </span>
-                    <input
-                        :placeholder="searchPlaceHolder"
-                        :value="searchValue"
-                        @input="$emit('search', $event.target.value)"
-                        type="search"
-                        class="pl-9 pr-3 py-2 w-full border border-gray-300 rounded-lg text-sm text-gray-800 bg-white focus:border-blue-500 focus:ring-blue-500"
-                    />
-                    <span v-if="isSearching" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
-                        <FontAwesomeIcon icon="fa-solid fa-rotate-right" class="animate-spin" />
-                    </span>
-                </div>
-            </div>
-        </slot>
-    </div>
-
-    <div class="relative shadow sm:rounded-lg mt-3" :class="baseTableClass">
+    <div class="relative shadow sm:rounded-lg mt-6" :class="baseTableClass">
         <table class="min-w-full border rounded-[10px] overflow-hidden text-[14px]" :class="tableClass">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50" :class="headerClass">
                 <tr class="bg-gray-200">
@@ -82,7 +84,7 @@
         </table>
     </div>
 
-    <div v-if="totalPages" class="flex mt-5 items-center w-full relative gap-4" :class="basePaginationClass">
+    <div v-if="totalPages" class="flex mt-6 items-center w-full relative gap-4" :class="basePaginationClass">
         <div>
             <select
                 v-model="pagination.perPage"

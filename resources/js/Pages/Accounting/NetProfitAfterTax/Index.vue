@@ -15,15 +15,13 @@
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
-                        <a :href="route('accounting.net-profit-after-tax.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
-                            </svg>
-                            Export PDF
-                        </a>
                         <a :href="route('accounting.net-profit-after-tax.report')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-download"></i>
-                            Download Report
+                            <i class="fa-solid fa-file-excel"></i>
+                            Export to Excel
+                        </a>
+                        <a :href="route('accounting.net-profit-after-tax.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            Export to PDF
                         </a>
                     </div>
                 </div>

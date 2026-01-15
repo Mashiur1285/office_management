@@ -774,8 +774,9 @@ const hasPermission = (permission) =>
     userPermissions.value.includes("*") ||
     userPermissions.value.includes("superadmin");
 
-const showAccessManagement =
-    hasPermission("role.view") || hasPermission("user.view");
+const showAccessManagement = computed(
+    () => hasPermission("role.view") || hasPermission("user.view")
+);
 
 const currentPath = computed(() => $page.url.split("?")[0]);
 

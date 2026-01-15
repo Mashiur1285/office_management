@@ -11,7 +11,7 @@ const props = defineProps({
 });
 
 const formData = useForm({
-    is_active: props.data.is_active,
+    is_active: Boolean(props.data.is_active),
 });
 
 const updateStatus = () => {

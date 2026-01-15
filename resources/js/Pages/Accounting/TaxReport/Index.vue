@@ -10,13 +10,13 @@
                         <p class="text-sm text-gray-600 mt-1">Monthly tax summary with payments and balance</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <a :href="route('accounting.tax-report.report')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-download"></i>
-                            Download Report
+                        <a :href="route('accounting.tax-report.report')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-excel"></i>
+                            Export to Excel
                         </a>
                         <a :href="route('accounting.tax-report.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
                             <i class="fa-solid fa-file-pdf"></i>
-                            Download PDF
+                            Export to PDF
                         </a>
                         <Link href="/accounting/tax-summary" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium text-sm">
                             Go to Tax Summary

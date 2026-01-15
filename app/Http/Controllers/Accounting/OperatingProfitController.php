@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class OperatingProfitController extends Controller
 {
@@ -98,6 +100,99 @@ class OperatingProfitController extends Controller
                     'total' => (float) ($expensesByCategory['general']['amount'] + $expensesByCategory['general']['vat_amount']),
                 ],
             ],
+        ]);
+    }
+
+    public function report(Request $request)
+    {
+        $period = AccountingPeriod::where('status', 'active')
+            ->orWhere('status', 'draft')
+            ->latest()
+            ->first();
+
+        $period->load(['incomeEntries', 'costOfSales', 'operatingExpenses']);
+
+        $grossProfit = $period->gross_profit;
+        $totalOperatingExpenses = $period->total_operating_expenses;
+        $totalOperatingExpensesVat = $period->total_operating_expenses_vat;
+        $totalOperatingExpensesWithVat = $totalOperatingExpenses + $totalOperatingExpensesVat;
+        $operatingProfit = $period->operating_profit;
+        $operatingMargin = $grossProfit > 0 ? (($operatingProfit / $grossProfit) * 100) : 0;
+
+        $expensesByCategory = [
+            'employee_manpower' => [
+                'amount' => $period->operatingExpenses()->where('category', 'employee_manpower')->sum('amount'),
+                'vat_amount' => $period->operatingExpenses()->where('category', 'employee_manpower')->sum('vat_amount'),
+            ],
+            'administrative' => [
+                'amount' => $period->operatingExpenses()->where('category', 'administrative')->sum('amount'),
+                'vat_amount' => $period->operatingExpenses()->where('category', 'administrative')->sum('vat_amount'),
+            ],
+            'selling_marketing' => [
+                'amount' => $period->operatingExpenses()->where('category', 'selling_marketing')->sum('amount'),
+                'vat_amount' => $period->operatingExpenses()->where('category', 'selling_marketing')->sum('vat_amount'),
+            ],
+            'general' => [
+                'amount' => $period->operatingExpenses()->where('category', 'general')->sum('amount'),
+                'vat_amount' => $period->operatingExpenses()->where('category', 'general')->sum('vat_amount'),
+            ],
+        ];
+
+        $categories = [
+            'employee_manpower' => 'Employee & Manpower',
+            'administrative' => 'Administrative',
+            'selling_marketing' => 'Selling & Marketing',
+            'general' => 'General',
+        ];
+
+        if ($request->query('type') === 'pdf') {
+            $fileName = 'operating-profit-report-' . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::view('pdfs.operating_profit_report', [
+                'period' => $period,
+                'grossProfit' => $grossProfit,
+                'totalOperatingExpenses' => $totalOperatingExpenses,
+                'totalOperatingExpensesVat' => $totalOperatingExpensesVat,
+                'totalOperatingExpensesWithVat' => $totalOperatingExpensesWithVat,
+                'operatingProfit' => $operatingProfit,
+                'operatingMargin' => $operatingMargin,
+                'categories' => $categories,
+                'expensesByCategory' => $expensesByCategory,
+            ])->name($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        fputcsv($handle, ['Operating Profit Summary']);
+        fputcsv($handle, ['Metric', 'Amount']);
+        fputcsv($handle, ['Gross Profit', $grossProfit]);
+        fputcsv($handle, ['Operating Expenses', $totalOperatingExpenses]);
+        fputcsv($handle, ['Operating Expenses VAT', $totalOperatingExpensesVat]);
+        fputcsv($handle, ['Operating Expenses Total', $totalOperatingExpensesWithVat]);
+        fputcsv($handle, ['Operating Profit', $operatingProfit]);
+        fputcsv($handle, ['Operating Margin', number_format($operatingMargin, 2) . '%']);
+        fputcsv($handle, []);
+
+        fputcsv($handle, ['Operating Expenses Breakdown']);
+        fputcsv($handle, ['Category', 'Amount', 'VAT', 'Total']);
+
+        foreach ($categories as $key => $name) {
+            $amount = $expensesByCategory[$key]['amount'] ?? 0;
+            $vatAmount = $expensesByCategory[$key]['vat_amount'] ?? 0;
+            $total = $amount + $vatAmount;
+
+            fputcsv($handle, [$name, $amount, $vatAmount, $total]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = 'operating-profit-report-' . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 }

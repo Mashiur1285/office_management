@@ -20,6 +20,7 @@
                 color="default"
                 prefix-icon="fa-solid fa-plus"
                 :pill="true"
+                btnClass="bg-blue-600 text-white hover:bg-blue-700"
                 @onClick="addUser"
                 v-if="canCreate"
             />
@@ -29,7 +30,7 @@
 
 <script setup>
 import { Head, router, usePage } from '@inertiajs/vue3';
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, onMounted, computed } from 'vue';
 import Table from '@/Components/Tables/BaseTable.vue';
 import BaseButton from '@/Components/Buttons/BaseButton.vue';
 import UserActions from '@/Pages/ACL/Users/Partials/UserActions.vue';
