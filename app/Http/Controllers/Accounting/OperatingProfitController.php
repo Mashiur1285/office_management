@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OperatingProfitController extends Controller
 {
@@ -148,7 +148,7 @@ class OperatingProfitController extends Controller
         if ($request->query('type') === 'pdf') {
             $fileName = 'operating-profit-report-' . now()->format('Y-m-d') . '.pdf';
 
-            return Pdf::view('pdfs.operating_profit_report', [
+            return Pdf::loadView('pdfs.operating_profit_report', [
                 'period' => $period,
                 'grossProfit' => $grossProfit,
                 'totalOperatingExpenses' => $totalOperatingExpenses,
@@ -158,7 +158,7 @@ class OperatingProfitController extends Controller
                 'operatingMargin' => $operatingMargin,
                 'categories' => $categories,
                 'expensesByCategory' => $expensesByCategory,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         $handle = fopen('php://memory', 'w');

@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Exports\CostOfSalesExport;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CostOfSalesController extends Controller
 {
@@ -179,11 +179,11 @@ class CostOfSalesController extends Controller
             ];
             $categoryName = $categoryNames[$category] ?? $category;
 
-            return Pdf::view('pdfs.cost_of_sales_report', [
+            return Pdf::loadView('pdfs.cost_of_sales_report', [
                 'entries' => $entries,
                 'period' => $period,
                 'categoryName' => $categoryName,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         // Default to CSV if type is not supported

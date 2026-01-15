@@ -9,7 +9,7 @@ use App\Models\OfficeStaff;
 use App\Models\OperatingExpense;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OperatingExpensesController extends Controller
 {
@@ -294,7 +294,7 @@ class OperatingExpensesController extends Controller
 
             $fileName = "operating-expenses-report-{$category}-" . now()->format('Y-m-d') . '.pdf';
 
-            return Pdf::view('pdfs.operating_expenses_report', [
+            return Pdf::loadView('pdfs.operating_expenses_report', [
                 'period' => $period,
                 'category' => $category,
                 'categoryName' => $categoryNames[$category] ?? $category,
@@ -302,7 +302,7 @@ class OperatingExpensesController extends Controller
                 'totalAmount' => $totalAmount,
                 'totalVat' => $totalVat,
                 'totalWithVat' => $totalWithVat,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         $handle = fopen('php://memory', 'w');

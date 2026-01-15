@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Exports\IncomeReportExport;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class IncomeController extends Controller
 {
@@ -197,11 +197,11 @@ class IncomeController extends Controller
             ];
             $categoryName = $categoryNames[$category] ?? $category;
 
-            return Pdf::view('pdfs.income_report', [
+            return Pdf::loadView('pdfs.income_report', [
                 'entries' => $entries,
                 'period' => $period,
                 'categoryName' => $categoryName,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         // Default to CSV if type is not supported

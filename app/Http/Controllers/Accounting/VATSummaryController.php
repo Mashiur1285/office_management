@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class VATSummaryController extends Controller
 {
@@ -363,14 +363,14 @@ class VATSummaryController extends Controller
         if ($request->query('type') === 'pdf') {
             $fileName = "vat-summary-report-" . now()->format('Y-m-d') . '.pdf';
 
-            return Pdf::view('pdfs.vat_summary_report', [
+            return Pdf::loadView('pdfs.vat_summary_report', [
                 'period' => $period,
                 'vatByCategory' => $vatByCategory,
                 'totalVat' => $totalVat,
                 'totalVatPayments' => $totalVatPayments,
                 'vatBalance' => $vatBalance,
                 'payments' => $period->vatPayments()->latest()->get(),
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         $handle = fopen('php://memory', 'w');

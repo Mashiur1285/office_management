@@ -9,7 +9,7 @@ use App\Models\NonOperatingEntry;
 use App\Models\Subcategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class NonOperatingController extends Controller
 {
@@ -187,14 +187,14 @@ class NonOperatingController extends Controller
         if ($request->query('type') === 'pdf') {
             $fileName = "non-operating-report-" . now()->format('Y-m-d') . '.pdf';
 
-            return Pdf::view('pdfs.non_operating_report', [
+            return Pdf::loadView('pdfs.non_operating_report', [
                 'period' => $period,
                 'incomeEntries' => $incomeEntries,
                 'expenseEntries' => $expenseEntries,
                 'totalIncome' => $totalIncome,
                 'totalExpenses' => $totalExpenses,
                 'netNonOperating' => $netNonOperating,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         $handle = fopen('php://memory', 'w');

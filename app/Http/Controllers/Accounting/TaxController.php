@@ -8,7 +8,7 @@ use App\Models\Client;
 use App\Models\TaxEntry;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TaxController extends Controller
 {
@@ -174,7 +174,7 @@ class TaxController extends Controller
         if ($request->query('type') === 'pdf') {
             $fileName = "tax-management-report-" . now()->format('Y-m-d') . '.pdf';
 
-            return Pdf::view('pdfs.tax_report', [
+            return Pdf::loadView('pdfs.tax_report', [
                 'period' => $period,
                 'currentTaxEntries' => $currentTaxEntries,
                 'deferredTaxEntries' => $deferredTaxEntries,
@@ -183,7 +183,7 @@ class TaxController extends Controller
                 'totalTax' => $totalTax,
                 'netProfitBeforeTax' => $netProfitBeforeTax,
                 'netProfitAfterTax' => $netProfitAfterTax,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         $handle = fopen('php://memory', 'w');

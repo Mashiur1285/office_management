@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class GrossProfitController extends Controller
 {
@@ -138,7 +138,7 @@ class GrossProfitController extends Controller
         if ($request->query('type') === 'pdf') {
             $fileName = "gross-profit-report-" . now()->format('Y-m-d') . '.pdf';
 
-            return Pdf::view('pdfs.gross_profit_report', [
+            return Pdf::loadView('pdfs.gross_profit_report', [
                 'period' => $period,
                 'totalIncome' => $totalIncome,
                 'totalCostOfSales' => $totalCostOfSales,
@@ -147,7 +147,7 @@ class GrossProfitController extends Controller
                 'categories' => $categories,
                 'incomeByCategory' => $incomeByCategory,
                 'costsByCategory' => $costsByCategory,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         foreach ($categories as $key => $name) {

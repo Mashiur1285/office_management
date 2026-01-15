@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TaxReportController extends Controller
 {
@@ -52,12 +52,12 @@ class TaxReportController extends Controller
         if ($request->query('type') === 'pdf') {
             $fileName = "tax-report-" . now()->format('Y-m-d') . '.pdf';
 
-            return Pdf::view('pdfs.tax_overview_report', [
+            return Pdf::loadView('pdfs.tax_overview_report', [
                 'periods' => $periods,
                 'overallTotalTax' => $overallTotalTax,
                 'overallTotalPayments' => $overallTotalPayments,
                 'overallOutstandingBalance' => $overallOutstandingBalance,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         $handle = fopen('php://memory', 'w');

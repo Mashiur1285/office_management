@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class VATReportController extends Controller
 {
@@ -53,12 +53,12 @@ class VATReportController extends Controller
         if ($request->query('type') === 'pdf') {
             $fileName = "vat-report-" . now()->format('Y-m-d') . '.pdf';
 
-            return Pdf::view('pdfs.vat_report', [
+            return Pdf::loadView('pdfs.vat_report', [
                 'periods' => $periods,
                 'overallTotalVat' => $overallTotalVat,
                 'overallTotalPayments' => $overallTotalPayments,
                 'overallOutstandingBalance' => $overallOutstandingBalance,
-            ])->name($fileName);
+            ])->download($fileName);
         }
 
         $handle = fopen('php://memory', 'w');
