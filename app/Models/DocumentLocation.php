@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Models\DocumentHolderType;
 
 class DocumentLocation extends Model
 {
@@ -48,7 +49,7 @@ class DocumentLocation extends Model
             'foreign_company' => $this->holder?->name ?? 'Foreign Company',
             'agency' => 'Agency',
             'other' => 'Other',
-            default => 'Unknown',
+            default => DocumentHolderType::labelFor($this->holder_type) ?? 'Unknown',
         };
     }
 

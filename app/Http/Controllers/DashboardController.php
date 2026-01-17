@@ -26,6 +26,18 @@ class DashboardController extends Controller
     public function data(Request $request)
     {
         $now = now();
+        $fileDateRange = $this->resolveDateRange(
+            $request->input('file_start_date'),
+            $request->input('file_end_date')
+        );
+        $agentDateRange = $this->resolveDateRange(
+            $request->input('agent_start_date'),
+            $request->input('agent_end_date')
+        );
+        $countryDateRange = $this->resolveDateRange(
+            $request->input('country_start_date'),
+            $request->input('country_end_date')
+        );
 
         $monthWindow = collect(range(5, 0))->map(fn ($i) => $now->copy()->subMonths($i));
 
@@ -120,6 +132,9 @@ class DashboardController extends Controller
 
         $bdCompanyBase = DocumentLocation::where('holder_type', 'bd_company')
             ->whereNull('returned_at');
+        if ($fileDateRange) {
+            $bdCompanyBase->whereBetween('created_at', $fileDateRange);
+        }
         $bdCompanyTotal = (clone $bdCompanyBase)->count();
         $bdCompanyPending = (clone $bdCompanyBase)->where(function ($query) {
             $query->whereNull('processing_status')->orWhere('processing_status', 'pending');
@@ -128,15 +143,57 @@ class DashboardController extends Controller
         $bdCompanyRejected = (clone $bdCompanyBase)->where('processing_status', 'rejected')->count();
         $bdCompanyCompleted = (clone $bdCompanyBase)->where('processing_status', 'completed')->count();
 
-        $agencyTotal = Client::query()
+        $agencyTotalQuery = Client::query();
+        $agencyTotalQuery->where(function ($query) use ($fileDateRange) {
+            $query->where(function ($inner) use ($fileDateRange) {
+                $inner->doesntHave('documentLocation');
+                if ($fileDateRange) {
+                    $inner->whereBetween('clients.created_at', $fileDateRange);
+                }
+            })->orWhereHas('documentLocation', function ($subQuery) use ($fileDateRange) {
+                $subQuery->whereIn('holder_type', ['agency', 'agency_user'])
+                    ->whereNull('returned_at');
+                if ($fileDateRange) {
+                    $subQuery->whereBetween('created_at', $fileDateRange);
+                }
+            });
+        });
+        $agencyTotal = $agencyTotalQuery->count();
+
+        $agentClientSummary = Agent::query()
+            ->withCount(['clients' => function ($query) use ($agentDateRange) {
+                if ($agentDateRange) {
+                    $query->whereBetween('clients.created_at', $agentDateRange);
+                }
+            }])
+            ->orderByDesc('clients_count')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Agent $agent) => [
+                'id' => $agent->id,
+                'name' => $agent->name,
+                'clients_count' => $agent->clients_count,
+            ])
+            ->values();
+
+        $foreignCountrySummary = Client::query()
+            ->leftJoin('foreign_companies', 'clients.foreign_company_id', '=', 'foreign_companies.id')
+            ->selectRaw("COALESCE(foreign_companies.country, clients.foreign_company_country, 'Unknown') as country, COUNT(*) as total")
             ->where(function ($query) {
-                $query->doesntHave('documentLocation')
-                    ->orWhereHas('documentLocation', function ($subQuery) {
-                        $subQuery->whereIn('holder_type', ['agency', 'agency_user'])
-                            ->whereNull('returned_at');
-                    });
+                $query->whereNotNull('clients.foreign_company_id')
+                    ->orWhereNotNull('clients.foreign_company_country');
             })
-            ->count();
+            ->when($countryDateRange, function ($query) use ($countryDateRange) {
+                $query->whereBetween('clients.created_at', $countryDateRange);
+            })
+            ->groupByRaw("COALESCE(foreign_companies.country, clients.foreign_company_country, 'Unknown')")
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($row) => [
+                'country' => $row->country,
+                'total' => (int) $row->total,
+            ])
+            ->values();
 
         return response()->json([
             'stats' => [
@@ -171,7 +228,25 @@ class DashboardController extends Controller
                 'rejected' => $bdCompanyRejected,
                 'completed' => $bdCompanyCompleted,
             ],
+            'agentClientSummary' => $agentClientSummary,
+            'foreignCountrySummary' => $foreignCountrySummary,
             'appName' => config('app.name'),
         ]);
+    }
+
+    private function resolveDateRange(?string $startDate, ?string $endDate): ?array
+    {
+        if (! $startDate || ! $endDate) {
+            return null;
+        }
+
+        try {
+            return [
+                Carbon::parse($startDate)->startOfDay(),
+                Carbon::parse($endDate)->endOfDay(),
+            ];
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 }

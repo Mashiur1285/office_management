@@ -72,28 +72,61 @@
 
             <div class="md:col-span-2 rounded-xl border border-gray-100 bg-white shadow-sm p-4 space-y-4">
                 <h2 class="text-lg font-semibold text-gray-900">Transfer Documents</h2>
-                <p class="text-sm text-gray-600">Hand over papers to agency staff, BD company, or other parties</p>
+                <p class="text-sm text-gray-600">Hand over papers to MITT staff, BD company, or other parties</p>
                 <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submit">
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-700">Holder Type *</label>
-                        <select v-model="form.to_holder_type" class="input" @change="onHolderTypeChange">
-                            <option value="">Select holder type</option>
-                            <option v-for="option in holders" :key="option.value" :value="option.value">
-                                {{ option.label }}
-                            </option>
-                        </select>
+                        <HolderTypeSelector
+                            v-model="form.to_holder_type"
+                            :holder-types="holderTypes"
+                        />
                         <p v-if="form.errors.to_holder_type" class="text-xs text-red-600">{{ form.errors.to_holder_type }}</p>
                     </div>
 
                     <!-- Specific holder selection based on type -->
                     <div v-if="form.to_holder_type === 'agency_user'" class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">Agency Staff Member *</label>
-                        <select v-model="form.to_holder_id" class="input">
-                            <option value="">Select staff member</option>
-                            <option v-for="user in agencyUsers" :key="user.value" :value="user.value">
-                                {{ user.label }}
-                            </option>
-                        </select>
+                        <label class="text-sm font-medium text-gray-700">MITT Staff Member *</label>
+                        <div class="relative">
+                            <input
+                                v-model="mittStaffSearch"
+                                @focus="showMittStaffDropdown = true"
+                                @blur="hideMittStaffDropdown"
+                                type="text"
+                                class="input"
+                                :placeholder="selectedMittStaffLabel || 'Search or select staff member...'"
+                            />
+                            <div
+                                v-if="showMittStaffDropdown"
+                                class="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
+                            >
+                                <div
+                                    v-for="user in filteredMittStaff"
+                                    :key="user.value"
+                                    @mousedown.prevent="selectMittStaff(user)"
+                                    class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                                >
+                                    <div class="font-medium text-gray-900">
+                                        {{ user.label }}
+                                    </div>
+                                </div>
+                                <div
+                                    v-if="filteredMittStaff.length === 0"
+                                    class="px-4 py-3 text-sm text-gray-500 text-center"
+                                >
+                                    No staff found
+                                </div>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            @click="openAddMittStaffModal"
+                            class="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                        >
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add MITT Staff
+                        </button>
                         <p v-if="form.errors.to_holder_id" class="text-xs text-red-600">{{ form.errors.to_holder_id }}</p>
                     </div>
 
@@ -218,12 +251,53 @@
                 </table>
             </div>
         </section>
+
+        <Modal :show="showMittStaffModal" @close="closeAddMittStaffModal" max-width="sm">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Add MITT Staff</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600">Name *</label>
+                        <input v-model="newMittStaff.name" class="input mt-1" placeholder="Staff name" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600">Designation</label>
+                        <input v-model="newMittStaff.designation" class="input mt-1" placeholder="Designation (optional)" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600">Mobile</label>
+                        <input v-model="newMittStaff.mobile" class="input mt-1" placeholder="Mobile (optional)" />
+                    </div>
+                    <p v-if="mittStaffError" class="text-xs text-red-600">{{ mittStaffError }}</p>
+                </div>
+                <div class="mt-4 flex justify-end gap-2">
+                    <button
+                        type="button"
+                        @click="closeAddMittStaffModal"
+                        class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        @click="createMittStaff"
+                        class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
+                        :disabled="mittStaffSaving"
+                    >
+                        {{ mittStaffSaving ? "Saving..." : "Save" }}
+                    </button>
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>
 
 <script setup>
-import { computed, watch, onMounted } from "vue";
+import { computed, watch, onMounted, ref, reactive } from "vue";
 import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
+import axios from "axios";
+import Modal from "@/Components/Modal.vue";
+import HolderTypeSelector from "@/Components/HolderTypeSelector.vue";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
@@ -297,6 +371,36 @@ const form = useForm({
     notes: "",
 });
 
+const holderTypes = ref([...(props.holders || [])]);
+const isRestoringForm = ref(true);
+
+const mittStaffOptions = ref([...(props.agencyUsers || [])]);
+const mittStaffSearch = ref("");
+const showMittStaffDropdown = ref(false);
+const showMittStaffModal = ref(false);
+const mittStaffSaving = ref(false);
+const mittStaffError = ref("");
+const newMittStaff = reactive({
+    name: "",
+    designation: "",
+    mobile: "",
+});
+
+const selectedMittStaffLabel = computed(() => {
+    const match = mittStaffOptions.value.find((user) => user.value === form.to_holder_id);
+    return match ? match.label : "";
+});
+
+const filteredMittStaff = computed(() => {
+    const query = mittStaffSearch.value.toLowerCase().trim();
+    if (!query) {
+        return mittStaffOptions.value;
+    }
+    return mittStaffOptions.value.filter((user) =>
+        user.label.toLowerCase().includes(query)
+    );
+});
+
 // LocalStorage key for this client's form
 const storageKey = `document_tracking_form_${props.client.id}`;
 
@@ -315,6 +419,7 @@ onMounted(() => {
             console.error('Failed to restore form data:', e);
         }
     }
+    isRestoringForm.value = false;
 });
 
 // Save form to localStorage whenever it changes
@@ -324,6 +429,18 @@ watch(
         localStorage.setItem(storageKey, JSON.stringify(newData));
     },
     { deep: true }
+);
+
+watch(
+    () => form.to_holder_type,
+    (newValue, oldValue) => {
+        if (isRestoringForm.value) {
+            return;
+        }
+        if (newValue !== oldValue) {
+            onHolderTypeChange();
+        }
+    }
 );
 
 const submit = () => {
@@ -340,13 +457,76 @@ const clearForm = () => {
 const onHolderTypeChange = () => {
     // Reset holder_id when type changes
     form.to_holder_id = null;
+    mittStaffSearch.value = "";
+};
+
+
+const hideMittStaffDropdown = () => {
+    setTimeout(() => {
+        showMittStaffDropdown.value = false;
+    }, 150);
+};
+
+const selectMittStaff = (user) => {
+    form.to_holder_id = user.value;
+    mittStaffSearch.value = user.label;
+    showMittStaffDropdown.value = false;
+};
+
+const openAddMittStaffModal = () => {
+    mittStaffError.value = "";
+    showMittStaffModal.value = true;
+};
+
+const closeAddMittStaffModal = () => {
+    showMittStaffModal.value = false;
+    mittStaffError.value = "";
+    newMittStaff.name = "";
+    newMittStaff.designation = "";
+    newMittStaff.mobile = "";
+};
+
+const createMittStaff = async () => {
+    const name = newMittStaff.name.trim();
+    if (!name) {
+        mittStaffError.value = "Name is required.";
+        return;
+    }
+    mittStaffSaving.value = true;
+    mittStaffError.value = "";
+    try {
+        const { data } = await axios.post(
+            "/office-staff",
+            {
+                name,
+                designation: newMittStaff.designation.trim() || null,
+                mobile: newMittStaff.mobile.trim() || null,
+                status: "active",
+            },
+            { headers: { Accept: "application/json" } }
+        );
+        if (data?.staffMember) {
+            mittStaffOptions.value = [...mittStaffOptions.value, data.staffMember];
+            form.to_holder_id = data.staffMember.value;
+            mittStaffSearch.value = data.staffMember.label;
+        }
+        closeAddMittStaffModal();
+    } catch (error) {
+        mittStaffError.value = error?.response?.data?.message || "Failed to add staff member.";
+    } finally {
+        mittStaffSaving.value = false;
+    }
 };
 
 const getHolderTypeLabel = (value) => {
     if (!value) return "—";
+    const holder = holderTypes.value.find((type) => type.value === value);
+    if (holder) {
+        return holder.label;
+    }
     const map = {
-        agency: "Agency (General)",
-        agency_user: "Agency Staff",
+        agency: "MITT (General)",
+        agency_user: "MITT Staff",
         bd_company: "BD Company",
         foreign_company: "Foreign Company",
         agent: "Agent",

@@ -6,6 +6,7 @@ use App\Models\Agent;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Arr;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AgentController extends Controller
 {
@@ -28,6 +29,53 @@ class AgentController extends Controller
 
         return Inertia::render('Agents/Index', [
             'agents' => $agents,
+        ]);
+    }
+
+    public function export(Request $request, ?string $type = null)
+    {
+        $agents = Agent::query()
+            ->withCount('clients')
+            ->latest()
+            ->get();
+
+        if ($type === 'pdf') {
+            $fileName = 'agents-report-' . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::loadView('pdfs.agent_list_report', [
+                'agents' => $agents,
+            ])->download($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        fputcsv($handle, [
+            'Name',
+            'Mobile',
+            'District',
+            'Services',
+            'Clients',
+        ]);
+
+        foreach ($agents as $agent) {
+            fputcsv($handle, [
+                $agent->name,
+                $agent->mobile,
+                $agent->district,
+                implode(', ', $agent->services ?? []),
+                $agent->clients_count,
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = 'agents-report-' . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 

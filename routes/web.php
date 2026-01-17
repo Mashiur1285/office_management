@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:client.view')->group(function () {
         Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
+        Route::get('clients/export/{type?}', [ClientController::class, 'export'])->name('clients.export');
         Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
     });
 
@@ -72,6 +73,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:quotation.view')->group(function () {
         Route::get('quotations', [QuotationController::class, 'index'])->name('quotations.index');
+        Route::get('quotations/export/{type?}', [QuotationController::class, 'export'])->name('quotations.export');
         Route::get('quotations/{quotation}', [QuotationController::class, 'show'])->name('quotations.show');
         Route::get('quotations/{quotation}/download', [QuotationController::class, 'download'])->name('quotations.download');
     });
@@ -88,6 +90,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:invoice.view')->group(function () {
         Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('invoices/export/{type?}', [InvoiceController::class, 'export'])->name('invoices.export');
         Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
         Route::get('invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
     });
@@ -104,6 +107,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:agent.view')->group(function () {
         Route::get('agents', [AgentController::class, 'index'])->name('agents.index');
+        Route::get('agents/export/{type?}', [AgentController::class, 'export'])->name('agents.export');
         Route::get('agents/{agent}', [AgentController::class, 'show'])->name('agents.show');
     });
 
@@ -119,6 +123,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:bd-company.view')->group(function () {
         Route::get('bd-companies', [BdCompanyController::class, 'index'])->name('bd-companies.index');
+        Route::get('bd-companies/export/{type?}', [BdCompanyController::class, 'export'])->name('bd-companies.export');
+        Route::get('bd-companies/{bdCompany}', [BdCompanyController::class, 'show'])->name('bd-companies.show');
     });
 
     Route::middleware('permission:foreign-company.add')->group(function () {
@@ -133,6 +139,9 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:foreign-company.view')->group(function () {
         Route::get('foreign-companies', [ForeignCompanyController::class, 'index'])->name('foreign-companies.index');
+        Route::get('foreign-companies/export/{type?}', [ForeignCompanyController::class, 'export'])->name('foreign-companies.export');
+        Route::get('foreign-companies/{foreignCompany}', [ForeignCompanyController::class, 'show'])->name('foreign-companies.show');
+        Route::get('foreign-companies/country/{country}', [ForeignCompanyController::class, 'country'])->name('foreign-companies.country');
     });
 
     Route::middleware('permission:office-staff.add')->group(function () {
@@ -147,6 +156,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:office-staff.view')->group(function () {
         Route::get('office-staff', [OfficeStaffController::class, 'index'])->name('office-staff.index');
+        Route::get('office-staff/export/{type?}', [OfficeStaffController::class, 'export'])->name('office-staff.export');
         Route::get('office-staff/{officeStaff}', [OfficeStaffController::class, 'show'])->name('office-staff.show');
     });
 
@@ -178,6 +188,17 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('permission:document.update')->group(function () {
         Route::patch('/clients/{client}/documents/status', [DocumentLocationController::class, 'updateStatus'])->name('clients.documents.update-status');
+    });
+
+    Route::middleware('permission:document.update')->group(function () {
+        Route::get('/document-holder-types', [\App\Http\Controllers\DocumentHolderTypeController::class, 'index'])
+            ->name('document-holder-types.index');
+        Route::post('/document-holder-types', [\App\Http\Controllers\DocumentHolderTypeController::class, 'store'])
+            ->name('document-holder-types.store');
+        Route::put('/document-holder-types/{documentHolderType}', [\App\Http\Controllers\DocumentHolderTypeController::class, 'update'])
+            ->name('document-holder-types.update');
+        Route::delete('/document-holder-types/{documentHolderType}', [\App\Http\Controllers\DocumentHolderTypeController::class, 'destroy'])
+            ->name('document-holder-types.destroy');
     });
 
     Route::post('/job-sectors', [JobSectorController::class, 'store'])

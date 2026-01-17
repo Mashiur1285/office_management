@@ -3,13 +3,18 @@
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50/30 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Tax Report</h1>
-                        <p class="text-sm text-gray-600 mt-1">Monthly tax summary with payments and balance</p>
+                        <h1 class="text-3xl font-bold text-white">Tax Report</h1>
+                        <p class="text-sm text-blue-100 mt-1">Monthly tax summary with payments and balance</p>
                     </div>
                     <div class="flex items-center gap-3">
+                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-900">
+                            <option v-for="p in periods" :key="p.id" :value="p.id" :selected="periods.length > 0 && p.id === periods[0].id">
+                                {{ p.name }} ({{ p.type }})
+                            </option>
+                        </select>
                         <a :href="route('accounting.tax-report.report')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex items-center gap-2">
                             <i class="fa-solid fa-file-excel"></i>
                             Export to Excel

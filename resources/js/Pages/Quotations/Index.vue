@@ -2,42 +2,58 @@
     <Head title="Quotations" />
 
     <div class="space-y-6">
-        <div class="flex items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Quotations</h1>
-                <p class="text-sm text-gray-600">
-                    Create and manage client quotations.
-                </p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="relative">
-                    <input
-                        v-model="searchQuery"
-                        type="text"
-                        placeholder="Search quotations..."
-                        class="w-80 rounded-lg border border-gray-300 px-4 py-2 pl-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                    />
-                    <svg
-                        class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                    </svg>
+        <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl">
+            <div class="px-6 py-8">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Quotations</h1>
+                        <p class="text-sm text-blue-100">
+                            Create and manage client quotations.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="relative">
+                            <input
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Search quotations..."
+                                class="w-full sm:w-80 rounded-xl border border-white/30 bg-white px-4 py-2.5 pl-10 text-sm text-gray-900 shadow-sm focus:border-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                            />
+                            <svg
+                                class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                />
+                            </svg>
+                        </div>
+                        <a
+                            :href="route('quotations.export', { type: 'excel', search: searchQuery })"
+                            class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-green-700 whitespace-nowrap"
+                        >
+                            Export to Excel
+                        </a>
+                        <a
+                            :href="route('quotations.export', { type: 'pdf', search: searchQuery })"
+                            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-red-700 whitespace-nowrap"
+                        >
+                            Export to PDF
+                        </a>
+                        <Link
+                            :href="route('quotations.create')"
+                            class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 shadow-lg transition hover:shadow-xl hover:scale-105 whitespace-nowrap"
+                        >
+                            <font-awesome-icon icon="file-invoice" />
+                            New Quotation
+                        </Link>
+                    </div>
                 </div>
-                <Link
-                    :href="route('quotations.create')"
-                    class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 whitespace-nowrap"
-                >
-                    <font-awesome-icon icon="file-invoice" />
-                    New Quotation
-                </Link>
             </div>
         </div>
 

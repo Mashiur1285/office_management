@@ -3,14 +3,14 @@
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50/30 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Tax Summary & Payments</h1>
-                        <p class="text-sm text-gray-600 mt-1">Period: {{ period.name }}</p>
+                        <h1 class="text-3xl font-bold text-white">Tax Summary & Payments</h1>
+                        <p class="text-sm text-blue-100 mt-1">Period: {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white">
+                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-900">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
@@ -252,8 +252,39 @@
             <!-- Tax Payment History -->
             <div v-if="taxPayments && taxPayments.length > 0" class="bg-white rounded-xl shadow-sm border-4 border-purple-500 overflow-hidden">
                 <div class="bg-purple-600 text-white p-4">
-                    <h2 class="text-xl font-bold">Tax Payment History</h2>
-                    <p class="text-sm text-purple-100 mt-1">All recorded payments for this period</p>
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold">Tax Payment History</h2>
+                            <p class="text-sm text-purple-100 mt-1">All recorded payments for this period</p>
+                        </div>
+                        <div class="flex-1 max-w-md">
+                            <div class="relative">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <svg class="h-5 w-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <input
+                                    v-model="searchPayments"
+                                    type="text"
+                                    class="block w-full rounded-lg border border-purple-400 bg-purple-500 pl-10 pr-4 py-2 text-sm text-white placeholder-purple-200 focus:border-white focus:ring-2 focus:ring-white focus:bg-purple-600 transition"
+                                    placeholder="Search by challan number, client, date..."
+                                />
+                                <button
+                                    v-if="searchPayments"
+                                    @click="searchPayments = ''"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-purple-200 hover:text-white"
+                                >
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="searchPayments" class="mt-2 text-sm text-purple-100">
+                        Showing <span class="font-semibold text-white">{{ filteredTaxPayments.length }}</span> of {{ taxPayments.length }} payments
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -271,7 +302,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            <tr v-for="payment in taxPayments" :key="payment.id" class="hover:bg-gray-50">
+                            <tr v-for="payment in filteredTaxPayments" :key="payment.id" class="hover:bg-gray-50">
                                 <td class="px-6 py-3 text-sm text-gray-900">
                                     {{ formatDate(payment.payment_date) }}
                                 </td>
@@ -308,6 +339,12 @@
                                     >
                                         Delete
                                     </button>
+                                </td>
+                            </tr>
+                            <tr v-if="filteredTaxPayments.length === 0 && taxPayments.length > 0">
+                                <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
+                                    No payments found matching your search.
+                                    <button @click="searchPayments = ''" class="text-purple-600 font-semibold hover:underline ml-1">Clear search</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -354,6 +391,23 @@ const props = defineProps({
 const chalanSlipInput = ref(null);
 const isSubmitting = ref(false);
 const showClientsWithTax = ref(false);
+const searchPayments = ref("");
+
+const filteredTaxPayments = computed(() => {
+    if (!props.taxPayments) return [];
+    if (!searchPayments.value) return props.taxPayments;
+
+    const query = searchPayments.value.toLowerCase();
+    return props.taxPayments.filter((payment) => {
+        return (
+            payment.chalan_number?.toLowerCase().includes(query) ||
+            payment.client_name?.toLowerCase().includes(query) ||
+            payment.payment_type?.toLowerCase().includes(query) ||
+            payment.notes?.toLowerCase().includes(query) ||
+            payment.payment_date?.toLowerCase().includes(query)
+        );
+    });
+});
 
 const paymentForm = ref({
     payment_type: 'bulk',

@@ -61,6 +61,66 @@ class QuotationController extends Controller
         ]);
     }
 
+    public function export(Request $request, ?string $type = null)
+    {
+        $search = $request->input('search');
+
+        $quotations = Quotation::with(['client:id,name', 'quotationMaker:id,name', 'creator:id,name'])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('client_name', 'like', "%{$search}%")
+                        ->orWhere('quotation_no', 'like', "%{$search}%")
+                        ->orWhere('client_mobile', 'like', "%{$search}%");
+                });
+            })
+            ->latest('quotation_date')
+            ->latest('id')
+            ->get();
+
+        if ($type === 'pdf') {
+            $fileName = 'quotations-report-' . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::loadView('pdfs.quotation_list_report', [
+                'quotations' => $quotations,
+            ])->download($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        fputcsv($handle, [
+            'Quotation No',
+            'Date',
+            'Client',
+            'Service Category',
+            'Service Type',
+            'Maker',
+            'Created By',
+        ]);
+
+        foreach ($quotations as $quotation) {
+            fputcsv($handle, [
+                $quotation->quotation_no,
+                $quotation->quotation_date?->format('Y-m-d'),
+                $quotation->client_name,
+                $quotation->service_category,
+                $quotation->service_type,
+                $quotation->quotationMaker?->name,
+                $quotation->creator?->name,
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = 'quotations-report-' . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
+    }
+
     public function create()
     {
         $clients = Client::select('id', 'name', 'organization_name', 'email', 'mobile')

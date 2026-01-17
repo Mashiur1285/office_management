@@ -7,9 +7,11 @@ use App\Models\BdCompany;
 use App\Models\Client;
 use App\Models\DocumentLocation;
 use App\Models\DocumentLocationHistory;
+use App\Models\DocumentHolderType;
 use App\Models\ForeignCompany;
 use App\Models\OfficeStaff;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -35,10 +37,23 @@ class DocumentLocationController extends Controller
                 ];
             });
 
-        $holders = [
-            ['value' => 'agency_user', 'label' => 'Agency Staff Member'],
-            ['value' => 'bd_company', 'label' => 'BD Processing Company'],
-        ];
+        if (Schema::hasTable('document_holder_types')) {
+            $holders = DocumentHolderType::query()
+                ->orderByDesc('is_system')
+                ->orderBy('label')
+                ->get()
+                ->map(fn ($holderType) => [
+                    'id' => $holderType->id,
+                    'value' => $holderType->value,
+                    'label' => $holderType->label,
+                    'is_system' => $holderType->is_system,
+                ]);
+        } else {
+            $holders = collect([
+                ['value' => 'agency_user', 'label' => 'MITT Staff Member', 'is_system' => true],
+                ['value' => 'bd_company', 'label' => 'BD Processing Company', 'is_system' => true],
+            ]);
+        }
 
         $agencyUsers = OfficeStaff::select('id', 'name', 'email', 'designation')
             ->where('status', 'active')
@@ -122,8 +137,15 @@ class DocumentLocationController extends Controller
 
     public function store(Request $request, Client $client)
     {
+        $allowedHolderTypes = Schema::hasTable('document_holder_types')
+            ? DocumentHolderType::query()->pluck('value')->all()
+            : [];
+        if (empty($allowedHolderTypes)) {
+            $allowedHolderTypes = ['agency_user', 'bd_company'];
+        }
+
         $data = $request->validate([
-            'to_holder_type' => ['required', Rule::in(['agency_user', 'bd_company'])],
+            'to_holder_type' => ['required', Rule::in($allowedHolderTypes)],
             'to_holder_id' => ['nullable', 'integer'],
             'expected_return_at' => ['nullable', 'date'],
             'processing_status' => ['nullable', Rule::in(['pending', 'accepted', 'rejected', 'completed'])],

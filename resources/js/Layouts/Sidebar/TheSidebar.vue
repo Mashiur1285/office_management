@@ -16,115 +16,196 @@
                                 class="w-5 h-5 text-white"
                             />
                         </div>
-                        <span class="ml-3">Dashboard</span>
+                        <span class="ml-3">Home</span>
                     </Link>
                 </li>
 
-                <li v-if="hasPermission('quotation.view')">
-                    <Link href="/quotations" :class="linkClass('/quotations')">
-                        <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-amber-500"
-                        >
-                            <font-awesome-icon
-                                icon="file-invoice"
-                                class="w-5 h-5 text-white"
-                            />
-                        </div>
-                        <span class="ml-3">Quotation</span>
-                    </Link>
-                </li>
-
-                <li v-if="hasPermission('invoice.view')">
-                    <Link href="/invoices" :class="linkClass('/invoices')">
+                <li v-if="showOperations">
+                    <button
+                        type="button"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        @click="toggleOperations"
+                    >
                         <div
                             class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-500"
                         >
                             <font-awesome-icon
-                                icon="file-invoice"
+                                icon="cubes"
                                 class="w-5 h-5 text-white"
                             />
                         </div>
-                        <span class="ml-3">Invoice</span>
-                    </Link>
-                </li>
-
-                <li v-if="hasPermission('client.view')">
-                    <Link href="/clients" :class="linkClass('/clients')">
-                        <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-green-500"
+                        <span class="flex-1 ml-3 text-left whitespace-nowrap"
+                            >Operations</span
                         >
-                            <font-awesome-icon
-                                icon="id-card"
-                                class="w-5 h-5 text-white"
-                            />
-                        </div>
-                        <span class="ml-3">Clients</span>
-                    </Link>
-                </li>
-
-                <li v-if="hasPermission('agent.view')">
-                    <Link href="/agents" :class="linkClass('/agents')">
-                        <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-500"
+                        <svg
+                            class="w-3 h-3 transition-transform duration-200"
+                            :class="{ 'rotate-180': operationsOpen }"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 10 6"
                         >
-                            <font-awesome-icon
-                                icon="address-card"
-                                class="w-5 h-5 text-white"
+                            <path
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="m1 1 4 4 4-4"
                             />
-                        </div>
-                        <span class="ml-3">Agents</span>
-                    </Link>
+                        </svg>
+                    </button>
+                    <ul v-show="operationsOpen" class="py-2 space-y-2 ml-3">
+                        <li v-if="hasPermission('quotation.view')">
+                            <Link
+                                href="/quotations"
+                                :class="linkClass('/quotations', true)"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500"
+                                >
+                                    <font-awesome-icon
+                                        icon="file-invoice"
+                                        class="w-4 h-4 text-white"
+                                    />
+                                </div>
+                                <span class="ml-3">Quotation</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('invoice.view')">
+                            <Link
+                                href="/invoices"
+                                :class="linkClass('/invoices', true)"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500"
+                                >
+                                    <font-awesome-icon
+                                        icon="file-invoice"
+                                        class="w-4 h-4 text-white"
+                                    />
+                                </div>
+                                <span class="ml-3">Invoice</span>
+                            </Link>
+                        </li>
+                    </ul>
                 </li>
 
-                <li v-if="hasPermission('office-staff.view')">
-                    <Link
-                        href="/office-staff"
-                        :class="linkClass('/office-staff')"
+                <li v-if="showRegistrations">
+                    <button
+                        type="button"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        @click="toggleRegistrations"
                     >
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-sky-500"
+                            class="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500"
                         >
                             <font-awesome-icon
-                                icon="users"
+                                icon="layer-group"
                                 class="w-5 h-5 text-white"
                             />
                         </div>
-                        <span class="ml-3">Office Staff</span>
-                    </Link>
-                </li>
-
-                <li v-if="hasPermission('bd-company.view')">
-                    <Link
-                        href="/bd-companies"
-                        :class="linkClass('/bd-companies')"
-                    >
-                        <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-purple-500"
+                        <span class="flex-1 ml-3 text-left whitespace-nowrap"
+                            >Registrations</span
                         >
-                            <font-awesome-icon
-                                icon="building"
-                                class="w-5 h-5 text-white"
-                            />
-                        </div>
-                        <span class="ml-3">BD Companies</span>
-                    </Link>
-                </li>
-
-                <li v-if="hasPermission('foreign-company.view')">
-                    <Link
-                        href="/foreign-companies"
-                        :class="linkClass('/foreign-companies')"
-                    >
-                        <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-500"
+                        <svg
+                            class="w-3 h-3 transition-transform duration-200"
+                            :class="{ 'rotate-180': registrationsOpen }"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 10 6"
                         >
-                            <font-awesome-icon
-                                icon="globe"
-                                class="w-5 h-5 text-white"
+                            <path
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="m1 1 4 4 4-4"
                             />
-                        </div>
-                        <span class="ml-3">Foreign Companies</span>
-                    </Link>
+                        </svg>
+                    </button>
+                    <ul v-show="registrationsOpen" class="py-2 space-y-2 ml-3">
+                        <li v-if="hasPermission('client.view')">
+                            <Link
+                                href="/clients"
+                                :class="linkClass('/clients', true)"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-green-500"
+                                >
+                                    <font-awesome-icon
+                                        icon="id-card"
+                                        class="w-4 h-4 text-white"
+                                    />
+                                </div>
+                                <span class="ml-3">Clients</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('agent.view')">
+                            <Link
+                                href="/agents"
+                                :class="linkClass('/agents', true)"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-500"
+                                >
+                                    <font-awesome-icon
+                                        icon="address-card"
+                                        class="w-4 h-4 text-white"
+                                    />
+                                </div>
+                                <span class="ml-3">Agents</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('office-staff.view')">
+                            <Link
+                                href="/office-staff"
+                                :class="linkClass('/office-staff', true)"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-sky-500"
+                                >
+                                    <font-awesome-icon
+                                        icon="users"
+                                        class="w-4 h-4 text-white"
+                                    />
+                                </div>
+                                <span class="ml-3">Office Staff</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('bd-company.view')">
+                            <Link
+                                href="/bd-companies"
+                                :class="linkClass('/bd-companies', true)"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500"
+                                >
+                                    <font-awesome-icon
+                                        icon="building"
+                                        class="w-4 h-4 text-white"
+                                    />
+                                </div>
+                                <span class="ml-3">BD Companies</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('foreign-company.view')">
+                            <Link
+                                href="/foreign-companies"
+                                :class="linkClass('/foreign-companies', true)"
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500"
+                                >
+                                    <font-awesome-icon
+                                        icon="globe"
+                                        class="w-4 h-4 text-white"
+                                    />
+                                </div>
+                                <span class="ml-3">Foreign Companies</span>
+                            </Link>
+                        </li>
+                    </ul>
                 </li>
 
                 <li>
@@ -142,7 +223,7 @@
                             />
                         </div>
                         <span class="flex-1 ml-3 text-left whitespace-nowrap"
-                            >Accounting</span
+                            >Accounts</span
                         >
                         <svg
                             class="w-3 h-3 transition-transform duration-200"
@@ -217,7 +298,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/income/travel-tourism"
-                                        :class="subLinkClass('/accounting/income/travel-tourism')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/income/travel-tourism'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="plane"
@@ -231,7 +316,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/income/manpower"
-                                        :class="subLinkClass('/accounting/income/manpower')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/income/manpower'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="user-tie"
@@ -245,7 +334,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/income/student"
-                                        :class="subLinkClass('/accounting/income/student')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/income/student'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="graduation-cap"
@@ -259,7 +352,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/income/other"
-                                        :class="subLinkClass('/accounting/income/other')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/income/other'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="hand-holding-dollar"
@@ -312,7 +409,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/cost-of-sales/travel-tourism"
-                                        :class="subLinkClass('/accounting/cost-of-sales/travel-tourism')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/cost-of-sales/travel-tourism'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="plane"
@@ -326,7 +427,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/cost-of-sales/manpower"
-                                        :class="subLinkClass('/accounting/cost-of-sales/manpower')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/cost-of-sales/manpower'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="user-tie"
@@ -340,7 +445,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/cost-of-sales/student"
-                                        :class="subLinkClass('/accounting/cost-of-sales/student')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/cost-of-sales/student'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="graduation-cap"
@@ -356,7 +465,9 @@
                         <li>
                             <Link
                                 href="/accounting/gross-profit"
-                                :class="linkClass('/accounting/gross-profit', true)"
+                                :class="
+                                    linkClass('/accounting/gross-profit', true)
+                                "
                             >
                                 <div
                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-teal-500"
@@ -413,7 +524,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/operating-expenses/employee"
-                                        :class="subLinkClass('/accounting/operating-expenses/employee')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/operating-expenses/employee'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="users"
@@ -427,7 +542,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/operating-expenses/administrative"
-                                        :class="subLinkClass('/accounting/operating-expenses/administrative')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/operating-expenses/administrative'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="file-lines"
@@ -439,7 +558,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/operating-expenses/selling-marketing"
-                                        :class="subLinkClass('/accounting/operating-expenses/selling-marketing')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/operating-expenses/selling-marketing'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="bullhorn"
@@ -453,7 +576,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/operating-expenses/general"
-                                        :class="subLinkClass('/accounting/operating-expenses/general')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/operating-expenses/general'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="list"
@@ -465,7 +592,11 @@
                                 <li>
                                     <Link
                                         href="/accounting/operating-profit"
-                                        :class="subLinkClass('/accounting/operating-profit')"
+                                        :class="
+                                            subLinkClass(
+                                                '/accounting/operating-profit'
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="chart-line"
@@ -481,7 +612,9 @@
                         <li>
                             <Link
                                 href="/accounting/non-operating"
-                                :class="linkClass('/accounting/non-operating', true)"
+                                :class="
+                                    linkClass('/accounting/non-operating', true)
+                                "
                             >
                                 <div
                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500"
@@ -497,7 +630,12 @@
                         <li>
                             <Link
                                 href="/accounting/net-profit-before-tax"
-                                :class="linkClass('/accounting/net-profit-before-tax', true)"
+                                :class="
+                                    linkClass(
+                                        '/accounting/net-profit-before-tax',
+                                        true
+                                    )
+                                "
                             >
                                 <div
                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500"
@@ -529,7 +667,12 @@
                         <li>
                             <Link
                                 href="/accounting/net-profit-after-tax"
-                                :class="linkClass('/accounting/net-profit-after-tax', true)"
+                                :class="
+                                    linkClass(
+                                        '/accounting/net-profit-after-tax',
+                                        true
+                                    )
+                                "
                             >
                                 <div
                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500"
@@ -545,7 +688,9 @@
                         <li>
                             <Link
                                 href="/accounting/tax-summary"
-                                :class="linkClass('/accounting/tax-summary', true)"
+                                :class="
+                                    linkClass('/accounting/tax-summary', true)
+                                "
                             >
                                 <div
                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500"
@@ -561,7 +706,9 @@
                         <li>
                             <Link
                                 href="/accounting/tax-report"
-                                :class="linkClass('/accounting/tax-report', true)"
+                                :class="
+                                    linkClass('/accounting/tax-report', true)
+                                "
                             >
                                 <div
                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500"
@@ -577,7 +724,9 @@
                         <li>
                             <Link
                                 href="/accounting/vat-summary"
-                                :class="linkClass('/accounting/vat-summary', true)"
+                                :class="
+                                    linkClass('/accounting/vat-summary', true)
+                                "
                             >
                                 <div
                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-lime-500"
@@ -593,7 +742,9 @@
                         <li>
                             <Link
                                 href="/accounting/vat-report"
-                                :class="linkClass('/accounting/vat-report', true)"
+                                :class="
+                                    linkClass('/accounting/vat-report', true)
+                                "
                             >
                                 <div
                                     class="flex items-center justify-center w-8 h-8 rounded-full bg-fuchsia-500"
@@ -607,20 +758,6 @@
                             </Link>
                         </li>
                     </ul>
-                </li>
-
-                <li v-if="hasPermission('settings.view')">
-                    <Link href="/settings" :class="linkClass('/settings')">
-                        <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-500"
-                        >
-                            <font-awesome-icon
-                                icon="gear"
-                                class="w-5 h-5 text-white"
-                            />
-                        </div>
-                        <span class="ml-3">Settings</span>
-                    </Link>
                 </li>
 
                 <li v-if="showAccessManagement">
@@ -638,7 +775,7 @@
                             />
                         </div>
                         <span class="flex-1 ml-3 text-left whitespace-nowrap"
-                            >Access Management</span
+                            >ACL</span
                         >
                         <svg
                             class="w-3 h-3 transition-transform duration-200"
@@ -685,6 +822,19 @@
                             </Link>
                         </li>
                     </ul>
+                </li>
+                <li v-if="hasPermission('settings.view')">
+                    <Link href="/settings" :class="linkClass('/settings')">
+                        <div
+                            class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-500"
+                        >
+                            <font-awesome-icon
+                                icon="gear"
+                                class="w-5 h-5 text-white"
+                            />
+                        </div>
+                        <span class="ml-3">Settings</span>
+                    </Link>
                 </li>
                 <li>
                     <Link href="/notepad" :class="linkClass('/notepad')">
@@ -777,6 +927,17 @@ const hasPermission = (permission) =>
 const showAccessManagement = computed(
     () => hasPermission("role.view") || hasPermission("user.view")
 );
+const showOperations = computed(
+    () => hasPermission("quotation.view") || hasPermission("invoice.view")
+);
+const showRegistrations = computed(
+    () =>
+        hasPermission("client.view") ||
+        hasPermission("agent.view") ||
+        hasPermission("office-staff.view") ||
+        hasPermission("bd-company.view") ||
+        hasPermission("foreign-company.view")
+);
 
 const currentPath = computed(() => $page.url.split("?")[0]);
 
@@ -802,6 +963,16 @@ const toggleAccess = () => {
 const accountingOpen = ref(false);
 const toggleAccounting = () => {
     accountingOpen.value = !accountingOpen.value;
+};
+
+const operationsOpen = ref(false);
+const toggleOperations = () => {
+    operationsOpen.value = !operationsOpen.value;
+};
+
+const registrationsOpen = ref(false);
+const toggleRegistrations = () => {
+    registrationsOpen.value = !registrationsOpen.value;
 };
 
 const incomeOpen = ref(false);

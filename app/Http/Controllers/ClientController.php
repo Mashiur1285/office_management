@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\JobSector;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ClientController extends Controller
 {
@@ -16,6 +17,7 @@ class ClientController extends Controller
         $bdCompanyStatus = $request->input('bd_company_status');
         $bdCompanyScope = $request->boolean('bd_company_scope');
         $agencyScope = $request->boolean('agency_scope');
+        $foreignCountry = $request->input('foreign_country');
 
         $query = Client::query()
             ->with(['bdCompany', 'foreignCompany', 'agent', 'documentLocation'])
@@ -42,6 +44,15 @@ class ClientController extends Controller
                         $q->where('processing_status', $bdCompanyStatus);
                     }
                 }
+            });
+        }
+
+        if ($foreignCountry) {
+            $query->where(function ($scope) use ($foreignCountry) {
+                $scope->where('foreign_company_country', $foreignCountry)
+                    ->orWhereHas('foreignCompany', function ($foreignQuery) use ($foreignCountry) {
+                        $foreignQuery->where('country', $foreignCountry);
+                    });
             });
         }
 
@@ -79,7 +90,9 @@ class ClientController extends Controller
                     'job_sub_sector' => $client->job_sub_sector,
                     'district' => $client->district,
                     'bd_company' => $client->bdCompany?->name,
-                    'foreign_company' => $client->foreignCompany?->name,
+                    'foreign_company' => $client->foreignCompany?->name
+                        ?? $client->foreign_company_name
+                        ?? $client->foreign_company_country,
                     'agent_name' => $client->agent_name ?? $client->agent?->name,
                     'agent' => $client->agent?->name,
                     'status' => $status['label'],
@@ -107,6 +120,7 @@ class ClientController extends Controller
                 'bd_company_status' => $bdCompanyStatus,
                 'bd_company_scope' => $bdCompanyScope,
                 'agency_scope' => $agencyScope,
+                'foreign_country' => $foreignCountry,
             ],
         ]);
     }
@@ -117,6 +131,119 @@ class ClientController extends Controller
             ...$this->formData(),
             'client' => null,
             'mode' => 'create',
+        ]);
+    }
+
+    public function export(Request $request, ?string $type = null)
+    {
+        $bdCompanyStatus = $request->input('bd_company_status');
+        $bdCompanyScope = $request->boolean('bd_company_scope');
+        $agencyScope = $request->boolean('agency_scope');
+        $foreignCountry = $request->input('foreign_country');
+
+        $query = Client::query()
+            ->with(['bdCompany', 'foreignCompany', 'agent', 'documentLocation'])
+            ->latest();
+
+        if ($agencyScope) {
+            $query->where(function ($scope) {
+                $scope->doesntHave('documentLocation')
+                    ->orWhereHas('documentLocation', function ($q) {
+                        $q->whereIn('holder_type', ['agency', 'agency_user'])
+                            ->whereNull('returned_at');
+                    });
+            });
+        } elseif ($bdCompanyScope || $bdCompanyStatus) {
+            $query->whereHas('documentLocation', function ($q) use ($bdCompanyStatus) {
+                $q->where('holder_type', 'bd_company');
+                if ($bdCompanyStatus && $bdCompanyStatus !== 'all') {
+                    if ($bdCompanyStatus === 'pending') {
+                        $q->where(function ($inner) {
+                            $inner->whereNull('processing_status')
+                                ->orWhere('processing_status', 'pending');
+                        });
+                    } else {
+                        $q->where('processing_status', $bdCompanyStatus);
+                    }
+                }
+            });
+        }
+
+        if ($foreignCountry) {
+            $query->where(function ($scope) use ($foreignCountry) {
+                $scope->where('foreign_company_country', $foreignCountry)
+                    ->orWhereHas('foreignCompany', function ($foreignQuery) use ($foreignCountry) {
+                        $foreignQuery->where('country', $foreignCountry);
+                    });
+            });
+        }
+
+        $clients = $query
+            ->get()
+            ->map(function (Client $client) {
+                $holder = $client->documentLocation;
+                $status = $this->resolveStatus($holder);
+
+                return [
+                    'name' => $client->name,
+                    'nid_number' => $client->nid_number,
+                    'passport_number' => $client->passport_number,
+                    'job_sector' => $client->job_sector,
+                    'agent_name' => $client->agent_name ?? $client->agent?->name,
+                    'status' => $status['label'],
+                    'bd_company' => $client->bdCompany?->name,
+                    'foreign_company' => $client->foreignCompany?->name
+                        ?? $client->foreign_company_name
+                        ?? $client->foreign_company_country,
+                    'current_due' => $client->current_due,
+                ];
+            });
+
+        if ($type === 'pdf') {
+            $fileName = 'clients-report-' . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::loadView('pdfs.client_list_report', [
+                'clients' => $clients,
+            ])->download($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        fputcsv($handle, [
+            'Name',
+            'NID',
+            'Passport',
+            'Job Sector',
+            'Agent',
+            'Status',
+            'BD Company',
+            'Foreign Company',
+            'Due Amount',
+        ]);
+
+        foreach ($clients as $client) {
+            fputcsv($handle, [
+                $client['name'],
+                $client['nid_number'],
+                $client['passport_number'],
+                $client['job_sector'],
+                $client['agent_name'],
+                $client['status'],
+                $client['bd_company'],
+                $client['foreign_company'],
+                $client['current_due'],
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = 'clients-report-' . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 
@@ -166,7 +293,7 @@ class ClientController extends Controller
         // Stage 1: Processing at Agency
         $stages[] = [
             'name' => 'Processing at Agency',
-            'description' => 'Documents received and being processed by agency staff',
+            'description' => 'Documents received and being processed by MITT staff',
             'date' => null,
         ];
 
@@ -472,7 +599,7 @@ class ClientController extends Controller
     private function resolveStatus($holder): array
     {
         if (! $holder) {
-            return ['value' => 'pending', 'label' => 'Pending at Agency', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
+            return ['value' => 'pending', 'label' => 'Pending at MITT', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
         }
 
         if ($holder->processing_status === 'rejected') {
@@ -487,6 +614,6 @@ class ClientController extends Controller
             return ['value' => 'company_processing', 'label' => 'Company Processing', 'badge' => 'bg-blue-100 text-blue-700 ring-blue-200'];
         }
 
-        return ['value' => 'pending', 'label' => 'Pending at Agency', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
+        return ['value' => 'pending', 'label' => 'Pending at MITT', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
     }
 }

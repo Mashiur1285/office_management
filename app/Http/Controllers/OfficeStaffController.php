@@ -7,6 +7,7 @@ use App\Models\OfficeStaff;
 use App\Models\OperatingExpense;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OfficeStaffController extends Controller
 {
@@ -16,6 +17,52 @@ class OfficeStaffController extends Controller
 
         return Inertia::render('OfficeStaff/Index', [
             'staff' => $staff,
+        ]);
+    }
+
+    public function export(Request $request, ?string $type = null)
+    {
+        $staff = OfficeStaff::orderBy('name')->get();
+
+        if ($type === 'pdf') {
+            $fileName = 'office-staff-report-' . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::loadView('pdfs.office_staff_list_report', [
+                'staff' => $staff,
+            ])->download($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        fputcsv($handle, [
+            'Name',
+            'Designation',
+            'Email',
+            'Mobile',
+            'Joining Date',
+            'Status',
+        ]);
+
+        foreach ($staff as $member) {
+            fputcsv($handle, [
+                $member->name,
+                $member->designation,
+                $member->email,
+                $member->mobile,
+                $member->joining_date,
+                $member->status,
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = 'office-staff-report-' . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 
@@ -148,7 +195,25 @@ class OfficeStaffController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        OfficeStaff::create($data);
+        $staff = OfficeStaff::create($data);
+
+        if ($request->expectsJson()) {
+            $label = $staff->name;
+            if ($staff->designation) {
+                $label .= ' - ' . $staff->designation;
+            }
+            if ($staff->email) {
+                $label .= ' (' . $staff->email . ')';
+            }
+
+            return response()->json([
+                'staffMember' => [
+                    'id' => $staff->id,
+                    'value' => $staff->id,
+                    'label' => $label,
+                ],
+            ], 201);
+        }
 
         return redirect()->route('office-staff.index')->with('success', 'Office staff member added successfully.');
     }

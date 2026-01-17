@@ -63,6 +63,72 @@ class InvoiceController extends Controller
         ]);
     }
 
+    public function export(Request $request, ?string $type = null)
+    {
+        $search = $request->input('search');
+
+        $invoices = Invoice::with(['client:id,name', 'creator:id,name'])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('client_name', 'like', "%{$search}%")
+                        ->orWhere('invoice_no', 'like', "%{$search}%")
+                        ->orWhere('client_mobile', 'like', "%{$search}%");
+                });
+            })
+            ->latest('invoice_date')
+            ->latest('id')
+            ->get();
+
+        if ($type === 'pdf') {
+            $fileName = 'invoices-report-' . now()->format('Y-m-d') . '.pdf';
+
+            return Pdf::loadView('pdfs.invoice_list_report', [
+                'invoices' => $invoices,
+            ])->download($fileName);
+        }
+
+        $handle = fopen('php://memory', 'w');
+
+        fputcsv($handle, [
+            'Invoice No',
+            'Date',
+            'Client',
+            'Service Category',
+            'Service Type',
+            'Total',
+            'Paid',
+            'Due',
+            'Status',
+            'Created By',
+        ]);
+
+        foreach ($invoices as $invoice) {
+            fputcsv($handle, [
+                $invoice->invoice_no,
+                $invoice->invoice_date?->format('Y-m-d'),
+                $invoice->client_name,
+                $invoice->service_category,
+                $invoice->service_type,
+                $invoice->total_amount,
+                $invoice->paid_amount,
+                $invoice->due_amount,
+                $invoice->payment_status,
+                $invoice->creator?->name,
+            ]);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        $fileName = 'invoices-report-' . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
+    }
+
     public function create()
     {
         $clients = Client::select('id', 'name', 'organization_name', 'email', 'mobile')

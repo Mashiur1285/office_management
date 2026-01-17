@@ -3,14 +3,14 @@
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-cyan-50/30 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Non-Operating Income & Expenses</h1>
-                        <p class="text-sm text-gray-600 mt-1">Period: {{ period.name }}</p>
+                        <h1 class="text-3xl font-bold text-white">Non-Operating Income & Expenses</h1>
+                        <p class="text-sm text-blue-100 mt-1">Period: {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white">
+                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-900">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>

@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, router } from "@inertiajs/vue3";
 import axios from "axios";
-import { onMounted, reactive, computed } from "vue";
+import { onMounted, reactive, computed, ref, watch } from "vue";
 import { Pie, Doughnut, Line, Bar } from "vue-chartjs";
 import {
     Chart as ChartJS,
@@ -69,6 +69,8 @@ const state = reactive({
         rejected: 0,
         completed: 0,
     },
+    agentClientSummary: [],
+    foreignCountrySummary: [],
     appName: "",
 });
 
@@ -80,10 +82,90 @@ const totals = computed(() => [
     { label: "Staff", value: state.stats.total_staff },
 ]);
 
+const fileRangePreset = ref("this_month");
+const fileCustomRange = reactive({ start: "", end: "" });
+const agentRangePreset = ref("this_month");
+const agentCustomRange = reactive({ start: "", end: "" });
+const countryRangePreset = ref("this_month");
+const countryCustomRange = reactive({ start: "", end: "" });
+
+const formatDate = (date) => date.toISOString().split("T")[0];
+
+const getPresetRange = (preset) => {
+    const now = new Date();
+    const start = new Date(now);
+    const end = new Date(now);
+
+    if (preset === "this_week") {
+        const day = (now.getDay() + 6) % 7;
+        start.setDate(now.getDate() - day);
+    } else if (preset === "last_week") {
+        const day = (now.getDay() + 6) % 7;
+        end.setDate(now.getDate() - day - 1);
+        start.setDate(end.getDate() - 6);
+    } else if (preset === "this_month") {
+        start.setDate(1);
+    } else if (preset === "last_month") {
+        start.setMonth(now.getMonth() - 1, 1);
+        end.setMonth(now.getMonth(), 0);
+    } else if (preset === "this_year") {
+        start.setMonth(0, 1);
+        end.setMonth(11, 31);
+    } else if (preset === "last_year") {
+        start.setFullYear(now.getFullYear() - 1, 0, 1);
+        end.setFullYear(now.getFullYear() - 1, 11, 31);
+    }
+
+    return { start: formatDate(start), end: formatDate(end) };
+};
+
+const fileDateRange = computed(() => {
+    if (fileRangePreset.value === "custom") {
+        if (fileCustomRange.start && fileCustomRange.end) {
+            return { start: fileCustomRange.start, end: fileCustomRange.end };
+        }
+        return null;
+    }
+    return getPresetRange(fileRangePreset.value);
+});
+
+const agentDateRange = computed(() => {
+    if (agentRangePreset.value === "custom") {
+        if (agentCustomRange.start && agentCustomRange.end) {
+            return { start: agentCustomRange.start, end: agentCustomRange.end };
+        }
+        return null;
+    }
+    return getPresetRange(agentRangePreset.value);
+});
+
+const countryDateRange = computed(() => {
+    if (countryRangePreset.value === "custom") {
+        if (countryCustomRange.start && countryCustomRange.end) {
+            return { start: countryCustomRange.start, end: countryCustomRange.end };
+        }
+        return null;
+    }
+    return getPresetRange(countryRangePreset.value);
+});
+
 const fetchData = async () => {
     state.loading = true;
     try {
-        const { data } = await axios.get("/dashboard/data");
+        const params = {};
+        if (fileDateRange.value) {
+            params.file_start_date = fileDateRange.value.start;
+            params.file_end_date = fileDateRange.value.end;
+        }
+        if (agentDateRange.value) {
+            params.agent_start_date = agentDateRange.value.start;
+            params.agent_end_date = agentDateRange.value.end;
+        }
+        if (countryDateRange.value) {
+            params.country_start_date = countryDateRange.value.start;
+            params.country_end_date = countryDateRange.value.end;
+        }
+        const { data } = await axios.get("/dashboard/data", { params });
         state.stats = data.stats;
         state.salesMonthly = data.salesMonthly;
         state.expensesMonthly = data.expensesMonthly;
@@ -104,6 +186,8 @@ const fetchData = async () => {
             rejected: 0,
             completed: 0,
         };
+        state.agentClientSummary = data.agentClientSummary || [];
+        state.foreignCountrySummary = data.foreignCountrySummary || [];
         state.appName = data.appName || "";
     } finally {
         state.loading = false;
@@ -111,6 +195,39 @@ const fetchData = async () => {
 };
 
 onMounted(fetchData);
+
+watch(
+    [
+        fileRangePreset,
+        () => fileCustomRange.start,
+        () => fileCustomRange.end,
+        agentRangePreset,
+        () => agentCustomRange.start,
+        () => agentCustomRange.end,
+        countryRangePreset,
+        () => countryCustomRange.start,
+        () => countryCustomRange.end,
+    ],
+    () => {
+        if (fileRangePreset.value !== "custom") {
+            fetchData();
+        } else if (fileCustomRange.start && fileCustomRange.end) {
+            fetchData();
+        }
+
+        if (agentRangePreset.value !== "custom") {
+            fetchData();
+        } else if (agentCustomRange.start && agentCustomRange.end) {
+            fetchData();
+        }
+
+        if (countryRangePreset.value !== "custom") {
+            fetchData();
+        } else if (countryCustomRange.start && countryCustomRange.end) {
+            fetchData();
+        }
+    }
+);
 
 // Entity Distribution Pie Chart with gradient colors
 const entityDistributionData = computed(() => ({
@@ -382,18 +499,77 @@ const lineChartOptions = {
 
 const bdCompanyFilesData = computed(() => ({
     labels: [
-        "Files at Agency",
-        "Total Files at Bd Company",
-        "Pending at Bd Company",
-        "Accepted at Bd Company",
-        "Rejected at Bd Company",
-        "Completed at Bd Company",
+        "Total at MITT",
+        "At BD Company",
+        "BD Pending",
+        "BD Accepted",
+        "BD Rejected",
+        "BD Completed",
+    ],
+    datasets: [
+        {
+            label: "Base",
+            data: [
+                mittPipelineTotal.value,
+                state.bdCompanyFiles.total,
+                state.bdCompanyFiles.pending,
+                state.bdCompanyFiles.accepted,
+                state.bdCompanyFiles.rejected,
+                state.bdCompanyFiles.completed,
+            ],
+            grouped: false,
+            barThickness: 44,
+            backgroundColor: [
+                "rgba(99, 102, 241, 0.18)",
+                "rgba(59, 130, 246, 0.18)",
+                "rgba(251, 191, 36, 0.18)",
+                "rgba(34, 197, 94, 0.18)",
+                "rgba(239, 68, 68, 0.18)",
+                "rgba(14, 116, 144, 0.18)",
+            ],
+            borderRadius: 14,
+            borderSkipped: false,
+            order: 1,
+        },
+        {
+            label: "Core",
+            data: [
+                mittPipelineTotal.value,
+                state.bdCompanyFiles.total,
+                state.bdCompanyFiles.pending,
+                state.bdCompanyFiles.accepted,
+                state.bdCompanyFiles.rejected,
+                state.bdCompanyFiles.completed,
+            ],
+            grouped: false,
+            barThickness: 28,
+            backgroundColor: [
+                "rgba(99, 102, 241, 0.92)",
+                "rgba(59, 130, 246, 0.55)",
+                "rgba(251, 191, 36, 0.85)",
+                "rgba(34, 197, 94, 0.6)",
+                "rgba(239, 68, 68, 0.9)",
+                "rgba(14, 116, 144, 0.7)",
+            ],
+            borderRadius: 12,
+            borderSkipped: false,
+            order: 2,
+        },
+    ],
+}));
+
+const fileTrackingDonutData = computed(() => ({
+    labels: [
+        "MITT Total",
+        "BD Pending",
+        "BD Accepted",
+        "BD Rejected",
+        "BD Completed",
     ],
     datasets: [
         {
             data: [
-                state.bdCompanyFiles.agency_total,
-                state.bdCompanyFiles.total,
+                mittPipelineTotal.value,
                 state.bdCompanyFiles.pending,
                 state.bdCompanyFiles.accepted,
                 state.bdCompanyFiles.rejected,
@@ -401,17 +577,32 @@ const bdCompanyFilesData = computed(() => ({
             ],
             backgroundColor: [
                 "rgba(99, 102, 241, 0.85)",
-                "rgba(59, 130, 246, 0.8)",
                 "rgba(251, 191, 36, 0.85)",
                 "rgba(34, 197, 94, 0.85)",
                 "rgba(239, 68, 68, 0.85)",
                 "rgba(14, 116, 144, 0.85)",
             ],
-            borderRadius: 8,
-            maxBarThickness: 48,
+            borderColor: "#ffffff",
+            borderWidth: 2,
+            hoverOffset: 6,
         },
     ],
 }));
+
+const fileTrackingDonutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "70%",
+    plugins: {
+        legend: { display: false },
+        tooltip: {
+            backgroundColor: "rgba(15, 23, 42, 0.9)",
+            padding: 10,
+            titleFont: { size: 12, weight: "bold" },
+            bodyFont: { size: 12 },
+        },
+    },
+};
 
 const bdCompanyFilesOptions = {
     responsive: true,
@@ -423,6 +614,20 @@ const bdCompanyFilesOptions = {
             padding: 10,
             titleFont: { size: 13, weight: "bold" },
             bodyFont: { size: 12 },
+            callbacks: {
+                label: (context) => {
+                    if (context.dataset?.label === "Base") {
+                        return null;
+                    }
+                    return `${context.label}: ${context.parsed.y}`;
+                },
+            },
+        },
+    },
+    datasets: {
+        bar: {
+            barPercentage: 1,
+            categoryPercentage: 0.85,
         },
     },
     scales: {
@@ -432,7 +637,12 @@ const bdCompanyFilesOptions = {
             grid: { color: "rgba(15, 23, 42, 0.06)" },
         },
         x: {
-            ticks: { font: { size: 11, weight: "bold" } },
+            ticks: {
+                font: { size: 10, weight: "bold" },
+                maxRotation: 0,
+                minRotation: 0,
+                autoSkip: false,
+            },
             grid: { display: false },
         },
     },
@@ -440,46 +650,39 @@ const bdCompanyFilesOptions = {
 
 const bdCompanyTiles = computed(() => [
     {
-        key: "total",
-        label: "Total Files at Bd Company",
+        key: "bd_total",
+        label: "At BD Company",
         value: state.bdCompanyFiles.total,
         tone: "blue",
         query: { bd_company_scope: 1 },
     },
     {
-        key: "pending",
-        label: "Pending at Bd Company",
+        key: "bd_pending",
+        label: "BD Pending",
         value: state.bdCompanyFiles.pending,
         tone: "amber",
         query: { bd_company_status: "pending" },
     },
     {
-        key: "accepted",
-        label: "Accepted at Bd Company",
+        key: "bd_accepted",
+        label: "BD Accepted",
         value: state.bdCompanyFiles.accepted,
         tone: "green",
         query: { bd_company_status: "accepted" },
     },
     {
-        key: "rejected",
-        label: "Rejected at Bd Company",
+        key: "bd_rejected",
+        label: "BD Rejected",
         value: state.bdCompanyFiles.rejected,
         tone: "red",
         query: { bd_company_status: "rejected" },
     },
     {
-        key: "completed",
-        label: "Completed at Bd Company",
+        key: "bd_completed",
+        label: "BD Completed",
         value: state.bdCompanyFiles.completed,
         tone: "teal",
         query: { bd_company_status: "completed" },
-    },
-    {
-        key: "agency",
-        label: "Files at Agency",
-        value: state.bdCompanyFiles.agency_total,
-        tone: "indigo",
-        query: { agency_scope: 1 },
     },
 ]);
 
@@ -487,27 +690,87 @@ const goToClients = (query) => {
     router.visit("/clients", { data: query });
 };
 
+const goToAgent = (agentId) => {
+    if (!agentId) return;
+    router.visit(`/agents/${agentId}`);
+};
+
+const goToForeignCountry = (country) => {
+    if (!country) return;
+    router.visit(route("foreign-companies.country", { country }));
+};
+
 const formatBytes = (bytes) => {
     if (!bytes || bytes <= 0) return "0 GB";
     const gb = bytes / (1024 * 1024 * 1024);
     return gb.toFixed(2) + " GB";
 };
+
+const storagePercent = computed(() => {
+    const totalBytes = state.appUsage.total || 0;
+    const gb = totalBytes / (1024 * 1024 * 1024);
+    const percent = (gb / 10) * 100;
+    return Math.max(0, Math.min(100, Math.round(percent)));
+});
+
+const mittPipelineTotal = computed(
+    () => state.bdCompanyFiles.agency_total + state.bdCompanyFiles.total
+);
 </script>
 
 <template>
     <Head title="Dashboard" />
 
     <div class="p-4 md:p-6 space-y-6">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-                <p class="text-sm text-gray-600">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div class="w-full max-w-3xl rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 shadow-md px-6 py-5 text-white">
+                <h1 class="text-2xl font-semibold">Dashboard</h1>
+                <p class="text-sm text-blue-100">
                     Overview of sales, expenses, and payables/receivables with
                     smart analytics.
                 </p>
+                <div v-if="state.loading" class="text-sm text-blue-100 mt-2">
+                    Loading...
+                </div>
             </div>
-            <div v-if="state.loading" class="text-sm text-gray-500">
-                Loading...
+            <div class="w-full lg:w-64">
+                <div class="relative overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm px-4 py-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-[0.2em] text-blue-600 font-semibold">
+                                Storage
+                            </p>
+                            <p class="text-xs text-gray-500">App usage</p>
+                        </div>
+                        <div class="text-xs font-semibold text-gray-700">
+                            {{ formatBytes(state.appUsage.total) }}
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center gap-3">
+                        <div class="relative h-16 w-16 overflow-hidden rounded-2xl bg-blue-50 border border-blue-100">
+                            <div
+                                class="absolute inset-x-0 bottom-0 water-wave"
+                                :style="{ height: `${storagePercent}%` }"
+                            >
+                                <div class="water-surface"></div>
+                            </div>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-[11px] font-bold text-blue-700">
+                                <span class="text-xs">{{ storagePercent }}%</span>
+                                <span class="text-[10px] font-semibold text-blue-500">Used</span>
+                            </div>
+                        </div>
+                        <div class="text-[11px] text-gray-500 leading-4">
+                            <div class="font-semibold text-gray-700">
+                                {{ formatBytes(state.appUsage.total) }}
+                            </div>
+                            <div class="text-[10px] text-gray-400">of 10 GB</div>
+                            <div class="mt-1 flex items-center gap-1 text-[10px] text-blue-500">
+                                <span class="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                                Live usage
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -537,100 +800,358 @@ const formatBytes = (bytes) => {
             </div>
         </div>
 
-        <!-- BD Company Files Section -->
-        <div
-            class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100/70 shadow-sm p-6"
-        >
-            <div
-                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-            >
+        <!-- File Tracking Section -->
+        <div class="rounded-[28px] border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100/80 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.45)] p-6">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <div
-                        class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white"
-                    >
+                    <div class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white">
+                        <font-awesome-icon icon="file-lines" />
                         File Tracking
                     </div>
                     <p class="mt-1 text-sm text-slate-600">
-                        Smart snapshot of BD company pipeline and agency
-                        handover
+                        Friendly overview of MITT and BD company processing
                     </p>
                 </div>
-                <div
-                    class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm"
-                >
-                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-                    Live counts
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm">
+                        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Live counts
+                    </div>
+                    <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">
+                        <span class="text-[10px] uppercase tracking-wide text-slate-400">Range</span>
+                        <select
+                            v-model="fileRangePreset"
+                            class="rounded-lg border border-slate-200 bg-white px-2 py-1 pr-8 text-xs text-slate-700"
+                        >
+                            <option value="this_week">This Week</option>
+                            <option value="last_week">Last Week</option>
+                            <option value="this_month">This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="this_year">This Year</option>
+                            <option value="last_year">Last Year</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <div v-if="fileRangePreset === 'custom'" class="flex items-center gap-2">
+                            <input
+                                v-model="fileCustomRange.start"
+                                type="date"
+                                class="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700"
+                            />
+                            <span class="text-[10px] text-slate-400">to</span>
+                            <input
+                                v-model="fileCustomRange.end"
+                                type="date"
+                                class="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-                <button
-                    v-for="tile in bdCompanyTiles"
-                    :key="tile.key"
-                    type="button"
-                    @click="goToClients(tile.query)"
-                    class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white/80 px-4 py-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
-                >
-                    <div
-                        :class="[
-                            'absolute left-0 top-0 h-full w-1.5',
-                            tile.tone === 'blue' && 'bg-blue-500',
-                            tile.tone === 'amber' && 'bg-amber-500',
-                            tile.tone === 'green' && 'bg-green-500',
-                            tile.tone === 'red' && 'bg-red-500',
-                            tile.tone === 'teal' && 'bg-teal-500',
-                            tile.tone === 'indigo' && 'bg-indigo-500',
-                        ]"
-                    ></div>
-                    <div
-                        :class="[
-                            'text-[11px] font-semibold uppercase tracking-wide',
-                            tile.tone === 'blue' && 'text-blue-600',
-                            tile.tone === 'amber' && 'text-amber-600',
-                            tile.tone === 'green' && 'text-green-600',
-                            tile.tone === 'red' && 'text-red-600',
-                            tile.tone === 'teal' && 'text-teal-600',
-                            tile.tone === 'indigo' && 'text-indigo-600',
-                        ]"
-                    >
-                        {{ tile.label }}
+
+            <div class="mt-6 grid gap-3 lg:grid-cols-3">
+                <div class="rounded-2xl border border-indigo-100 bg-white/90 p-5 shadow-[0_18px_40px_-30px_rgba(99,102,241,0.55)]">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">All Files at MITT</p>
+                            <p class="text-[11px] text-slate-500">Total pipeline (MITT + BD)</p>
+                        </div>
+                        <span class="text-xl font-bold text-indigo-700">{{ mittPipelineTotal }}</span>
                     </div>
-                    <div
-                        class="mt-2 text-3xl font-bold text-slate-900 group-hover:text-slate-950"
-                    >
-                        {{ tile.value }}
+                    <div class="mt-4 grid grid-cols-2 gap-2">
+                        <button
+                            type="button"
+                            @click="goToClients({ agency_scope: 1 })"
+                            class="rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2.5 text-left transition hover:bg-indigo-100 hover:shadow-sm"
+                        >
+                            <div class="flex items-center gap-2 text-[11px] font-semibold text-indigo-700">
+                                <font-awesome-icon icon="file-lines" class="text-indigo-500" />
+                                MITT Pending
+                            </div>
+                            <div class="mt-1 text-lg font-bold text-indigo-800">{{ state.bdCompanyFiles.agency_total }}</div>
+                        </button>
+                        <button
+                            type="button"
+                            @click="goToClients({ bd_company_scope: 1 })"
+                            class="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5 text-left transition hover:bg-blue-100 hover:shadow-sm"
+                        >
+                            <div class="flex items-center gap-2 text-[11px] font-semibold text-blue-700">
+                                <font-awesome-icon icon="building" class="text-blue-500" />
+                                At BD Company
+                            </div>
+                            <div class="mt-1 text-lg font-bold text-blue-800">{{ state.bdCompanyFiles.total }}</div>
+                        </button>
+                        <button
+                            type="button"
+                            @click="goToClients({ bd_company_status: 'rejected' })"
+                            class="rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 text-left transition hover:bg-red-100 hover:shadow-sm"
+                        >
+                            <div class="flex items-center gap-2 text-[11px] font-semibold text-red-700">
+                                <font-awesome-icon icon="circle-xmark" class="text-red-500" />
+                                Rejected
+                            </div>
+                            <div class="mt-1 text-lg font-bold text-red-800">{{ state.bdCompanyFiles.rejected }}</div>
+                        </button>
+                        <button
+                            type="button"
+                            @click="goToClients({ bd_company_status: 'completed' })"
+                            class="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2.5 text-left transition hover:bg-emerald-100 hover:shadow-sm"
+                        >
+                            <div class="flex items-center gap-2 text-[11px] font-semibold text-emerald-700">
+                                <font-awesome-icon icon="trophy" class="text-emerald-500" />
+                                Completed
+                            </div>
+                            <div class="mt-1 text-lg font-bold text-emerald-800">{{ state.bdCompanyFiles.completed }}</div>
+                        </button>
                     </div>
-                    <div
-                        class="mt-1 text-xs text-slate-400 group-hover:text-slate-500"
-                    >
-                        View list →
+                </div>
+
+                <div class="rounded-2xl border border-blue-100 bg-white/90 p-5 shadow-[0_18px_40px_-30px_rgba(59,130,246,0.45)] lg:col-span-2">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">BD Company Breakdown</p>
+                            <p class="text-[11px] text-slate-500">Status-wise processing</p>
+                        </div>
+                        <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+                            {{ state.bdCompanyFiles.total }} in BD
+                        </span>
                     </div>
-                </button>
+                    <div class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        <button
+                            v-for="tile in bdCompanyTiles"
+                            :key="tile.key"
+                            type="button"
+                            @click="goToClients(tile.query)"
+                            class="group relative overflow-hidden rounded-xl border border-slate-200 bg-white/80 px-3 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
+                        >
+                            <div
+                                :class="[
+                                    'absolute left-0 top-0 h-full w-1.5',
+                                    tile.tone === 'blue' && 'bg-blue-500',
+                                    tile.tone === 'amber' && 'bg-amber-500',
+                                    tile.tone === 'green' && 'bg-green-500',
+                                    tile.tone === 'red' && 'bg-red-500',
+                                    tile.tone === 'teal' && 'bg-teal-500',
+                                    tile.tone === 'indigo' && 'bg-indigo-500',
+                                ]"
+                            ></div>
+                            <div
+                                :class="[
+                                    'text-[11px] font-semibold uppercase tracking-wide',
+                                    tile.tone === 'blue' && 'text-blue-600',
+                                    tile.tone === 'amber' && 'text-amber-600',
+                                    tile.tone === 'green' && 'text-green-600',
+                                    tile.tone === 'red' && 'text-red-600',
+                                    tile.tone === 'teal' && 'text-teal-600',
+                                    tile.tone === 'indigo' && 'text-indigo-600',
+                                ]"
+                            >
+                                <div class="flex items-center gap-2">
+                                    <font-awesome-icon
+                                        :icon="tile.tone === 'amber'
+                                            ? 'clock'
+                                            : tile.tone === 'green'
+                                                ? 'circle-check'
+                                                : tile.tone === 'red'
+                                                    ? 'circle-xmark'
+                                                    : tile.tone === 'teal'
+                                                        ? 'trophy'
+                                                        : 'building'"
+                                        class="opacity-70"
+                                    />
+                                    {{ tile.label }}
+                                </div>
+                            </div>
+                            <div class="mt-2 text-xl font-bold text-slate-900 group-hover:text-slate-950">
+                                {{ tile.value }}
+                            </div>
+                            <div class="mt-1 text-[11px] text-slate-400 group-hover:text-slate-500">
+                                View list →
+                            </div>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="mt-6 h-64 rounded-2xl bg-white p-3 shadow-sm">
-                <Bar
-                    :data="bdCompanyFilesData"
-                    :options="bdCompanyFilesOptions"
-                />
+
+            <div class="mt-5 grid gap-4 lg:grid-cols-2">
+                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)]">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">Tracking Graph</p>
+                            <p class="text-[11px] text-slate-500">Quick breakdown</p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-slate-500">Live</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="h-36 w-36">
+                            <Doughnut :data="fileTrackingDonutData" :options="fileTrackingDonutOptions" />
+                        </div>
+                        <div class="space-y-2 text-xs text-slate-600">
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+                                MITT Total: {{ mittPipelineTotal }}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-amber-400"></span>
+                                BD Pending: {{ state.bdCompanyFiles.pending }}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-green-500"></span>
+                                BD Accepted: {{ state.bdCompanyFiles.accepted }}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                                BD Rejected: {{ state.bdCompanyFiles.rejected }}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-teal-600"></span>
+                                BD Completed: {{ state.bdCompanyFiles.completed }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)]">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">Tracking Bars</p>
+                            <p class="text-[11px] text-slate-500">MITT vs BD company status</p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-slate-500">Live</span>
+                    </div>
+                    <div class="h-56">
+                        <Bar :data="bdCompanyFilesData" :options="bdCompanyFilesOptions" />
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- App Storage Usage -->
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-            <div class="flex items-center justify-between mb-2">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-900">
-                        App Storage Usage
-                    </h2>
-                    <p class="text-xs text-gray-500">
-                        Only this project size (app folder)
-                    </p>
+        <!-- Agent & Foreign Country Summaries -->
+        <div class="grid gap-4 lg:grid-cols-2">
+            <div class="rounded-2xl border border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-emerald-100/60 shadow-sm p-6">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1">
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            Agent Client Summary
+                        </h2>
+                        <p class="text-xs text-gray-600">
+                            Each agent and total assigned clients
+                        </p>
+                    </div>
+                    <div class="flex flex-nowrap items-center gap-2 shrink-0">
+                        <span class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full whitespace-nowrap">
+                            {{ state.agentClientSummary.length }} Agents
+                        </span>
+                        <div class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm">
+                            <span class="text-[10px] uppercase tracking-wide text-emerald-400">Range</span>
+                            <select
+                                v-model="agentRangePreset"
+                                class="rounded-lg border border-emerald-200 bg-white px-2 py-1 pr-8 text-xs text-emerald-700 whitespace-nowrap"
+                            >
+                                <option value="this_week">This Week</option>
+                                <option value="last_week">Last Week</option>
+                                <option value="this_month">This Month</option>
+                                <option value="last_month">Last Month</option>
+                                <option value="this_year">This Year</option>
+                                <option value="last_year">Last Year</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <div v-if="agentRangePreset === 'custom'" class="flex items-center gap-2">
+                                <input
+                                    v-model="agentCustomRange.start"
+                                    type="date"
+                                    class="rounded-lg border border-emerald-200 bg-white px-2 py-1 text-xs text-emerald-700"
+                                />
+                                <span class="text-[10px] text-emerald-400">to</span>
+                                <input
+                                    v-model="agentCustomRange.end"
+                                    type="date"
+                                    class="rounded-lg border border-emerald-200 bg-white px-2 py-1 text-xs text-emerald-700"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-sm font-semibold text-gray-700">
-                    {{ formatBytes(state.appUsage.total) }}
+                <div class="mt-4 max-h-[240px] space-y-3 overflow-y-auto pr-1">
+                    <div
+                        v-for="agent in state.agentClientSummary"
+                        :key="agent.id"
+                        class="flex items-center justify-between rounded-xl bg-white/80 px-4 py-3 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                        @click="goToAgent(agent.id)"
+                    >
+                        <div class="text-sm font-semibold text-gray-900">
+                            {{ agent.name }}
+                        </div>
+                        <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                            {{ agent.clients_count }} Clients
+                        </span>
+                    </div>
+                    <div v-if="!state.agentClientSummary.length" class="text-sm text-gray-500">
+                        No agent data found.
+                    </div>
                 </div>
             </div>
-            <div class="text-xs text-gray-500">
-                Path: {{ state.appUsage.path || "—" }}
+
+            <div class="rounded-2xl border border-indigo-200 bg-gradient-to-br from-white via-indigo-50 to-indigo-100/60 shadow-sm p-6">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex-1">
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            Foreign Country Summary
+                        </h2>
+                        <p class="text-xs text-gray-600">
+                            Clients grouped by destination country
+                        </p>
+                    </div>
+                    <div class="flex flex-nowrap items-center gap-2 shrink-0">
+                        <span class="text-xs font-semibold text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full whitespace-nowrap">
+                            {{ state.foreignCountrySummary.length }} Countries
+                        </span>
+                        <div class="flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold text-indigo-700 shadow-sm ml-2">
+                            <span class="text-[10px] uppercase tracking-wide text-indigo-400">Range</span>
+                            <select
+                                v-model="countryRangePreset"
+                                class="rounded-lg border border-indigo-200 bg-white px-2 py-1 pr-8 text-xs text-indigo-700 whitespace-nowrap"
+                            >
+                                <option value="this_week">This Week</option>
+                                <option value="last_week">Last Week</option>
+                                <option value="this_month">This Month</option>
+                                <option value="last_month">Last Month</option>
+                                <option value="this_year">This Year</option>
+                                <option value="last_year">Last Year</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <div v-if="countryRangePreset === 'custom'" class="flex items-center gap-2">
+                                <input
+                                    v-model="countryCustomRange.start"
+                                    type="date"
+                                    class="rounded-lg border border-indigo-200 bg-white px-2 py-1 text-xs text-indigo-700"
+                                />
+                                <span class="text-[10px] text-indigo-400">to</span>
+                                <input
+                                    v-model="countryCustomRange.end"
+                                    type="date"
+                                    class="rounded-lg border border-indigo-200 bg-white px-2 py-1 text-xs text-indigo-700"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 max-h-[240px] space-y-3 overflow-y-auto pr-1">
+                    <div
+                        v-for="countryItem in state.foreignCountrySummary"
+                        :key="countryItem.country"
+                        class="flex items-center justify-between rounded-xl bg-white/80 px-4 py-3 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                        @click="goToForeignCountry(countryItem.country)"
+                    >
+                        <div class="text-sm font-semibold text-gray-900">
+                            {{ countryItem.country }}
+                        </div>
+                        <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
+                            {{ countryItem.total }} Clients
+                        </span>
+                    </div>
+                    <div v-if="!state.foreignCountrySummary.length" class="text-sm text-gray-500">
+                        No foreign country data found.
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -854,3 +1375,44 @@ const formatBytes = (bytes) => {
         </div>
     </div>
 </template>
+
+<style scoped>
+.water-wave {
+    transition: height 0.8s ease;
+    animation: waterFloat 3.5s ease-in-out infinite;
+    background: linear-gradient(120deg, rgba(59,130,246,0.85), rgba(34,211,238,0.9), rgba(59,130,246,0.85));
+}
+
+.water-surface {
+    height: 8px;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.35) 0,
+        rgba(255, 255, 255, 0.35) 10px,
+        rgba(255, 255, 255, 0.1) 10px,
+        rgba(255, 255, 255, 0.1) 20px
+    );
+    animation: surfaceDrift 2.6s linear infinite;
+}
+
+@keyframes waterFloat {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes surfaceDrift {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-20px);
+    }
+}
+</style>
