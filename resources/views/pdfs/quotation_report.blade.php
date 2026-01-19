@@ -108,7 +108,8 @@
                 <tr>
                     <th style="width: 40px;">SL</th>
                     <th>Service Description</th>
-                    <th class="right" style="width: 90px;">Price</th>
+                    <th class="right" style="width: 70px;">Qty</th>
+                    <th class="right" style="width: 90px;">Unit Price</th>
                     <th class="right" style="width: 90px;">Discount</th>
                     <th class="right" style="width: 70px;">VAT %</th>
                     <th class="right" style="width: 90px;">VAT Amt</th>
@@ -120,7 +121,8 @@
                     <tr>
                         <td>{{ $item->sl }}</td>
                         <td>{{ $item->service_description }}</td>
-                        <td class="right">৳{{ number_format($item->price, 2) }}</td>
+                        <td class="right">{{ number_format($item->quantity ?? 1, 2) }}</td>
+                        <td class="right">৳{{ number_format($item->unit_price ?? $item->price, 2) }}</td>
                         <td class="right">৳{{ number_format($item->discount_amount ?? 0, 2) }}</td>
                         <td class="right">{{ number_format($item->vat_rate ?? 0, 2) }}%</td>
                         <td class="right">৳{{ number_format($item->vat_amount ?? 0, 2) }}</td>
@@ -156,24 +158,6 @@
     <div class="section card">
         <h2>Terms & Conditions</h2>
         <div class="terms">{{ $quotation->terms_text }}</div>
-    </div>
-
-    <div class="section card">
-        <h2>Company Contact</h2>
-        <table class="info-grid">
-            <tr>
-                <td class="label">Phone</td>
-                <td>{{ $quotation->company_phone ?? '—' }}</td>
-            </tr>
-            <tr>
-                <td class="label">Email</td>
-                <td>{{ $quotation->company_email ?? '—' }}</td>
-            </tr>
-            <tr>
-                <td class="label">Address</td>
-                <td>{{ $quotation->company_address ?? '—' }}</td>
-            </tr>
-        </table>
     </div>
 
     @include('pdfs.partials.report_footer')

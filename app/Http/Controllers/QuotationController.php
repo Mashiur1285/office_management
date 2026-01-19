@@ -175,7 +175,8 @@ class QuotationController extends Controller
             'company_address' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.service_description' => ['required', 'string', 'max:255'],
-            'items.*.price' => ['required', 'numeric', 'min:0'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.discount_type' => ['required', 'in:percent,amount'],
             'items.*.discount_value' => ['nullable', 'numeric', 'min:0'],
             'items.*.vat_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
@@ -238,6 +239,8 @@ class QuotationController extends Controller
                     'quotation_id' => $quotation->id,
                     'sl' => $index + 1,
                     'service_description' => $item['service_description'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
                     'price' => $item['price'],
                     'discount_type' => $item['discount_type'],
                     'discount_value' => $item['discount_value'],
@@ -310,6 +313,8 @@ class QuotationController extends Controller
                 'valid_until' => $quotation->valid_until?->format('Y-m-d'),
                 'items' => $quotation->items->map(fn ($item) => [
                     'service_description' => $item->service_description,
+                    'quantity' => (float) ($item->quantity ?? 1),
+                    'unit_price' => (float) ($item->unit_price ?? $item->price),
                     'price' => (float) $item->price,
                     'discount_type' => $item->discount_type ?? 'percent',
                     'discount_value' => (float) ($item->discount_value ?? 0),
@@ -346,7 +351,8 @@ class QuotationController extends Controller
             'company_address' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.service_description' => ['required', 'string', 'max:255'],
-            'items.*.price' => ['required', 'numeric', 'min:0'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.unit_price' => ['required', 'numeric', 'min:0'],
             'items.*.discount_type' => ['required', 'in:percent,amount'],
             'items.*.discount_value' => ['nullable', 'numeric', 'min:0'],
             'items.*.vat_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
@@ -398,6 +404,8 @@ class QuotationController extends Controller
                     'quotation_id' => $quotation->id,
                     'sl' => $index + 1,
                     'service_description' => $item['service_description'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
                     'price' => $item['price'],
                     'discount_type' => $item['discount_type'],
                     'discount_value' => $item['discount_value'],
@@ -454,6 +462,8 @@ class QuotationController extends Controller
                     'id' => $item->id,
                     'sl' => $item->sl,
                     'service_description' => $item->service_description,
+                    'quantity' => (float) ($item->quantity ?? 1),
+                    'unit_price' => (float) ($item->unit_price ?? $item->price),
                     'price' => (float) $item->price,
                     'discount_type' => $item->discount_type ?? 'percent',
                     'discount_value' => (float) ($item->discount_value ?? 0),
@@ -499,20 +509,24 @@ class QuotationController extends Controller
     private function normalizeQuotationItems(array $items): array
     {
         return collect($items)->values()->map(function ($item) {
-            $price = (float) $item['price'];
+            $quantity = (float) $item['quantity'];
+            $unitPrice = (float) $item['unit_price'];
+            $baseAmount = $quantity * $unitPrice;
             $discountValue = (float) ($item['discount_value'] ?? 0);
             $discountAmount = $item['discount_type'] === 'percent'
-                ? ($price * $discountValue) / 100
+                ? ($baseAmount * $discountValue) / 100
                 : $discountValue;
-            $discountAmount = min($price, max(0, $discountAmount));
-            $taxableAmount = max(0, $price - $discountAmount);
+            $discountAmount = min($baseAmount, max(0, $discountAmount));
+            $taxableAmount = max(0, $baseAmount - $discountAmount);
             $vatRate = (float) ($item['vat_rate'] ?? 0);
             $vatAmount = ($taxableAmount * $vatRate) / 100;
             $lineTotal = $taxableAmount + $vatAmount;
 
             return [
                 'service_description' => $item['service_description'],
-                'price' => $price,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'price' => $baseAmount,
                 'discount_type' => $item['discount_type'],
                 'discount_value' => $discountValue,
                 'discount_amount' => $discountAmount,
@@ -531,11 +545,13 @@ class QuotationController extends Controller
         $totalAmount = 0;
 
         foreach ($quotation->items as $item) {
-            $price = (float) $item->price;
-            $subtotal += $price;
+            $quantity = (float) ($item->quantity ?? 1);
+            $unitPrice = (float) ($item->unit_price ?? $item->price);
+            $baseAmount = $quantity * $unitPrice;
+            $subtotal += $baseAmount;
             $discountAmount += (float) ($item->discount_amount ?? 0);
             $vatAmount += (float) ($item->vat_amount ?? 0);
-            $totalAmount += (float) ($item->line_total ?? $price);
+            $totalAmount += (float) ($item->line_total ?? $baseAmount);
         }
 
         return [

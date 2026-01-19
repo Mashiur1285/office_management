@@ -58,7 +58,8 @@
                         <tr>
                             <th class="px-3 py-2">SL</th>
                             <th class="px-3 py-2">Service Description</th>
-                            <th class="px-3 py-2 text-right">Price</th>
+                            <th class="px-3 py-2 text-right">Qty</th>
+                            <th class="px-3 py-2 text-right">Unit Price</th>
                             <th class="px-3 py-2 text-right">Discount</th>
                             <th class="px-3 py-2 text-right">VAT %</th>
                             <th class="px-3 py-2 text-right">VAT Amt</th>
@@ -69,7 +70,8 @@
                         <tr v-for="item in quotation.items" :key="item.id" class="border-b">
                             <td class="px-3 py-2 font-semibold text-gray-700">{{ item.sl }}</td>
                             <td class="px-3 py-2">{{ item.service_description }}</td>
-                            <td class="px-3 py-2 text-right">{{ money(item.price) }}</td>
+                            <td class="px-3 py-2 text-right">{{ formatQuantity(item.quantity) }}</td>
+                            <td class="px-3 py-2 text-right">{{ money(item.unit_price) }}</td>
                             <td class="px-3 py-2 text-right">{{ money(item.discount_amount) }}</td>
                             <td class="px-3 py-2 text-right">{{ item.vat_rate }}%</td>
                             <td class="px-3 py-2 text-right">{{ money(item.vat_amount) }}</td>
@@ -97,12 +99,6 @@
             </p>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 class="text-lg font-semibold text-gray-900 mb-3">Company Contact</h2>
-            <InfoRow label="Phone" :value="quotation.company_phone || '—'" />
-            <InfoRow label="Email" :value="quotation.company_email || '—'" />
-            <InfoRow label="Address" :value="quotation.company_address || '—'" />
-        </div>
     </div>
 </template>
 
@@ -128,6 +124,11 @@ const formatService = (category, type) => {
 const money = (value) => {
     if (value === null || value === undefined) return '৳0.00';
     return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+};
+
+const formatQuantity = (value) => {
+    if (value === null || value === undefined) return '0';
+    return new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
 };
 
 const InfoCard = {

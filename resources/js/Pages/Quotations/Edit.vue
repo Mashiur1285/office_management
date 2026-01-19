@@ -142,7 +142,8 @@
                             <tr>
                                 <th class="px-3 py-2">SL</th>
                                 <th class="px-3 py-2">Service Description</th>
-                                <th class="px-3 py-2">Price</th>
+                                <th class="px-3 py-2">Qty</th>
+                                <th class="px-3 py-2">Unit Price</th>
                                 <th class="px-3 py-2">Discount</th>
                                 <th class="px-3 py-2">VAT %</th>
                                 <th class="px-3 py-2 text-right">VAT Amt</th>
@@ -162,10 +163,22 @@
                                 </td>
                                 <td class="px-3 py-2">
                                     <input
-                                        v-model="item.price"
+                                        v-model="item.quantity"
+                                        type="number"
+                                        min="1"
+                                        step="1"
+                                        inputmode="numeric"
+                                        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                        placeholder="1"
+                                    />
+                                </td>
+                                <td class="px-3 py-2">
+                                    <input
+                                        v-model="item.unit_price"
                                         type="number"
                                         min="0"
-                                        step="0.01"
+                                        step="1"
+                                        inputmode="numeric"
                                         class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                                         placeholder="0.00"
                                     />
@@ -274,35 +287,6 @@
             </section>
 
             <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Company Contact</h2>
-                <div class="grid gap-4 md:grid-cols-2">
-                    <FormGroup label="Phone" :error="form.errors.company_phone">
-                        <input
-                            v-model="form.company_phone"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
-                            placeholder="Phone number"
-                        />
-                    </FormGroup>
-                    <FormGroup label="Email" :error="form.errors.company_email">
-                        <input
-                            v-model="form.company_email"
-                            type="email"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
-                            placeholder="Company email"
-                        />
-                    </FormGroup>
-                </div>
-                <FormGroup label="Address" :error="form.errors.company_address" class="mt-4">
-                    <textarea
-                        v-model="form.company_address"
-                        rows="3"
-                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
-                        placeholder="Company address"
-                    ></textarea>
-                </FormGroup>
-            </section>
-
-            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Terms & Conditions</h2>
                 <div class="flex flex-wrap gap-4">
                     <label class="inline-flex items-center gap-2 text-sm text-gray-700">
@@ -350,7 +334,6 @@ const props = defineProps({
     officeStaff: Array,
     subcategories: Array,
     defaultTerms: String,
-    companyDefaults: Object,
 });
 
 const form = useForm({
@@ -365,11 +348,8 @@ const form = useForm({
     terms_type: props.quotation.terms_type,
     terms_text: props.quotation.terms_text,
     valid_until: props.quotation.valid_until,
-    company_phone: props.quotation.company_phone || '',
-    company_email: props.quotation.company_email || '',
-    company_address: props.quotation.company_address || '',
     items: props.quotation.items.length > 0 ? props.quotation.items : [
-        { service_description: '', price: '', discount_type: 'percent', discount_value: '', vat_rate: '' },
+        { service_description: '', quantity: 1, unit_price: '', discount_type: 'percent', discount_value: '', vat_rate: '' },
     ],
 });
 
@@ -385,19 +365,21 @@ const subcategoryOptions = computed(() => {
 
 const itemCalculations = computed(() => {
     return form.items.map(item => {
-        const price = parseFloat(item.price) || 0;
+        const quantity = parseFloat(item.quantity) || 0;
+        const unitPrice = parseFloat(item.unit_price) || 0;
+        const baseAmount = quantity * unitPrice;
         const discountValue = parseFloat(item.discount_value) || 0;
         const discountAmount = item.discount_type === 'amount'
             ? discountValue
-            : (price * discountValue) / 100;
-        const safeDiscount = Math.min(price, Math.max(0, discountAmount));
-        const taxable = Math.max(0, price - safeDiscount);
+            : (baseAmount * discountValue) / 100;
+        const safeDiscount = Math.min(baseAmount, Math.max(0, discountAmount));
+        const taxable = Math.max(0, baseAmount - safeDiscount);
         const vatRate = parseFloat(item.vat_rate) || 0;
         const vatAmount = (taxable * vatRate) / 100;
         const lineTotal = taxable + vatAmount;
 
         return {
-            baseAmount: price,
+            baseAmount,
             discountAmount: safeDiscount,
             vatAmount,
             lineTotal,
@@ -436,7 +418,8 @@ const handleServiceCategoryChange = () => {
 const addItem = () => {
     form.items.push({
         service_description: '',
-        price: '',
+        quantity: 1,
+        unit_price: '',
         discount_type: 'percent',
         discount_value: '',
         vat_rate: '',

@@ -164,8 +164,9 @@
                                     <input
                                         v-model="item.quantity"
                                         type="number"
-                                        min="0.01"
-                                        step="0.01"
+                                        min="1"
+                                        step="1"
+                                        inputmode="numeric"
                                         class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                                         placeholder="1"
                                     />
@@ -175,7 +176,8 @@
                                         v-model="item.unit_price"
                                         type="number"
                                         min="0"
-                                        step="0.01"
+                                        step="1"
+                                        inputmode="numeric"
                                         class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                                         placeholder="0.00"
                                     />

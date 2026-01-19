@@ -11,6 +11,8 @@ class QuotationItem extends Model
         'quotation_id',
         'sl',
         'service_description',
+        'quantity',
+        'unit_price',
         'price',
         'discount_type',
         'discount_value',
@@ -21,6 +23,8 @@ class QuotationItem extends Model
     ];
 
     protected $casts = [
+        'quantity' => 'decimal:2',
+        'unit_price' => 'decimal:2',
         'price' => 'decimal:2',
         'discount_value' => 'decimal:2',
         'discount_amount' => 'decimal:2',
