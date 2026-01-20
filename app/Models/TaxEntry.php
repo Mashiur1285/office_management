@@ -9,6 +9,7 @@ class TaxEntry extends Model
     protected $fillable = [
         'accounting_period_id',
         'client_id',
+        'staff_id',
         'tax_type',
         'description',
         'amount',
@@ -27,5 +28,10 @@ class TaxEntry extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function staff()
+    {
+        return $this->belongsTo(OfficeStaff::class, 'staff_id');
     }
 }

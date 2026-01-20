@@ -52,7 +52,8 @@ class NonOperatingController extends Controller
 
         // Calculate totals
         $totalIncome = $incomeEntries->sum('amount');
-        $totalExpenses = $expenseEntries->sum('amount');
+        $totalExpenseTax = $expenseEntries->sum('tax_amount');
+        $totalExpenses = $expenseEntries->sum(fn($entry) => $entry->amount + $entry->tax_amount);
         $netNonOperating = $totalIncome - $totalExpenses;
 
         // Group by category for breakdown
@@ -60,7 +61,7 @@ class NonOperatingController extends Controller
             ->map(fn($items) => $items->sum('amount'));
 
         $expenseBreakdown = $expenseEntries->groupBy('category')
-            ->map(fn($items) => $items->sum('amount'));
+            ->map(fn($items) => $items->sum(fn($entry) => $entry->amount + $entry->tax_amount));
 
         $subcategories = Subcategory::where('type', 'non_operating')
             ->orderBy('name')
@@ -90,6 +91,8 @@ class NonOperatingController extends Controller
                 'category' => $e->category,
                 'description' => $e->description,
                 'amount' => (float) $e->amount,
+                'tax_rate' => (float) $e->tax_rate,
+                'tax_amount' => (float) $e->tax_amount,
                 'notes' => $e->notes,
                 'created_at' => $e->created_at->format('Y-m-d H:i'),
             ])->values(),
@@ -104,10 +107,13 @@ class NonOperatingController extends Controller
                 'category' => $e->category,
                 'description' => $e->description,
                 'amount' => (float) $e->amount,
+                'tax_rate' => (float) $e->tax_rate,
+                'tax_amount' => (float) $e->tax_amount,
                 'notes' => $e->notes,
                 'created_at' => $e->created_at->format('Y-m-d H:i'),
             ])->values(),
             'totalIncome' => (float) $totalIncome,
+            'totalExpenseTax' => (float) $totalExpenseTax,
             'totalExpenses' => (float) $totalExpenses,
             'netNonOperating' => (float) $netNonOperating,
             'incomeBreakdown' => $incomeBreakdown,
@@ -135,8 +141,14 @@ class NonOperatingController extends Controller
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
         ]);
+
+        $validated['tax_rate'] = $validated['tax_rate'] ?? 0;
+        $validated['tax_amount'] = $validated['type'] === 'expense'
+            ? ($validated['amount'] * $validated['tax_rate']) / 100
+            : 0;
 
         NonOperatingEntry::create($validated);
 
@@ -150,8 +162,14 @@ class NonOperatingController extends Controller
             'category' => 'required|string|max:255',
             'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
         ]);
+
+        $validated['tax_rate'] = $validated['tax_rate'] ?? 0;
+        $validated['tax_amount'] = $nonOperatingEntry->type === 'expense'
+            ? ($validated['amount'] * $validated['tax_rate']) / 100
+            : 0;
 
         $nonOperatingEntry->update($validated);
 
@@ -181,7 +199,8 @@ class NonOperatingController extends Controller
         $incomeEntries = $entries->where('type', 'income');
         $expenseEntries = $entries->where('type', 'expense');
         $totalIncome = $incomeEntries->sum('amount');
-        $totalExpenses = $expenseEntries->sum('amount');
+        $totalExpenseTax = $expenseEntries->sum('tax_amount');
+        $totalExpenses = $expenseEntries->sum(fn($entry) => $entry->amount + $entry->tax_amount);
         $netNonOperating = $totalIncome - $totalExpenses;
 
         if ($request->query('type') === 'pdf') {
@@ -192,6 +211,7 @@ class NonOperatingController extends Controller
                 'incomeEntries' => $incomeEntries,
                 'expenseEntries' => $expenseEntries,
                 'totalIncome' => $totalIncome,
+                'totalExpenseTax' => $totalExpenseTax,
                 'totalExpenses' => $totalExpenses,
                 'netNonOperating' => $netNonOperating,
             ])->download($fileName);
@@ -203,13 +223,14 @@ class NonOperatingController extends Controller
         fputcsv($handle, ['Non-Operating Summary']);
         fputcsv($handle, ['Metric', 'Amount']);
         fputcsv($handle, ['Total Income', $totalIncome]);
-        fputcsv($handle, ['Total Expenses', $totalExpenses]);
+        fputcsv($handle, ['Total Expense Tax', $totalExpenseTax]);
+        fputcsv($handle, ['Total Expenses (with Tax)', $totalExpenses]);
         fputcsv($handle, ['Net Profit/Loss', $netNonOperating]);
         fputcsv($handle, []);
 
         // Detailed Entries
         fputcsv($handle, ['Detailed Entries']);
-        fputcsv($handle, ['Type', 'Subcategory', 'Client', 'Description', 'Amount', 'Date']);
+        fputcsv($handle, ['Type', 'Subcategory', 'Client', 'Description', 'Amount', 'Tax Rate', 'Tax Amount', 'Total', 'Date']);
 
         foreach ($incomeEntries as $entry) {
             fputcsv($handle, [
@@ -218,6 +239,9 @@ class NonOperatingController extends Controller
                 $entry->client->name ?? 'N/A',
                 $entry->description,
                 $entry->amount,
+                $entry->tax_rate,
+                $entry->tax_amount,
+                $entry->amount + $entry->tax_amount,
                 $entry->created_at->format('Y-m-d H:i'),
             ]);
         }
@@ -229,6 +253,9 @@ class NonOperatingController extends Controller
                 $entry->client->name ?? 'N/A',
                 $entry->description,
                 $entry->amount,
+                $entry->tax_rate,
+                $entry->tax_amount,
+                $entry->amount + $entry->tax_amount,
                 $entry->created_at->format('Y-m-d H:i'),
             ]);
         }

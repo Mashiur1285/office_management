@@ -53,7 +53,7 @@
             </tr>
             <tr>
                 <th>Description</th>
-                <th>Client</th>
+                <th>Party</th>
                 <th>Amount</th>
                 <th>Date</th>
                 <th>Notes</th>
@@ -63,7 +63,7 @@
             @forelse($currentTaxEntries as $entry)
                 <tr>
                     <td>{{ $entry->description }}</td>
-                    <td>{{ optional($entry->client)->name ?? 'N/A' }}</td>
+                    <td>{{ optional($entry->client)->name ?? optional($entry->staff)->name ?? 'Organization-wide' }}</td>
                     <td>{{ $entry->amount }}</td>
                     <td>{{ $entry->created_at->format('Y-m-d H:i') }}</td>
                     <td>{{ $entry->notes }}</td>
@@ -83,7 +83,7 @@
             </tr>
             <tr>
                 <th>Description</th>
-                <th>Client</th>
+                <th>Party</th>
                 <th>Amount</th>
                 <th>Date</th>
                 <th>Notes</th>
@@ -93,7 +93,7 @@
             @forelse($deferredTaxEntries as $entry)
                 <tr>
                     <td>{{ $entry->description }}</td>
-                    <td>{{ optional($entry->client)->name ?? 'N/A' }}</td>
+                    <td>{{ optional($entry->client)->name ?? optional($entry->staff)->name ?? 'Organization-wide' }}</td>
                     <td>{{ $entry->amount }}</td>
                     <td>{{ $entry->created_at->format('Y-m-d H:i') }}</td>
                     <td>{{ $entry->notes }}</td>

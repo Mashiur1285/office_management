@@ -36,6 +36,26 @@
                     <h2 class="text-xl font-bold">VAT Overview - All Periods</h2>
                     <p class="text-sm text-purple-100 mt-1">Complete VAT payment tracking across all accounting periods</p>
                 </div>
+                <div class="bg-white border-b border-purple-100 px-4 py-3">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="text-sm font-medium text-gray-700">Search by period or chalan number</div>
+                        <div class="flex w-full max-w-md items-center gap-2">
+                            <input
+                                v-model="searchTerm"
+                                type="text"
+                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                                placeholder="e.g. 2024-Q1 or CH-12345"
+                            />
+                            <button
+                                v-if="searchTerm"
+                                @click="searchTerm = ''"
+                                class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full">
@@ -51,7 +71,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            <template v-for="period in periods" :key="period.id">
+                            <template v-for="period in filteredPeriods" :key="period.id">
                                 <tr class="hover:bg-gray-50 cursor-pointer" @click="togglePeriod(period.id)">
                                     <td class="px-6 py-4 text-sm font-semibold text-gray-900">
                                         <div class="flex items-center gap-2">
@@ -98,7 +118,7 @@
                                 </tr>
 
                                 <!-- Expanded Payment Details -->
-                                <tr v-if="expandedPeriods.includes(period.id) && period.payments.length > 0" class="bg-purple-50">
+                                <tr v-if="expandedPeriods.includes(period.id) && getFilteredPayments(period).length > 0" class="bg-purple-50">
                                     <td colspan="7" class="px-6 py-4">
                                         <div class="bg-white rounded-lg p-4 shadow-sm">
                                             <h3 class="text-sm font-bold text-purple-900 mb-3">Payment Details for {{ period.name }}</h3>
@@ -113,7 +133,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody class="divide-y divide-gray-200">
-                                                    <tr v-for="payment in period.payments" :key="payment.id" class="hover:bg-gray-50">
+                                                    <tr v-for="payment in getFilteredPayments(period)" :key="payment.id" class="hover:bg-gray-50">
                                                         <td class="px-4 py-2 text-sm text-gray-900">{{ formatDate(payment.payment_date) }}</td>
                                                         <td class="px-4 py-2 text-sm font-semibold text-green-700">{{ money(payment.payment_amount) }}</td>
                                                         <td class="px-4 py-2 text-sm text-gray-900">{{ payment.chalan_number || '—' }}</td>
@@ -137,21 +157,23 @@
                                 </tr>
 
                                 <!-- No Payments Message -->
-                                <tr v-if="expandedPeriods.includes(period.id) && period.payments.length === 0" class="bg-purple-50">
+                                <tr v-if="expandedPeriods.includes(period.id) && getFilteredPayments(period).length === 0" class="bg-purple-50">
                                     <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                                        No payments recorded for this period
+                                        {{ searchTerm ? 'No payments match this search' : 'No payments recorded for this period' }}
                                     </td>
                                 </tr>
                             </template>
 
                             <!-- Empty State -->
-                            <tr v-if="periods.length === 0">
+                            <tr v-if="filteredPeriods.length === 0">
                                 <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                                     <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
-                                    <div class="text-sm font-medium">No accounting periods found</div>
-                                    <div class="text-xs text-gray-400 mt-1">Create an accounting period to start tracking VAT</div>
+                                    <div class="text-sm font-medium">{{ searchTerm ? 'No matching periods found' : 'No accounting periods found' }}</div>
+                                    <div class="text-xs text-gray-400 mt-1">
+                                        {{ searchTerm ? 'Try a different period name or chalan number.' : 'Create an accounting period to start tracking VAT.' }}
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -189,6 +211,7 @@ const props = defineProps({
 });
 
 const expandedPeriods = ref([]);
+const searchTerm = ref('');
 
 const money = (value) => {
     if (value === null || value === undefined) return '৳0';
@@ -213,6 +236,31 @@ const getChalanFileCount = (period) => {
     if (!period.payments) return 0;
     return period.payments.filter(payment => payment.chalan_slip).length;
 };
+
+const normalize = (value) => {
+    if (value === null || value === undefined) return '';
+    return String(value).toLowerCase();
+};
+
+const getFilteredPayments = (period) => {
+    if (!period.payments) return [];
+    if (!searchTerm.value) return period.payments;
+    const term = normalize(searchTerm.value);
+    return period.payments.filter(payment => normalize(payment.chalan_number).includes(term));
+};
+
+const filteredPeriods = computed(() => {
+    if (!searchTerm.value) return props.periods;
+    const term = normalize(searchTerm.value);
+    return props.periods.filter((period) => {
+        const periodMatch =
+            normalize(period.name).includes(term) ||
+            normalize(period.status).includes(term) ||
+            normalize(period.start_date).includes(term) ||
+            normalize(period.end_date).includes(term);
+        return periodMatch || getFilteredPayments(period).length > 0;
+    });
+});
 
 const totalAllVat = computed(() => {
     return props.periods.reduce((sum, period) => sum + period.total_vat, 0);

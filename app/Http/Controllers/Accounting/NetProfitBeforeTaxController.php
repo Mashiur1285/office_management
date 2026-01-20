@@ -37,6 +37,8 @@ class NetProfitBeforeTaxController extends Controller
         $grossProfit = $period->gross_profit;
         $totalOperatingExpenses = $period->total_operating_expenses;
         $totalOperatingExpensesVat = $period->total_operating_expenses_vat;
+        $totalOperatingExpensesTax = $period->total_operating_expenses_tax;
+        $totalOperatingExpensesWithVatTax = $totalOperatingExpenses + $totalOperatingExpensesVat + $totalOperatingExpensesTax;
         $operatingProfit = $period->operating_profit;
 
         $nonOperatingIncome = $period->non_operating_income;
@@ -61,6 +63,8 @@ class NetProfitBeforeTaxController extends Controller
             'grossProfit' => (float) $grossProfit,
             'totalOperatingExpenses' => (float) $totalOperatingExpenses,
             'totalOperatingExpensesVat' => (float) $totalOperatingExpensesVat,
+            'totalOperatingExpensesTax' => (float) $totalOperatingExpensesTax,
+            'totalOperatingExpensesWithVatTax' => (float) $totalOperatingExpensesWithVatTax,
             'operatingProfit' => (float) $operatingProfit,
             'nonOperatingIncome' => (float) $nonOperatingIncome,
             'nonOperatingExpenses' => (float) $nonOperatingExpenses,
@@ -80,6 +84,9 @@ class NetProfitBeforeTaxController extends Controller
 
         $grossProfit = $period->gross_profit;
         $totalOperatingExpenses = $period->total_operating_expenses;
+        $totalOperatingExpensesVat = $period->total_operating_expenses_vat;
+        $totalOperatingExpensesTax = $period->total_operating_expenses_tax;
+        $totalOperatingExpensesWithVatTax = $totalOperatingExpenses + $totalOperatingExpensesVat + $totalOperatingExpensesTax;
         $operatingProfit = $period->operating_profit;
         $netNonOperating = $period->net_non_operating;
         $netProfitBeforeTax = $period->net_profit_before_tax;
@@ -90,7 +97,7 @@ class NetProfitBeforeTaxController extends Controller
             return Pdf::loadView('pdfs.net_profit_before_tax_report', [
                 'period' => $period,
                 'grossProfit' => $grossProfit,
-                'totalOperatingExpenses' => $totalOperatingExpenses,
+                'totalOperatingExpenses' => $totalOperatingExpensesWithVatTax,
                 'operatingProfit' => $operatingProfit,
                 'netNonOperating' => $netNonOperating,
                 'netProfitBeforeTax' => $netProfitBeforeTax,
@@ -103,7 +110,7 @@ class NetProfitBeforeTaxController extends Controller
         fputcsv($handle, ['Net Profit Before Tax Calculation Summary']);
         fputcsv($handle, ['Metric', 'Amount']);
         fputcsv($handle, ['Gross Profit', $grossProfit]);
-        fputcsv($handle, ['Less: Total Operating Expenses', $totalOperatingExpenses]);
+        fputcsv($handle, ['Less: Total Operating Expenses (with VAT & Tax)', $totalOperatingExpensesWithVatTax]);
         fputcsv($handle, ['Operating Profit', $operatingProfit]);
         fputcsv($handle, ['Add/Less: Net Non-Operating Profit/Loss', $netNonOperating]);
         fputcsv($handle, ['Net Profit Before Tax', $netProfitBeforeTax]);

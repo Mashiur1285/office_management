@@ -41,6 +41,8 @@ class NetProfitAfterTaxController extends Controller
 
         $totalOperatingExpenses = $period->total_operating_expenses;
         $totalOperatingExpensesVat = $period->total_operating_expenses_vat;
+        $totalOperatingExpensesTax = $period->total_operating_expenses_tax;
+        $totalOperatingExpensesWithVatTax = $totalOperatingExpenses + $totalOperatingExpensesVat + $totalOperatingExpensesTax;
         $operatingProfit = $period->operating_profit;
 
         $nonOperatingIncome = $period->non_operating_income;
@@ -75,6 +77,8 @@ class NetProfitAfterTaxController extends Controller
             'grossProfit' => (float) $grossProfit,
             'totalOperatingExpenses' => (float) $totalOperatingExpenses,
             'totalOperatingExpensesVat' => (float) $totalOperatingExpensesVat,
+            'totalOperatingExpensesTax' => (float) $totalOperatingExpensesTax,
+            'totalOperatingExpensesWithVatTax' => (float) $totalOperatingExpensesWithVatTax,
             'operatingProfit' => (float) $operatingProfit,
             'nonOperatingIncome' => (float) $nonOperatingIncome,
             'nonOperatingExpenses' => (float) $nonOperatingExpenses,
@@ -104,6 +108,9 @@ class NetProfitAfterTaxController extends Controller
         $netProfitBeforeTax = $period->net_profit_before_tax;
         $totalTax = $period->total_tax;
         $netProfitAfterTax = $period->net_profit_after_tax;
+        $totalOperatingExpensesWithVatTax = $period->total_operating_expenses
+            + $period->total_operating_expenses_vat
+            + $period->total_operating_expenses_tax;
 
         if ($request->query('type') === 'pdf') {
             $fileName = "profit-and-loss-report-" . now()->format('Y-m-d') . '.pdf';
@@ -114,7 +121,7 @@ class NetProfitAfterTaxController extends Controller
                 'totalCostOfSales' => $totalCostOfSales,
                 'grossProfit' => $grossProfit,
                 'operatingProfit' => $operatingProfit,
-                'totalOperatingExpenses' => $period->total_operating_expenses,
+                'totalOperatingExpenses' => $totalOperatingExpensesWithVatTax,
                 'netNonOperating' => $netNonOperating,
                 'netProfitBeforeTax' => $netProfitBeforeTax,
                 'totalTax' => $totalTax,
@@ -133,7 +140,7 @@ class NetProfitAfterTaxController extends Controller
         fputcsv($handle, ['Gross Profit', $grossProfit]);
         fputcsv($handle, []);
 
-        fputcsv($handle, ['Less: Operating Expenses', $period->total_operating_expenses]);
+        fputcsv($handle, ['Less: Operating Expenses (with VAT & Tax)', $totalOperatingExpensesWithVatTax]);
         fputcsv($handle, ['Operating Profit', $operatingProfit]);
         fputcsv($handle, []);
 

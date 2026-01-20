@@ -28,7 +28,11 @@
                 <td>{{ $totalIncome }}</td>
             </tr>
             <tr>
-                <td>Total Expenses</td>
+                <td>Total Expense Tax</td>
+                <td>{{ $totalExpenseTax }}</td>
+            </tr>
+            <tr>
+                <td>Total Expenses (with Tax)</td>
                 <td>{{ $totalExpenses }}</td>
             </tr>
             <tr>
@@ -71,13 +75,15 @@
     <table>
         <thead>
             <tr>
-                <th colspan="5">Expense Entries</th>
+                <th colspan="7">Expense Entries</th>
             </tr>
             <tr>
                 <th>Category</th>
                 <th>Client</th>
                 <th>Description</th>
                 <th>Amount</th>
+                <th>Tax Rate</th>
+                <th>Tax Amount</th>
                 <th>Date</th>
             </tr>
         </thead>
@@ -88,11 +94,13 @@
                     <td>{{ optional($entry->client)->name ?? 'N/A' }}</td>
                     <td>{{ $entry->description }}</td>
                     <td>{{ $entry->amount }}</td>
+                    <td>{{ $entry->tax_rate }}%</td>
+                    <td>{{ $entry->tax_amount }}</td>
                     <td>{{ $entry->created_at->format('Y-m-d H:i') }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" style="text-align: center;">No expense entries found.</td>
+                    <td colspan="7" style="text-align: center;">No expense entries found.</td>
                 </tr>
             @endforelse
         </tbody>

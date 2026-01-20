@@ -34,39 +34,23 @@
                 <div class="space-y-6">
                     <!-- Formula Display -->
                     <div class="bg-green-50 rounded-xl p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex-1">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="rounded-xl border border-green-200 bg-white/80 p-5">
                                 <p class="text-sm text-gray-600 mb-2">Total Income</p>
                                 <p class="text-3xl font-bold text-green-700">{{ money(totalIncome) }}</p>
                             </div>
-                            <div class="px-4">
-                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
+                            <div class="rounded-xl border border-pink-200 bg-white/80 p-5">
                                 <p class="text-sm text-gray-600 mb-2">Total Cost of Sales</p>
                                 <p class="text-3xl font-bold text-pink-700">{{ money(totalCostOfSales) }}</p>
                             </div>
-                            <div class="px-4">
-                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm text-gray-600 mb-2">Gross Profit</p>
-                                <p class="text-3xl font-bold" :class="grossProfit >= 0 ? 'text-green-700' : 'text-red-700'">
+                            <div class="rounded-xl border-2 border-green-500 bg-green-100 p-5 shadow-sm">
+                                <p class="text-sm text-gray-700 mb-2 font-semibold">Gross Profit</p>
+                                <p class="text-4xl font-bold" :class="grossProfit >= 0 ? 'text-green-700' : 'text-red-700'">
                                     {{ money(grossProfit) }}
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Formula Text -->
-                        <div class="text-center pt-4 border-t border-green-200">
-                            <p class="text-sm text-gray-600">
-                                Formula: <span class="font-semibold">Gross Profit = Total Income - Total Cost of Sales</span>
-                            </p>
-                        </div>
                     </div>
 
                     <!-- Profitability Metrics -->

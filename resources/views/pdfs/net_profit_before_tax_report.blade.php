@@ -28,7 +28,7 @@
                 <td>{{ $grossProfit }}</td>
             </tr>
             <tr>
-                <td>Total Operating Expenses</td>
+                <td>Total Operating Expenses (with VAT &amp; Tax)</td>
                 <td>{{ $totalOperatingExpenses }}</td>
             </tr>
             <tr>

@@ -54,11 +54,15 @@ class AccountingDashboardController extends Controller
             'general' => $period->operatingExpenses()->where('category', 'general')->sum('amount'),
         ];
 
+        $totalOperatingExpensesWithVatTax = $period->total_operating_expenses
+            + $period->total_operating_expenses_vat
+            + $period->total_operating_expenses_tax;
+
         // P&L Overview for pie chart
         $plOverview = [
             'revenue' => (float) $period->total_income,
             'cost_of_sales' => (float) $period->total_cost_of_sales,
-            'operating_expenses' => (float) $period->total_operating_expenses,
+            'operating_expenses' => (float) $totalOperatingExpensesWithVatTax,
             'tax' => (float) $period->total_tax,
             'net_profit' => (float) $period->net_profit_after_tax,
         ];
@@ -76,6 +80,7 @@ class AccountingDashboardController extends Controller
                 'total_cost_of_sales' => (float) $period->total_cost_of_sales,
                 'gross_profit' => (float) $period->gross_profit,
                 'total_operating_expenses' => (float) $period->total_operating_expenses,
+                'total_operating_expenses_total' => (float) $totalOperatingExpensesWithVatTax,
                 'operating_profit' => (float) $period->operating_profit,
                 'non_operating_income' => (float) $period->non_operating_income,
                 'non_operating_expenses' => (float) $period->non_operating_expenses,

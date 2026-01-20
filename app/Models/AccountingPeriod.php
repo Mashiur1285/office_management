@@ -86,9 +86,17 @@ class AccountingPeriod extends Model
         return $this->operatingExpenses()->sum('vat_amount');
     }
 
+    public function getTotalOperatingExpensesTaxAttribute()
+    {
+        return $this->operatingExpenses()->sum('tax_amount');
+    }
+
     public function getOperatingProfitAttribute()
     {
-        return $this->gross_profit - $this->total_operating_expenses - $this->total_operating_expenses_vat;
+        return $this->gross_profit
+            - $this->total_operating_expenses
+            - $this->total_operating_expenses_vat
+            - $this->total_operating_expenses_tax;
     }
 
     public function getNonOperatingIncomeAttribute()
@@ -98,7 +106,9 @@ class AccountingPeriod extends Model
 
     public function getNonOperatingExpensesAttribute()
     {
-        return $this->nonOperatingEntries()->where('type', 'expense')->sum('amount');
+        return $this->nonOperatingEntries()
+            ->where('type', 'expense')
+            ->sum(\DB::raw('amount + tax_amount'));
     }
 
     public function getNetNonOperatingAttribute()

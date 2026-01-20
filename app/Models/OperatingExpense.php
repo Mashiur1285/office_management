@@ -18,7 +18,10 @@ class OperatingExpense extends Model
         'paid_amount',
         'due_amount',
         'amount',
+        'vat_rate',
         'vat_amount',
+        'tax_rate',
+        'tax_amount',
         'notes',
     ];
 
@@ -28,7 +31,10 @@ class OperatingExpense extends Model
         'paid_amount' => 'decimal:2',
         'due_amount' => 'decimal:2',
         'amount' => 'decimal:2',
+        'vat_rate' => 'decimal:2',
         'vat_amount' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
     ];
 
     public function accountingPeriod()

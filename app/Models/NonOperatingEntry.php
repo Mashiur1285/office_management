@@ -13,11 +13,15 @@ class NonOperatingEntry extends Model
         'category',
         'description',
         'amount',
+        'tax_rate',
+        'tax_amount',
         'notes',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
     ];
 
     public function accountingPeriod()

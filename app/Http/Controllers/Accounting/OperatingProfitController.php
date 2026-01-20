@@ -37,7 +37,8 @@ class OperatingProfitController extends Controller
         $grossProfit = $period->gross_profit;
         $totalOperatingExpenses = $period->total_operating_expenses;
         $totalOperatingExpensesVat = $period->total_operating_expenses_vat;
-        $totalOperatingExpensesWithVat = $totalOperatingExpenses + $totalOperatingExpensesVat;
+        $totalOperatingExpensesTax = $period->total_operating_expenses_tax;
+        $totalOperatingExpensesWithVatTax = $totalOperatingExpenses + $totalOperatingExpensesVat + $totalOperatingExpensesTax;
         $operatingProfit = $period->operating_profit;
 
         // Get operating expenses breakdown by category
@@ -45,18 +46,22 @@ class OperatingProfitController extends Controller
             'employee_manpower' => [
                 'amount' => $period->operatingExpenses()->where('category', 'employee_manpower')->sum('amount'),
                 'vat_amount' => $period->operatingExpenses()->where('category', 'employee_manpower')->sum('vat_amount'),
+                'tax_amount' => $period->operatingExpenses()->where('category', 'employee_manpower')->sum('tax_amount'),
             ],
             'administrative' => [
                 'amount' => $period->operatingExpenses()->where('category', 'administrative')->sum('amount'),
                 'vat_amount' => $period->operatingExpenses()->where('category', 'administrative')->sum('vat_amount'),
+                'tax_amount' => $period->operatingExpenses()->where('category', 'administrative')->sum('tax_amount'),
             ],
             'selling_marketing' => [
                 'amount' => $period->operatingExpenses()->where('category', 'selling_marketing')->sum('amount'),
                 'vat_amount' => $period->operatingExpenses()->where('category', 'selling_marketing')->sum('vat_amount'),
+                'tax_amount' => $period->operatingExpenses()->where('category', 'selling_marketing')->sum('tax_amount'),
             ],
             'general' => [
                 'amount' => $period->operatingExpenses()->where('category', 'general')->sum('amount'),
                 'vat_amount' => $period->operatingExpenses()->where('category', 'general')->sum('vat_amount'),
+                'tax_amount' => $period->operatingExpenses()->where('category', 'general')->sum('tax_amount'),
             ],
         ];
 
@@ -76,28 +81,33 @@ class OperatingProfitController extends Controller
             'grossProfit' => (float) $grossProfit,
             'totalOperatingExpenses' => (float) $totalOperatingExpenses,
             'totalOperatingExpensesVat' => (float) $totalOperatingExpensesVat,
-            'totalOperatingExpensesWithVat' => (float) $totalOperatingExpensesWithVat,
+            'totalOperatingExpensesTax' => (float) $totalOperatingExpensesTax,
+            'totalOperatingExpensesWithVatTax' => (float) $totalOperatingExpensesWithVatTax,
             'operatingProfit' => (float) $operatingProfit,
             'expensesByCategory' => [
                 'employee_manpower' => [
                     'amount' => (float) $expensesByCategory['employee_manpower']['amount'],
                     'vat_amount' => (float) $expensesByCategory['employee_manpower']['vat_amount'],
-                    'total' => (float) ($expensesByCategory['employee_manpower']['amount'] + $expensesByCategory['employee_manpower']['vat_amount']),
+                    'tax_amount' => (float) $expensesByCategory['employee_manpower']['tax_amount'],
+                    'total' => (float) ($expensesByCategory['employee_manpower']['amount'] + $expensesByCategory['employee_manpower']['vat_amount'] + $expensesByCategory['employee_manpower']['tax_amount']),
                 ],
                 'administrative' => [
                     'amount' => (float) $expensesByCategory['administrative']['amount'],
                     'vat_amount' => (float) $expensesByCategory['administrative']['vat_amount'],
-                    'total' => (float) ($expensesByCategory['administrative']['amount'] + $expensesByCategory['administrative']['vat_amount']),
+                    'tax_amount' => (float) $expensesByCategory['administrative']['tax_amount'],
+                    'total' => (float) ($expensesByCategory['administrative']['amount'] + $expensesByCategory['administrative']['vat_amount'] + $expensesByCategory['administrative']['tax_amount']),
                 ],
                 'selling_marketing' => [
                     'amount' => (float) $expensesByCategory['selling_marketing']['amount'],
                     'vat_amount' => (float) $expensesByCategory['selling_marketing']['vat_amount'],
-                    'total' => (float) ($expensesByCategory['selling_marketing']['amount'] + $expensesByCategory['selling_marketing']['vat_amount']),
+                    'tax_amount' => (float) $expensesByCategory['selling_marketing']['tax_amount'],
+                    'total' => (float) ($expensesByCategory['selling_marketing']['amount'] + $expensesByCategory['selling_marketing']['vat_amount'] + $expensesByCategory['selling_marketing']['tax_amount']),
                 ],
                 'general' => [
                     'amount' => (float) $expensesByCategory['general']['amount'],
                     'vat_amount' => (float) $expensesByCategory['general']['vat_amount'],
-                    'total' => (float) ($expensesByCategory['general']['amount'] + $expensesByCategory['general']['vat_amount']),
+                    'tax_amount' => (float) $expensesByCategory['general']['tax_amount'],
+                    'total' => (float) ($expensesByCategory['general']['amount'] + $expensesByCategory['general']['vat_amount'] + $expensesByCategory['general']['tax_amount']),
                 ],
             ],
         ]);
@@ -115,7 +125,8 @@ class OperatingProfitController extends Controller
         $grossProfit = $period->gross_profit;
         $totalOperatingExpenses = $period->total_operating_expenses;
         $totalOperatingExpensesVat = $period->total_operating_expenses_vat;
-        $totalOperatingExpensesWithVat = $totalOperatingExpenses + $totalOperatingExpensesVat;
+        $totalOperatingExpensesTax = $period->total_operating_expenses_tax;
+        $totalOperatingExpensesWithVatTax = $totalOperatingExpenses + $totalOperatingExpensesVat + $totalOperatingExpensesTax;
         $operatingProfit = $period->operating_profit;
         $operatingMargin = $grossProfit > 0 ? (($operatingProfit / $grossProfit) * 100) : 0;
 
@@ -123,18 +134,22 @@ class OperatingProfitController extends Controller
             'employee_manpower' => [
                 'amount' => $period->operatingExpenses()->where('category', 'employee_manpower')->sum('amount'),
                 'vat_amount' => $period->operatingExpenses()->where('category', 'employee_manpower')->sum('vat_amount'),
+                'tax_amount' => $period->operatingExpenses()->where('category', 'employee_manpower')->sum('tax_amount'),
             ],
             'administrative' => [
                 'amount' => $period->operatingExpenses()->where('category', 'administrative')->sum('amount'),
                 'vat_amount' => $period->operatingExpenses()->where('category', 'administrative')->sum('vat_amount'),
+                'tax_amount' => $period->operatingExpenses()->where('category', 'administrative')->sum('tax_amount'),
             ],
             'selling_marketing' => [
                 'amount' => $period->operatingExpenses()->where('category', 'selling_marketing')->sum('amount'),
                 'vat_amount' => $period->operatingExpenses()->where('category', 'selling_marketing')->sum('vat_amount'),
+                'tax_amount' => $period->operatingExpenses()->where('category', 'selling_marketing')->sum('tax_amount'),
             ],
             'general' => [
                 'amount' => $period->operatingExpenses()->where('category', 'general')->sum('amount'),
                 'vat_amount' => $period->operatingExpenses()->where('category', 'general')->sum('vat_amount'),
+                'tax_amount' => $period->operatingExpenses()->where('category', 'general')->sum('tax_amount'),
             ],
         ];
 
@@ -153,7 +168,8 @@ class OperatingProfitController extends Controller
                 'grossProfit' => $grossProfit,
                 'totalOperatingExpenses' => $totalOperatingExpenses,
                 'totalOperatingExpensesVat' => $totalOperatingExpensesVat,
-                'totalOperatingExpensesWithVat' => $totalOperatingExpensesWithVat,
+                'totalOperatingExpensesTax' => $totalOperatingExpensesTax,
+                'totalOperatingExpensesWithVatTax' => $totalOperatingExpensesWithVatTax,
                 'operatingProfit' => $operatingProfit,
                 'operatingMargin' => $operatingMargin,
                 'categories' => $categories,
@@ -168,20 +184,22 @@ class OperatingProfitController extends Controller
         fputcsv($handle, ['Gross Profit', $grossProfit]);
         fputcsv($handle, ['Operating Expenses', $totalOperatingExpenses]);
         fputcsv($handle, ['Operating Expenses VAT', $totalOperatingExpensesVat]);
-        fputcsv($handle, ['Operating Expenses Total', $totalOperatingExpensesWithVat]);
+        fputcsv($handle, ['Operating Expenses Tax', $totalOperatingExpensesTax]);
+        fputcsv($handle, ['Operating Expenses Total', $totalOperatingExpensesWithVatTax]);
         fputcsv($handle, ['Operating Profit', $operatingProfit]);
         fputcsv($handle, ['Operating Margin', number_format($operatingMargin, 2) . '%']);
         fputcsv($handle, []);
 
         fputcsv($handle, ['Operating Expenses Breakdown']);
-        fputcsv($handle, ['Category', 'Amount', 'VAT', 'Total']);
+        fputcsv($handle, ['Category', 'Amount', 'VAT', 'Tax', 'Total']);
 
         foreach ($categories as $key => $name) {
             $amount = $expensesByCategory[$key]['amount'] ?? 0;
             $vatAmount = $expensesByCategory[$key]['vat_amount'] ?? 0;
-            $total = $amount + $vatAmount;
+            $taxAmount = $expensesByCategory[$key]['tax_amount'] ?? 0;
+            $total = $amount + $vatAmount + $taxAmount;
 
-            fputcsv($handle, [$name, $amount, $vatAmount, $total]);
+            fputcsv($handle, [$name, $amount, $vatAmount, $taxAmount, $total]);
         }
 
         rewind($handle);

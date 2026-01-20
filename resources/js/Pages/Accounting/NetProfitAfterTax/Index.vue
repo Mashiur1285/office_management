@@ -34,23 +34,21 @@
                 <div class="space-y-4">
                     <!-- Formula Display -->
                     <div class="bg-purple-50 rounded-lg p-6">
-                        <div class="flex items-center justify-center gap-4 text-lg font-medium">
-                            <div class="text-center">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="rounded-xl border border-green-200 bg-white/80 p-5 text-center">
                                 <div class="text-sm text-gray-600 mb-1">Net Profit Before Tax</div>
                                 <Link href="/accounting/net-profit-before-tax" class="text-2xl font-bold hover:underline" :class="netProfitBeforeTax >= 0 ? 'text-green-700 hover:text-green-800' : 'text-red-700 hover:text-red-800'">
                                     {{ money(netProfitBeforeTax) }}
                                 </Link>
                             </div>
-                            <div class="text-3xl text-gray-400">−</div>
-                            <div class="text-center">
+                            <div class="rounded-xl border border-yellow-200 bg-white/80 p-5 text-center">
                                 <div class="text-sm text-gray-600 mb-1">Total Tax Expenses</div>
                                 <Link href="/accounting/tax" class="text-2xl font-bold text-yellow-700 hover:text-yellow-800 hover:underline">
                                     {{ money(totalTax) }}
                                 </Link>
                             </div>
-                            <div class="text-3xl text-gray-400">=</div>
-                            <div class="text-center">
-                                <div class="text-sm text-gray-600 mb-1">Net Profit After Tax</div>
+                            <div class="rounded-xl border-2 border-purple-500 bg-purple-100 p-5 text-center shadow-sm">
+                                <div class="text-sm text-gray-700 mb-1 font-semibold">Net Profit After Tax</div>
                                 <div class="text-3xl font-bold" :class="netProfitAfterTax >= 0 ? 'text-purple-700' : 'text-red-700'">
                                     {{ money(netProfitAfterTax) }}
                                 </div>
@@ -113,8 +111,8 @@
                                 <span class="font-semibold text-green-700">{{ money(grossProfit) }}</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
-                                <span class="text-gray-700">Less: Operating Expenses (with VAT)</span>
-                                <span class="font-semibold text-pink-700">{{ money(totalOperatingExpenses + totalOperatingExpensesVat) }}</span>
+                                <span class="text-gray-700">Less: Operating Expenses (with VAT &amp; Tax)</span>
+                                <span class="font-semibold text-pink-700">{{ money(totalOperatingExpensesWithVatTax) }}</span>
                             </div>
                             <div class="pt-2 border-t border-blue-200 flex justify-between items-center">
                                 <span class="font-bold text-gray-900">Operating Profit</span>
@@ -241,6 +239,8 @@ const props = defineProps({
     grossProfit: Number,
     totalOperatingExpenses: Number,
     totalOperatingExpensesVat: Number,
+    totalOperatingExpensesTax: Number,
+    totalOperatingExpensesWithVatTax: Number,
     operatingProfit: Number,
     nonOperatingIncome: Number,
     nonOperatingExpenses: Number,

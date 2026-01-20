@@ -31,19 +31,18 @@
             <div class="bg-white rounded-xl shadow-sm border-4 border-cyan-500 p-6">
                 <h2 class="text-xl font-bold text-cyan-700 mb-4">Net Non-Operating Profit/Loss</h2>
                 <div class="bg-cyan-50 rounded-lg p-6">
-                    <div class="flex items-center justify-center gap-4 text-lg font-medium">
-                        <div class="text-center">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="rounded-xl border border-green-200 bg-white/80 p-5 text-center">
                             <div class="text-sm text-gray-600 mb-1">Non-Operating Income</div>
                             <div class="text-2xl font-bold text-green-700">{{ money(totalIncome) }}</div>
                         </div>
-                        <div class="text-3xl text-gray-400">−</div>
-                        <div class="text-center">
+                        <div class="rounded-xl border border-red-200 bg-white/80 p-5 text-center">
                             <div class="text-sm text-gray-600 mb-1">Non-Operating Expenses</div>
                             <div class="text-2xl font-bold text-red-700">{{ money(totalExpenses) }}</div>
+                            <div class="text-xs text-gray-500 mt-1">Tax: {{ money(totalExpenseTax) }}</div>
                         </div>
-                        <div class="text-3xl text-gray-400">=</div>
-                        <div class="text-center">
-                            <div class="text-sm text-gray-600 mb-1">Net Result</div>
+                        <div class="rounded-xl border-2 border-cyan-500 bg-cyan-100 p-5 text-center shadow-sm">
+                            <div class="text-sm text-gray-700 mb-1 font-semibold">Net Result</div>
                             <div class="text-3xl font-bold" :class="netNonOperating >= 0 ? 'text-cyan-700' : 'text-red-700'">
                                 {{ money(netNonOperating) }}
                             </div>
@@ -161,13 +160,16 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Rate</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Amount</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             <tr v-if="filteredEntries.length === 0">
-                                <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                <td colspan="10" class="px-6 py-12 text-center text-gray-500">
                                     {{ filterActive ? 'No entries found for this subcategory.' : 'No non-operating entries yet. Click "Add Income" or "Add Expense" to create one.' }}
                                 </td>
                             </tr>
@@ -188,6 +190,15 @@
                                 <td class="px-6 py-4 text-sm text-gray-700">{{ entry.description }}</td>
                                 <td class="px-6 py-4 text-sm text-right font-bold" :class="entry.type === 'income' ? 'text-green-700' : 'text-red-700'">
                                     {{ money(entry.amount) }}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-right text-gray-700">
+                                    {{ entry.type === 'expense' ? `${entry.tax_rate}%` : '—' }}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-right font-medium text-amber-700">
+                                    {{ entry.type === 'expense' ? money(entry.tax_amount) : '—' }}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-right font-bold text-purple-700">
+                                    {{ money(entry.type === 'expense' ? (entry.amount + entry.tax_amount) : entry.amount) }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ entry.created_at }}</td>
                                 <td class="px-6 py-4 text-center">
@@ -286,6 +297,28 @@
                             placeholder="0.00"
                         />
                     </div>
+                    <div v-if="form.type === 'expense'">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tax Rate (%)</label>
+                        <input
+                            v-model.number="form.tax_rate"
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                            placeholder="0"
+                        />
+                        <div v-if="form.tax_rate > 0" class="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-700">Calculated Tax Amount:</span>
+                                <span class="text-sm font-bold text-amber-700">{{ money(calculatedTax) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-sm font-medium text-gray-900">Total with Tax:</span>
+                                <span class="text-sm font-bold text-purple-700">{{ money(totalWithTaxPreview) }}</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
@@ -334,6 +367,7 @@ const props = defineProps({
     incomeEntries: Array,
     expenseEntries: Array,
     totalIncome: Number,
+    totalExpenseTax: Number,
     totalExpenses: Number,
     netNonOperating: Number,
     incomeBreakdown: Object,
@@ -390,6 +424,7 @@ const form = ref({
     category: '',
     description: '',
     amount: 0,
+    tax_rate: 0,
     notes: '',
 });
 
@@ -416,8 +451,20 @@ const money = (value) => {
     return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 };
 
+const calculatedTax = computed(() => {
+    if (!form.value.amount || !form.value.tax_rate) return 0;
+    return (form.value.amount * form.value.tax_rate) / 100;
+});
+
+const totalWithTaxPreview = computed(() => {
+    return (form.value.amount || 0) + calculatedTax.value;
+});
+
 const showAddModal = (type) => {
     form.value.type = type;
+    if (type !== 'expense') {
+        form.value.tax_rate = 0;
+    }
     showModal.value = true;
 };
 
@@ -435,6 +482,9 @@ const clearFilter = () => {
 const quickAdd = (type, category) => {
     form.value.type = type;
     form.value.category = category;
+    if (type !== 'expense') {
+        form.value.tax_rate = 0;
+    }
     showModal.value = true;
 };
 
@@ -486,6 +536,7 @@ const editEntry = (entry) => {
         category: entry.category,
         description: entry.description,
         amount: entry.amount,
+        tax_rate: entry.tax_rate || 0,
         notes: entry.notes || '',
     };
     // Set client search value
@@ -514,6 +565,7 @@ const closeModal = () => {
         category: '',
         description: '',
         amount: 0,
+        tax_rate: 0,
         notes: '',
     };
 };

@@ -36,8 +36,12 @@
                 <td>{{ $totalOperatingExpensesVat }}</td>
             </tr>
             <tr>
+                <td>Operating Expenses Tax</td>
+                <td>{{ $totalOperatingExpensesTax }}</td>
+            </tr>
+            <tr>
                 <td>Operating Expenses Total</td>
-                <td>{{ $totalOperatingExpensesWithVat }}</td>
+                <td>{{ $totalOperatingExpensesWithVatTax }}</td>
             </tr>
             <tr>
                 <td>Operating Profit</td>
@@ -56,6 +60,7 @@
                 <th>Category</th>
                 <th>Amount</th>
                 <th>VAT</th>
+                <th>Tax</th>
                 <th>Total</th>
             </tr>
         </thead>
@@ -64,12 +69,14 @@
                 @php
                     $amount = $expensesByCategory[$key]['amount'] ?? 0;
                     $vatAmount = $expensesByCategory[$key]['vat_amount'] ?? 0;
-                    $total = $amount + $vatAmount;
+                    $taxAmount = $expensesByCategory[$key]['tax_amount'] ?? 0;
+                    $total = $amount + $vatAmount + $taxAmount;
                 @endphp
                 <tr>
                     <td>{{ $name }}</td>
                     <td>{{ $amount }}</td>
                     <td>{{ $vatAmount }}</td>
+                    <td>{{ $taxAmount }}</td>
                     <td>{{ $total }}</td>
                 </tr>
             @endforeach

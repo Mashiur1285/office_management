@@ -34,21 +34,19 @@
                 <div class="space-y-4">
                     <!-- Formula Display -->
                     <div class="bg-blue-50 rounded-lg p-6">
-                        <div class="flex items-center justify-center gap-4 text-lg font-medium">
-                            <div class="text-center">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="rounded-xl border border-green-200 bg-white/80 p-5 text-center">
                                 <div class="text-sm text-gray-600 mb-1">Gross Profit</div>
                                 <Link href="/accounting/gross-profit" class="text-2xl font-bold text-green-700 hover:text-green-800 hover:underline">
                                     {{ money(grossProfit) }}
                                 </Link>
                             </div>
-                            <div class="text-3xl text-gray-400">−</div>
-                            <div class="text-center">
-                                <div class="text-sm text-gray-600 mb-1">Total Operating Expenses</div>
-                                <div class="text-2xl font-bold text-pink-700">{{ money(totalOperatingExpensesWithVat) }}</div>
+                            <div class="rounded-xl border border-pink-200 bg-white/80 p-5 text-center">
+                                <div class="text-sm text-gray-600 mb-1">Total Operating Expenses (with VAT &amp; Tax)</div>
+                                <div class="text-2xl font-bold text-pink-700">{{ money(totalOperatingExpensesWithVatTax) }}</div>
                             </div>
-                            <div class="text-3xl text-gray-400">=</div>
-                            <div class="text-center">
-                                <div class="text-sm text-gray-600 mb-1">Net Operating Profit</div>
+                            <div class="rounded-xl border-2 border-blue-500 bg-blue-100 p-5 text-center shadow-sm">
+                                <div class="text-sm text-gray-700 mb-1 font-semibold">Net Operating Profit</div>
                                 <div class="text-3xl font-bold" :class="operatingProfit >= 0 ? 'text-blue-700' : 'text-red-700'">
                                     {{ money(operatingProfit) }}
                                 </div>
@@ -76,10 +74,11 @@
                 <!-- Table Header -->
                 <div class="mb-2">
                     <div class="grid grid-cols-12 gap-2 px-2 py-2 bg-gray-50 rounded-lg font-semibold text-xs text-gray-600 uppercase">
-                        <div class="col-span-5">Category</div>
+                        <div class="col-span-4">Category</div>
                         <div class="col-span-2 text-right">Amount</div>
                         <div class="col-span-2 text-right">VAT</div>
-                        <div class="col-span-3 text-right">Total</div>
+                        <div class="col-span-2 text-right">Tax</div>
+                        <div class="col-span-2 text-right">Total</div>
                     </div>
                 </div>
 
@@ -87,7 +86,7 @@
                 <ul class="space-y-1">
                     <li class="hover:bg-blue-50 rounded-lg p-2 transition-colors">
                         <div class="grid grid-cols-12 gap-2 items-center">
-                            <Link href="/accounting/operating-expenses/employee" class="col-span-5 text-sm text-gray-700 hover:text-blue-800 font-medium flex items-center gap-2">
+                            <Link href="/accounting/operating-expenses/employee" class="col-span-4 text-sm text-gray-700 hover:text-blue-800 font-medium flex items-center gap-2">
                                 <span class="font-bold text-blue-700">A.</span>
                                 <span>Employee & Manpower</span>
                             </Link>
@@ -97,14 +96,17 @@
                             <div class="col-span-2 text-right">
                                 <span class="font-semibold text-red-700">{{ money(expensesByCategory.employee_manpower.vat_amount) }}</span>
                             </div>
-                            <div class="col-span-3 text-right">
+                            <div class="col-span-2 text-right">
+                                <span class="font-semibold text-amber-700">{{ money(expensesByCategory.employee_manpower.tax_amount) }}</span>
+                            </div>
+                            <div class="col-span-2 text-right">
                                 <span class="font-bold text-pink-700">{{ money(expensesByCategory.employee_manpower.total) }}</span>
                             </div>
                         </div>
                     </li>
                     <li class="hover:bg-blue-50 rounded-lg p-2 transition-colors">
                         <div class="grid grid-cols-12 gap-2 items-center">
-                            <Link href="/accounting/operating-expenses/administrative" class="col-span-5 text-sm text-gray-700 hover:text-blue-800 font-medium flex items-center gap-2">
+                            <Link href="/accounting/operating-expenses/administrative" class="col-span-4 text-sm text-gray-700 hover:text-blue-800 font-medium flex items-center gap-2">
                                 <span class="font-bold text-blue-700">B.</span>
                                 <span>Administrative</span>
                             </Link>
@@ -114,14 +116,17 @@
                             <div class="col-span-2 text-right">
                                 <span class="font-semibold text-red-700">{{ money(expensesByCategory.administrative.vat_amount) }}</span>
                             </div>
-                            <div class="col-span-3 text-right">
+                            <div class="col-span-2 text-right">
+                                <span class="font-semibold text-amber-700">{{ money(expensesByCategory.administrative.tax_amount) }}</span>
+                            </div>
+                            <div class="col-span-2 text-right">
                                 <span class="font-bold text-pink-700">{{ money(expensesByCategory.administrative.total) }}</span>
                             </div>
                         </div>
                     </li>
                     <li class="hover:bg-blue-50 rounded-lg p-2 transition-colors">
                         <div class="grid grid-cols-12 gap-2 items-center">
-                            <Link href="/accounting/operating-expenses/selling-marketing" class="col-span-5 text-sm text-gray-700 hover:text-blue-800 font-medium flex items-center gap-2">
+                            <Link href="/accounting/operating-expenses/selling-marketing" class="col-span-4 text-sm text-gray-700 hover:text-blue-800 font-medium flex items-center gap-2">
                                 <span class="font-bold text-blue-700">C.</span>
                                 <span>Selling & Marketing</span>
                             </Link>
@@ -131,14 +136,17 @@
                             <div class="col-span-2 text-right">
                                 <span class="font-semibold text-red-700">{{ money(expensesByCategory.selling_marketing.vat_amount) }}</span>
                             </div>
-                            <div class="col-span-3 text-right">
+                            <div class="col-span-2 text-right">
+                                <span class="font-semibold text-amber-700">{{ money(expensesByCategory.selling_marketing.tax_amount) }}</span>
+                            </div>
+                            <div class="col-span-2 text-right">
                                 <span class="font-bold text-pink-700">{{ money(expensesByCategory.selling_marketing.total) }}</span>
                             </div>
                         </div>
                     </li>
                     <li class="hover:bg-blue-50 rounded-lg p-2 transition-colors">
                         <div class="grid grid-cols-12 gap-2 items-center">
-                            <Link href="/accounting/operating-expenses/general" class="col-span-5 text-sm text-gray-700 hover:text-blue-800 font-medium flex items-center gap-2">
+                            <Link href="/accounting/operating-expenses/general" class="col-span-4 text-sm text-gray-700 hover:text-blue-800 font-medium flex items-center gap-2">
                                 <span class="font-bold text-blue-700">D.</span>
                                 <span>General</span>
                             </Link>
@@ -148,7 +156,10 @@
                             <div class="col-span-2 text-right">
                                 <span class="font-semibold text-red-700">{{ money(expensesByCategory.general.vat_amount) }}</span>
                             </div>
-                            <div class="col-span-3 text-right">
+                            <div class="col-span-2 text-right">
+                                <span class="font-semibold text-amber-700">{{ money(expensesByCategory.general.tax_amount) }}</span>
+                            </div>
+                            <div class="col-span-2 text-right">
                                 <span class="font-bold text-pink-700">{{ money(expensesByCategory.general.total) }}</span>
                             </div>
                         </div>
@@ -158,7 +169,7 @@
                 <!-- Total Row -->
                 <div class="mt-4 pt-4 border-t-2 border-blue-300">
                     <div class="grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-5">
+                        <div class="col-span-4">
                             <span class="font-bold text-gray-900">Total Operating Expenses:</span>
                         </div>
                         <div class="col-span-2 text-right">
@@ -167,8 +178,11 @@
                         <div class="col-span-2 text-right">
                             <span class="text-xl font-bold text-red-700">{{ money(totalOperatingExpensesVat) }}</span>
                         </div>
-                        <div class="col-span-3 text-right">
-                            <span class="text-xl font-bold text-pink-700">{{ money(totalOperatingExpensesWithVat) }}</span>
+                        <div class="col-span-2 text-right">
+                            <span class="text-xl font-bold text-amber-700">{{ money(totalOperatingExpensesTax) }}</span>
+                        </div>
+                        <div class="col-span-2 text-right">
+                            <span class="text-xl font-bold text-pink-700">{{ money(totalOperatingExpensesWithVatTax) }}</span>
                         </div>
                     </div>
                 </div>
@@ -198,7 +212,8 @@ const props = defineProps({
     grossProfit: Number,
     totalOperatingExpenses: Number,
     totalOperatingExpensesVat: Number,
-    totalOperatingExpensesWithVat: Number,
+    totalOperatingExpensesTax: Number,
+    totalOperatingExpensesWithVatTax: Number,
     operatingProfit: Number,
     expensesByCategory: Object,
 });

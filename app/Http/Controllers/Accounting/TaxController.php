@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\AccountingPeriod;
 use App\Models\Client;
+use App\Models\OfficeStaff;
 use App\Models\TaxEntry;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -38,9 +39,13 @@ class TaxController extends Controller
             ->orderBy('name')
             ->get();
 
+        $officeStaff = OfficeStaff::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
         // Get tax entries for this period
         $entries = TaxEntry::where('accounting_period_id', $period->id)
-            ->with('client:id,name,mobile')
+            ->with('client:id,name,mobile', 'staff:id,name')
             ->orderBy('tax_type', 'asc')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -75,10 +80,15 @@ class TaxController extends Controller
             'currentTaxEntries' => $currentTaxEntries->map(fn($e) => [
                 'id' => $e->id,
                 'client_id' => $e->client_id,
+                'staff_id' => $e->staff_id,
                 'client' => $e->client ? [
                     'id' => $e->client->id,
                     'name' => $e->client->name,
                     'phone_number' => $e->client->mobile,
+                ] : null,
+                'staff' => $e->staff ? [
+                    'id' => $e->staff->id,
+                    'name' => $e->staff->name,
                 ] : null,
                 'description' => $e->description,
                 'amount' => (float) $e->amount,
@@ -88,10 +98,15 @@ class TaxController extends Controller
             'deferredTaxEntries' => $deferredTaxEntries->map(fn($e) => [
                 'id' => $e->id,
                 'client_id' => $e->client_id,
+                'staff_id' => $e->staff_id,
                 'client' => $e->client ? [
                     'id' => $e->client->id,
                     'name' => $e->client->name,
                     'phone_number' => $e->client->mobile,
+                ] : null,
+                'staff' => $e->staff ? [
+                    'id' => $e->staff->id,
+                    'name' => $e->staff->name,
                 ] : null,
                 'description' => $e->description,
                 'amount' => (float) $e->amount,
@@ -108,6 +123,10 @@ class TaxController extends Controller
                 'name' => $c->name,
                 'phone_number' => $c->mobile,
             ]),
+            'officeStaff' => $officeStaff->map(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+            ]),
         ]);
     }
 
@@ -116,11 +135,18 @@ class TaxController extends Controller
         $validated = $request->validate([
             'accounting_period_id' => 'required|exists:accounting_periods,id',
             'client_id' => 'nullable|exists:clients,id',
+            'staff_id' => 'nullable|exists:office_staff,id',
             'tax_type' => 'required|in:current,deferred',
             'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
+
+        if (!empty($validated['staff_id'])) {
+            $validated['client_id'] = null;
+        } elseif (!empty($validated['client_id'])) {
+            $validated['staff_id'] = null;
+        }
 
         TaxEntry::create($validated);
 
@@ -131,10 +157,17 @@ class TaxController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'nullable|exists:clients,id',
+            'staff_id' => 'nullable|exists:office_staff,id',
             'description' => 'nullable|string',
             'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
+
+        if (!empty($validated['staff_id'])) {
+            $validated['client_id'] = null;
+        } elseif (!empty($validated['client_id'])) {
+            $validated['staff_id'] = null;
+        }
 
         $taxEntry->update($validated);
 
@@ -156,7 +189,7 @@ class TaxController extends Controller
             ->first();
 
         $entries = TaxEntry::where('accounting_period_id', $period->id)
-            ->with('client:id,name,mobile')
+            ->with('client:id,name,mobile', 'staff:id,name')
             ->orderBy('tax_type', 'asc')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -200,13 +233,13 @@ class TaxController extends Controller
 
         // Detailed Entries
         fputcsv($handle, ['Detailed Tax Entries']);
-        fputcsv($handle, ['Type', 'Description', 'Client', 'Amount', 'Date']);
+        fputcsv($handle, ['Type', 'Description', 'Party', 'Amount', 'Date']);
 
         foreach ($currentTaxEntries as $entry) {
             fputcsv($handle, [
                 'Current Tax',
                 $entry->description,
-                $entry->client->name ?? 'N/A',
+                $entry->client->name ?? $entry->staff->name ?? 'Organization-wide',
                 $entry->amount,
                 $entry->created_at->format('Y-m-d H:i'),
             ]);
@@ -216,7 +249,7 @@ class TaxController extends Controller
             fputcsv($handle, [
                 'Deferred Tax',
                 $entry->description,
-                $entry->client->name ?? 'N/A',
+                $entry->client->name ?? $entry->staff->name ?? 'Organization-wide',
                 $entry->amount,
                 $entry->created_at->format('Y-m-d H:i'),
             ]);

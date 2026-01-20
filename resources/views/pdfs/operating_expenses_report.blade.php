@@ -32,8 +32,12 @@
                 <td>{{ $totalVat }}</td>
             </tr>
             <tr>
-                <td>Total with VAT</td>
-                <td>{{ $totalWithVat }}</td>
+                <td>Total Tax</td>
+                <td>{{ $totalTax }}</td>
+            </tr>
+            <tr>
+                <td>Total with VAT &amp; Tax</td>
+                <td>{{ $totalWithVatTax }}</td>
             </tr>
         </tbody>
     </table>
@@ -47,6 +51,8 @@
                 <th>Amount</th>
                 <th>VAT Rate</th>
                 <th>VAT Amount</th>
+                <th>Tax Rate</th>
+                <th>Tax Amount</th>
                 <th>Total</th>
                 <th>Date</th>
             </tr>
@@ -60,12 +66,14 @@
                     <td>{{ $entry->amount }}</td>
                     <td>{{ $entry->vat_rate }}%</td>
                     <td>{{ $entry->vat_amount }}</td>
-                    <td>{{ $entry->amount + $entry->vat_amount }}</td>
+                    <td>{{ $entry->tax_rate }}%</td>
+                    <td>{{ $entry->tax_amount }}</td>
+                    <td>{{ $entry->amount + $entry->vat_amount + $entry->tax_amount }}</td>
                     <td>{{ $entry->created_at->format('Y-m-d H:i') }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" style="text-align: center;">No entries found.</td>
+                    <td colspan="10" style="text-align: center;">No entries found.</td>
                 </tr>
             @endforelse
         </tbody>

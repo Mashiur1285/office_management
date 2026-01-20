@@ -32,18 +32,22 @@
 
             <!-- Total Summary -->
             <div class="bg-white rounded-xl shadow-sm border-4 border-pink-500 p-6">
-                <div class="grid grid-cols-3 gap-6">
-                    <div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div class="rounded-xl border border-green-200 bg-white/80 p-5">
                         <p class="text-sm text-gray-600">Total Amount</p>
                         <p class="text-3xl font-bold text-green-700">{{ money(totalAmount) }}</p>
                     </div>
-                    <div>
+                    <div class="rounded-xl border border-red-200 bg-white/80 p-5">
                         <p class="text-sm text-gray-600">Total VAT</p>
                         <p class="text-3xl font-bold text-red-700">{{ money(totalVat) }}</p>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Total with VAT</p>
-                        <p class="text-3xl font-bold text-pink-700">{{ money(totalWithVat) }}</p>
+                    <div class="rounded-xl border border-amber-200 bg-white/80 p-5">
+                        <p class="text-sm text-gray-600">Total Tax</p>
+                        <p class="text-3xl font-bold text-amber-700">{{ money(totalTax) }}</p>
+                    </div>
+                    <div class="rounded-xl border-2 border-pink-500 bg-pink-100 p-5 shadow-sm">
+                        <p class="text-sm text-gray-700 font-semibold">Total with VAT &amp; Tax</p>
+                        <p class="text-4xl font-bold text-pink-700">{{ money(totalWithVatTax) }}</p>
                     </div>
                 </div>
             </div>
@@ -55,9 +59,10 @@
                 <!-- Table Header -->
                 <div class="mb-2">
                     <div class="grid grid-cols-12 gap-2 px-2 py-2 bg-gray-50 rounded-lg font-semibold text-xs text-gray-600 uppercase">
-                        <div class="col-span-6">Subcategory</div>
+                        <div class="col-span-4">Subcategory</div>
                         <div class="col-span-2 text-right">Amount</div>
                         <div class="col-span-2 text-right">VAT</div>
+                        <div class="col-span-2 text-right">Tax</div>
                         <div class="col-span-2 text-right">Total</div>
                     </div>
                 </div>
@@ -66,7 +71,7 @@
                 <ul class="space-y-1">
                     <li v-for="(subcategory, index) in subcategories" :key="subcategory.id" class="group hover:bg-pink-50 rounded-lg p-2 transition-colors cursor-pointer">
                         <div class="grid grid-cols-12 gap-2 items-center">
-                            <button @click="filterBySubcategory(subcategory.name)" class="col-span-6 text-sm text-gray-700 hover:text-pink-800 font-medium text-left flex items-center gap-2">
+                            <button @click="filterBySubcategory(subcategory.name)" class="col-span-4 text-sm text-gray-700 hover:text-pink-800 font-medium text-left flex items-center gap-2">
                                 <span class="font-bold text-pink-700">{{ String.fromCharCode(65 + index) }}.</span>
                                 <span>{{ subcategory.name }}</span>
                                 <span class="text-xs text-gray-500">(VAT: {{ subcategory.vat_rate }}%)</span>
@@ -76,6 +81,9 @@
                             </div>
                             <div class="col-span-2 text-right">
                                 <span class="font-semibold text-red-700">{{ money(getBreakdown(subcategory.name).vat_amount) }}</span>
+                            </div>
+                            <div class="col-span-2 text-right">
+                                <span class="font-semibold text-amber-700">{{ money(getBreakdown(subcategory.name).tax_amount) }}</span>
                             </div>
                             <div class="col-span-2 text-right flex items-center justify-end gap-2">
                                 <span class="font-bold text-pink-700">{{ money(getBreakdown(subcategory.name).total) }}</span>
@@ -90,7 +98,7 @@
                 <!-- Total Row -->
                 <div class="mt-4 pt-4 border-t-2 border-pink-300">
                     <div class="grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-6">
+                        <div class="col-span-4">
                             <span class="font-bold text-gray-900">Total {{ categoryName }}:</span>
                         </div>
                         <div class="col-span-2 text-right">
@@ -100,7 +108,10 @@
                             <span class="text-xl font-bold text-red-700">{{ money(totalVat) }}</span>
                         </div>
                         <div class="col-span-2 text-right">
-                            <span class="text-xl font-bold text-pink-700">{{ money(totalWithVat) }}</span>
+                            <span class="text-xl font-bold text-amber-700">{{ money(totalTax) }}</span>
+                        </div>
+                        <div class="col-span-2 text-right">
+                            <span class="text-xl font-bold text-pink-700">{{ money(totalWithVatTax) }}</span>
                         </div>
                     </div>
                 </div>
@@ -131,6 +142,8 @@
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">VAT Rate</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">VAT Amount</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Rate</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Amount</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -138,7 +151,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             <tr v-if="filteredEntries.length === 0">
-                                <td colspan="9" class="px-6 py-12 text-center text-gray-500">
+                                <td colspan="11" class="px-6 py-12 text-center text-gray-500">
                                     {{ filterActive ? 'No entries found for this subcategory.' : 'No operating expense entries yet. Click "Add Entry" to create one.' }}
                                 </td>
                             </tr>
@@ -163,7 +176,9 @@
                                 <td class="px-6 py-4 text-sm text-right font-bold text-green-700">{{ money(entry.amount) }}</td>
                                 <td class="px-6 py-4 text-sm text-right text-gray-700">{{ entry.vat_rate }}%</td>
                                 <td class="px-6 py-4 text-sm text-right font-medium text-red-700">{{ money(entry.vat_amount) }}</td>
-                                <td class="px-6 py-4 text-sm text-right font-bold text-pink-700">{{ money(entry.amount + entry.vat_amount) }}</td>
+                                <td class="px-6 py-4 text-sm text-right text-gray-700">{{ entry.tax_rate }}%</td>
+                                <td class="px-6 py-4 text-sm text-right font-medium text-amber-700">{{ money(entry.tax_amount) }}</td>
+                                <td class="px-6 py-4 text-sm text-right font-bold text-pink-700">{{ money(entry.amount + entry.vat_amount + entry.tax_amount) }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ entry.created_at }}</td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
@@ -306,6 +321,28 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                             />
                         </div>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tax Rate (%)</label>
+                            <input
+                                v-model.number="form.tax_rate"
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.01"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
+                    <div v-if="isSalarySubcategory" class="bg-amber-50 rounded-lg p-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Calculated Tax Amount:</span>
+                            <span class="text-lg font-bold text-amber-700">{{ money(calculatedTax) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-sm font-medium text-gray-900">Total with Tax:</span>
+                            <span class="text-xl font-bold text-pink-700">{{ money(totalWithVatTaxPreview) }}</span>
+                        </div>
                     </div>
 
                     <div v-else class="grid grid-cols-2 gap-4">
@@ -331,16 +368,32 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                             />
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tax Rate (%)</label>
+                            <input
+                                v-model.number="form.tax_rate"
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.01"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                                placeholder="0"
+                            />
+                        </div>
                     </div>
 
-                    <div v-if="!isEmployeeCategory && form.vat_rate > 0" class="bg-red-50 rounded-lg p-4">
+                    <div v-if="!isEmployeeCategory && (form.vat_rate > 0 || form.tax_rate > 0)" class="bg-red-50 rounded-lg p-4">
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-700">Calculated VAT Amount:</span>
                             <span class="text-lg font-bold text-red-700">{{ money(calculatedVat) }}</span>
                         </div>
                         <div class="flex justify-between items-center mt-2">
-                            <span class="text-sm font-medium text-gray-900">Total with VAT:</span>
-                            <span class="text-xl font-bold text-pink-700">{{ money(totalWithVatPreview) }}</span>
+                            <span class="text-sm text-gray-700">Calculated Tax Amount:</span>
+                            <span class="text-lg font-bold text-amber-700">{{ money(calculatedTax) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-sm font-medium text-gray-900">Total with VAT &amp; Tax:</span>
+                            <span class="text-xl font-bold text-pink-700">{{ money(totalWithVatTaxPreview) }}</span>
                         </div>
                     </div>
 
@@ -389,7 +442,8 @@ const props = defineProps({
     entries: Array,
     totalAmount: Number,
     totalVat: Number,
-    totalWithVat: Number,
+    totalTax: Number,
+    totalWithVatTax: Number,
     expenseBreakdown: Object,
     clients: Array,
     officeStaff: Array,
@@ -425,6 +479,7 @@ const form = ref({
     paid_amount: 0,
     due_amount: 0,
     vat_rate: 0,
+    tax_rate: 0,
     notes: '',
 });
 
@@ -465,8 +520,13 @@ const calculatedVat = computed(() => {
     return (form.value.amount * form.value.vat_rate) / 100;
 });
 
-const totalWithVatPreview = computed(() => {
-    return (form.value.amount || 0) + calculatedVat.value;
+const calculatedTax = computed(() => {
+    if (!form.value.amount || !form.value.tax_rate) return 0;
+    return (form.value.amount * form.value.tax_rate) / 100;
+});
+
+const totalWithVatTaxPreview = computed(() => {
+    return (form.value.amount || 0) + calculatedVat.value + calculatedTax.value;
 });
 
 watch(
@@ -489,7 +549,7 @@ const money = (value) => {
 };
 
 const getBreakdown = (subcategory) => {
-    return props.expenseBreakdown[subcategory] || { amount: 0, vat_amount: 0, total: 0 };
+    return props.expenseBreakdown[subcategory] || { amount: 0, vat_amount: 0, tax_amount: 0, total: 0 };
 };
 
 const filterBySubcategory = (subcategory) => {
@@ -572,6 +632,7 @@ const editEntry = (entry) => {
         paid_amount: entry.paid_amount || 0,
         due_amount: entry.due_amount || 0,
         vat_rate: entry.vat_rate,
+        tax_rate: entry.tax_rate || 0,
         notes: entry.notes || '',
     };
     // Set client search value
@@ -606,6 +667,7 @@ const closeModal = () => {
         paid_amount: 0,
         due_amount: 0,
         vat_rate: 0,
+        tax_rate: 0,
         notes: '',
     };
 };

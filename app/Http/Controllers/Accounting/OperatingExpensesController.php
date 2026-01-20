@@ -41,14 +41,16 @@ class OperatingExpensesController extends Controller
         // Calculate totals
         $totalAmount = $entries->sum('amount');
         $totalVat = $entries->sum('vat_amount');
-        $totalWithVat = $totalAmount + $totalVat;
+        $totalTax = $entries->sum('tax_amount');
+        $totalWithVatTax = $totalAmount + $totalVat + $totalTax;
 
         // Group by subcategory and calculate totals
         $expenseBreakdown = $entries->groupBy('subcategory')
             ->map(fn($items) => [
                 'amount' => $items->sum('amount'),
                 'vat_amount' => $items->sum('vat_amount'),
-                'total' => $items->sum('amount') + $items->sum('vat_amount'),
+                'tax_amount' => $items->sum('tax_amount'),
+                'total' => $items->sum('amount') + $items->sum('vat_amount') + $items->sum('tax_amount'),
             ]);
 
         // Get all periods for selector
@@ -114,12 +116,15 @@ class OperatingExpensesController extends Controller
                 'amount' => (float) $e->amount,
                 'vat_rate' => (float) $e->vat_rate,
                 'vat_amount' => (float) $e->vat_amount,
+                'tax_rate' => (float) $e->tax_rate,
+                'tax_amount' => (float) $e->tax_amount,
                 'notes' => $e->notes,
                 'created_at' => $e->created_at->format('Y-m-d H:i'),
             ]),
             'totalAmount' => (float) $totalAmount,
             'totalVat' => (float) $totalVat,
-            'totalWithVat' => (float) $totalWithVat,
+            'totalTax' => (float) $totalTax,
+            'totalWithVatTax' => (float) $totalWithVatTax,
             'expenseBreakdown' => $expenseBreakdown,
             'clients' => $clients->map(fn($c) => [
                 'id' => $c->id,
@@ -152,10 +157,12 @@ class OperatingExpensesController extends Controller
             'bonus_amount' => 'nullable|numeric|min:0',
             'paid_amount' => 'nullable|numeric|min:0',
             'vat_rate' => 'nullable|numeric|min:0|max:100',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
         ]);
 
         $validated['vat_rate'] = $validated['vat_rate'] ?? 0;
+        $validated['tax_rate'] = $validated['tax_rate'] ?? 0;
 
         if ($validated['category'] === 'employee_manpower') {
             if (empty($validated['staff_id'])) {
@@ -192,6 +199,9 @@ class OperatingExpensesController extends Controller
             $validated['due_amount'] = null;
         }
 
+        $validated['vat_amount'] = ($validated['amount'] * $validated['vat_rate']) / 100;
+        $validated['tax_amount'] = ($validated['amount'] * $validated['tax_rate']) / 100;
+
         OperatingExpense::create($validated);
 
         return redirect()->back()->with('success', 'Operating expense entry added successfully.');
@@ -209,10 +219,12 @@ class OperatingExpensesController extends Controller
             'bonus_amount' => 'nullable|numeric|min:0',
             'paid_amount' => 'nullable|numeric|min:0',
             'vat_rate' => 'nullable|numeric|min:0|max:100',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
             'notes' => 'nullable|string',
         ]);
 
         $validated['vat_rate'] = $validated['vat_rate'] ?? 0;
+        $validated['tax_rate'] = $validated['tax_rate'] ?? 0;
 
         if ($operatingExpense->category === 'employee_manpower') {
             if (empty($validated['staff_id'])) {
@@ -248,6 +260,9 @@ class OperatingExpensesController extends Controller
             $validated['paid_amount'] = null;
             $validated['due_amount'] = null;
         }
+
+        $validated['vat_amount'] = ($validated['amount'] * $validated['vat_rate']) / 100;
+        $validated['tax_amount'] = ($validated['amount'] * $validated['tax_rate']) / 100;
 
         $operatingExpense->update($validated);
 
@@ -290,7 +305,8 @@ class OperatingExpensesController extends Controller
 
             $totalAmount = $entries->sum('amount');
             $totalVat = $entries->sum('vat_amount');
-            $totalWithVat = $totalAmount + $totalVat;
+            $totalTax = $entries->sum('tax_amount');
+            $totalWithVatTax = $totalAmount + $totalVat + $totalTax;
 
             $fileName = "operating-expenses-report-{$category}-" . now()->format('Y-m-d') . '.pdf';
 
@@ -301,13 +317,14 @@ class OperatingExpensesController extends Controller
                 'entries' => $entries,
                 'totalAmount' => $totalAmount,
                 'totalVat' => $totalVat,
-                'totalWithVat' => $totalWithVat,
+                'totalTax' => $totalTax,
+                'totalWithVatTax' => $totalWithVatTax,
             ])->download($fileName);
         }
 
         $handle = fopen('php://memory', 'w');
         
-        fputcsv($handle, ['Subcategory', 'Client/Staff', 'Description', 'Amount', 'VAT Rate', 'VAT Amount', 'Total', 'Date']);
+        fputcsv($handle, ['Subcategory', 'Client/Staff', 'Description', 'Amount', 'VAT Rate', 'VAT Amount', 'Tax Rate', 'Tax Amount', 'Total', 'Date']);
 
         foreach ($entries as $entry) {
             fputcsv($handle, [
@@ -317,7 +334,9 @@ class OperatingExpensesController extends Controller
                 $entry->amount,
                 $entry->vat_rate,
                 $entry->vat_amount,
-                $entry->amount + $entry->vat_amount,
+                $entry->tax_rate,
+                $entry->tax_amount,
+                $entry->amount + $entry->vat_amount + $entry->tax_amount,
                 $entry->created_at->format('Y-m-d H:i'),
             ]);
         }

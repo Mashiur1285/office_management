@@ -113,8 +113,8 @@
 
                     <!-- Operating Expenses -->
                     <div class="flex justify-between items-center py-3 border-b border-gray-200">
-                        <span class="text-gray-700 font-medium">Operating Expenses</span>
-                        <span class="text-xl font-bold text-orange-700">({{ money(period.total_operating_expenses) }})</span>
+                        <span class="text-gray-700 font-medium">Operating Expenses (with VAT &amp; Tax)</span>
+                        <span class="text-xl font-bold text-orange-700">({{ money(period.total_operating_expenses_total) }})</span>
                     </div>
 
                     <!-- Operating Profit -->

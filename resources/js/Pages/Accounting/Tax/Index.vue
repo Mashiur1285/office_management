@@ -34,19 +34,17 @@
                 <div class="space-y-4">
                     <!-- Formula Display -->
                     <div class="bg-yellow-50 rounded-lg p-6">
-                        <div class="flex items-center justify-center gap-4 text-lg font-medium">
-                            <div class="text-center">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="rounded-xl border border-amber-200 bg-white/80 p-5 text-center">
                                 <div class="text-sm text-gray-600 mb-1">Current Tax</div>
                                 <div class="text-2xl font-bold text-amber-700">{{ money(totalCurrentTax) }}</div>
                             </div>
-                            <div class="text-3xl text-gray-400">+</div>
-                            <div class="text-center">
+                            <div class="rounded-xl border border-amber-200 bg-white/80 p-5 text-center">
                                 <div class="text-sm text-gray-600 mb-1">Deferred Tax</div>
                                 <div class="text-2xl font-bold text-amber-700">{{ money(totalDeferredTax) }}</div>
                             </div>
-                            <div class="text-3xl text-gray-400">=</div>
-                            <div class="text-center">
-                                <div class="text-sm text-gray-600 mb-1">Total Tax</div>
+                            <div class="rounded-xl border-2 border-yellow-500 bg-yellow-100 p-5 text-center shadow-sm">
+                                <div class="text-sm text-gray-700 mb-1 font-semibold">Total Tax</div>
                                 <div class="text-3xl font-bold text-yellow-700">{{ money(totalTax) }}</div>
                             </div>
                         </div>
@@ -93,6 +91,9 @@
                                     <div class="font-medium text-gray-900 text-sm">{{ entry.description }}</div>
                                     <div v-if="entry.client" class="text-xs text-gray-600 mt-1">
                                         Client: {{ entry.client.name }} ({{ entry.client.phone_number }})
+                                    </div>
+                                    <div v-else-if="entry.staff" class="text-xs text-gray-600 mt-1">
+                                        Staff: {{ entry.staff.name }}
                                     </div>
                                     <div v-else class="text-xs text-gray-400 italic mt-1">Organization-wide</div>
                                     <div v-if="entry.notes" class="text-xs text-gray-600 mt-1">{{ entry.notes }}</div>
@@ -145,6 +146,9 @@
                                     <div class="font-medium text-gray-900 text-sm">{{ entry.description }}</div>
                                     <div v-if="entry.client" class="text-xs text-gray-600 mt-1">
                                         Client: {{ entry.client.name }} ({{ entry.client.phone_number }})
+                                    </div>
+                                    <div v-else-if="entry.staff" class="text-xs text-gray-600 mt-1">
+                                        Staff: {{ entry.staff.name }}
                                     </div>
                                     <div v-else class="text-xs text-gray-400 italic mt-1">Organization-wide</div>
                                     <div v-if="entry.notes" class="text-xs text-gray-600 mt-1">{{ entry.notes }}</div>
@@ -207,40 +211,97 @@
                 </div>
                 <form @submit.prevent="submitForm" class="flex-1 overflow-y-auto">
                     <div class="p-6 space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Client (Optional)</label>
-                            <div class="relative" ref="clientDropdownRef">
-                                <input
-                                    v-model="clientSearch"
-                                    @input="filterClients"
-                                    @focus="showClientDropdown = true"
-                                    type="text"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                                    placeholder="Search by name or phone number..."
-                                />
-                                <div
-                                    v-if="showClientDropdown"
-                                    class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
-                                >
-                                    <div
-                                        @click="selectClient(null)"
-                                        class="px-4 py-2 hover:bg-yellow-50 cursor-pointer text-sm"
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Applies To</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        @click="setTargetType('client')"
+                                        :class="targetType === 'client' ? 'bg-yellow-100 border-yellow-400 text-yellow-800' : 'bg-white border-gray-300 text-gray-700'"
+                                        class="px-3 py-1.5 text-xs font-semibold rounded-lg border"
                                     >
-                                        No Client (Organization-wide)
-                                    </div>
-                                    <div
-                                        v-for="client in filteredClients"
-                                        :key="client.id"
-                                        @click="selectClient(client)"
-                                        class="px-4 py-2 hover:bg-yellow-50 cursor-pointer text-sm border-t border-gray-100"
+                                        Client
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="setTargetType('staff')"
+                                        :class="targetType === 'staff' ? 'bg-blue-100 border-blue-400 text-blue-800' : 'bg-white border-gray-300 text-gray-700'"
+                                        class="px-3 py-1.5 text-xs font-semibold rounded-lg border"
                                     >
-                                        <div class="font-medium">{{ client.name }}</div>
-                                        <div class="text-xs text-gray-500">{{ client.phone_number }}</div>
-                                    </div>
-                                    <div v-if="filteredClients.length === 0 && clientSearch" class="px-4 py-2 text-sm text-gray-500 italic">
-                                        No clients found
+                                        Staff
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="setTargetType('other')"
+                                        :class="targetType === 'other' ? 'bg-gray-100 border-gray-400 text-gray-800' : 'bg-white border-gray-300 text-gray-700'"
+                                        class="px-3 py-1.5 text-xs font-semibold rounded-lg border"
+                                    >
+                                        Other (Organization-wide)
+                                    </button>
+                                </div>
+                            </div>
+                            <div v-if="targetType === 'client'">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Client *</label>
+                                <div class="relative" ref="clientDropdownRef">
+                                    <input
+                                        v-model="clientSearch"
+                                        @input="filterClients"
+                                        @focus="showClientDropdown = true"
+                                        type="text"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                        placeholder="Search by name or phone number..."
+                                    />
+                                    <div
+                                        v-if="showClientDropdown"
+                                        class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+                                    >
+                                        <div
+                                            v-for="client in filteredClients"
+                                            :key="client.id"
+                                            @click="selectClient(client)"
+                                            class="px-4 py-2 hover:bg-yellow-50 cursor-pointer text-sm border-t border-gray-100"
+                                        >
+                                            <div class="font-medium">{{ client.name }}</div>
+                                            <div class="text-xs text-gray-500">{{ client.phone_number }}</div>
+                                        </div>
+                                        <div v-if="filteredClients.length === 0 && clientSearch" class="px-4 py-2 text-sm text-gray-500 italic">
+                                            No clients found
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div v-else-if="targetType === 'staff'">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Staff *</label>
+                                <div class="relative" ref="staffDropdownRef">
+                                    <input
+                                        v-model="staffSearch"
+                                        @input="filterStaff"
+                                        @focus="showStaffDropdown = true"
+                                        type="text"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                        placeholder="Search by staff name..."
+                                    />
+                                    <div
+                                        v-if="showStaffDropdown"
+                                        class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+                                    >
+                                        <div
+                                            v-for="staff in filteredStaff"
+                                            :key="staff.id"
+                                            @click="selectStaff(staff)"
+                                            class="px-4 py-2 hover:bg-yellow-50 cursor-pointer text-sm border-t border-gray-100"
+                                        >
+                                            <div class="font-medium">{{ staff.name }}</div>
+                                        </div>
+                                        <div v-if="filteredStaff.length === 0 && staffSearch" class="px-4 py-2 text-sm text-gray-500 italic">
+                                            No staff found
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-3 text-xs text-gray-600">
+                                Organization-wide tax entry. No client or staff will be linked.
                             </div>
                         </div>
 
@@ -317,20 +378,27 @@ const props = defineProps({
     netProfitBeforeTax: Number,
     netProfitAfterTax: Number,
     clients: Array,
+    officeStaff: Array,
 });
 
 const showModal = ref(false);
 const editingEntry = ref(null);
+const targetType = ref('other');
 const clientSearch = ref('');
 const filteredClients = ref(props.clients || []);
 const showClientDropdown = ref(false);
 const clientDropdownRef = ref(null);
+const staffSearch = ref('');
+const filteredStaff = ref(props.officeStaff || []);
+const showStaffDropdown = ref(false);
+const staffDropdownRef = ref(null);
 const setBodyScrollLock = (locked) => {
     document.body.style.overflow = locked ? 'hidden' : '';
 };
 
 const form = ref({
     client_id: null,
+    staff_id: null,
     tax_type: '',
     description: '',
     amount: 0,
@@ -341,6 +409,9 @@ const form = ref({
 const handleClickOutside = (event) => {
     if (clientDropdownRef.value && !clientDropdownRef.value.contains(event.target)) {
         showClientDropdown.value = false;
+    }
+    if (staffDropdownRef.value && !staffDropdownRef.value.contains(event.target)) {
+        showStaffDropdown.value = false;
     }
 };
 
@@ -370,23 +441,65 @@ const filterClients = () => {
     }
 };
 
+const filterStaff = () => {
+    const search = staffSearch.value.toLowerCase();
+    if (!search) {
+        filteredStaff.value = props.officeStaff || [];
+    } else {
+        filteredStaff.value = (props.officeStaff || []).filter((staff) =>
+            staff.name.toLowerCase().includes(search)
+        );
+    }
+};
+
 const selectClient = (client) => {
-    if (client) {
-        form.value.client_id = client.id;
-        clientSearch.value = `${client.name} (${client.phone_number})`;
+    form.value.client_id = client.id;
+    clientSearch.value = `${client.name} (${client.phone_number})`;
+    showClientDropdown.value = false;
+};
+
+const selectStaff = (staff) => {
+    form.value.staff_id = staff.id;
+    staffSearch.value = staff.name;
+    showStaffDropdown.value = false;
+};
+
+const setTargetType = (type) => {
+    targetType.value = type;
+    if (type === 'client') {
+        form.value.staff_id = null;
+        staffSearch.value = '';
+    } else if (type === 'staff') {
+        form.value.client_id = null;
+        clientSearch.value = '';
     } else {
         form.value.client_id = null;
-        clientSearch.value = 'No Client (Organization-wide)';
+        form.value.staff_id = null;
+        clientSearch.value = '';
+        staffSearch.value = '';
     }
-    showClientDropdown.value = false;
 };
 
 const showAddModal = (taxType) => {
     form.value.tax_type = taxType;
+    targetType.value = 'other';
     showModal.value = true;
 };
 
 const submitForm = () => {
+    if (targetType.value === 'client' && !form.value.client_id) {
+        alert('Please select a client.');
+        return;
+    }
+    if (targetType.value === 'staff' && !form.value.staff_id) {
+        alert('Please select a staff member.');
+        return;
+    }
+    if (targetType.value === 'other') {
+        form.value.client_id = null;
+        form.value.staff_id = null;
+    }
+
     const data = {
         ...form.value,
         accounting_period_id: props.period.id,
@@ -407,6 +520,7 @@ const editEntry = (entry, taxType) => {
     editingEntry.value = entry;
     form.value = {
         client_id: entry.client_id || null,
+        staff_id: entry.staff_id || null,
         tax_type: taxType,
         description: entry.description,
         amount: entry.amount,
@@ -415,9 +529,17 @@ const editEntry = (entry, taxType) => {
 
     // Set client search value if editing
     if (entry.client_id && entry.client) {
+        targetType.value = 'client';
         clientSearch.value = `${entry.client.name} (${entry.client.phone_number})`;
+        staffSearch.value = '';
+    } else if (entry.staff_id && entry.staff) {
+        targetType.value = 'staff';
+        staffSearch.value = entry.staff.name;
+        clientSearch.value = '';
     } else {
-        clientSearch.value = 'No Client (Organization-wide)';
+        targetType.value = 'other';
+        clientSearch.value = '';
+        staffSearch.value = '';
     }
 
     showModal.value = true;
@@ -432,16 +554,21 @@ const deleteEntry = (entry) => {
 const closeModal = () => {
     showModal.value = false;
     editingEntry.value = null;
+    targetType.value = 'other';
     form.value = {
         client_id: null,
+        staff_id: null,
         tax_type: '',
         description: '',
         amount: 0,
         notes: '',
     };
     clientSearch.value = '';
+    staffSearch.value = '';
     filteredClients.value = props.clients || [];
+    filteredStaff.value = props.officeStaff || [];
     showClientDropdown.value = false;
+    showStaffDropdown.value = false;
 };
 
 watch(
