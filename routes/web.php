@@ -246,7 +246,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Accounting Routes
-    Route::prefix('accounting')->name('accounting.')->group(function () {
+    Route::prefix('accounting')->name('accounting.')->middleware('permission:accounting.view')->group(function () {
         Route::get('/', [\App\Http\Controllers\Accounting\AccountingDashboardController::class, 'index'])->name('dashboard');
 
         // Subcategory Management Routes

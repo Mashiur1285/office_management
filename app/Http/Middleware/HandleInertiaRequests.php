@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
                     : null,
             ],
             'userPermissions' => $user ? $user->getAllPermissions()->pluck('name') : [],
+            'userRoles' => $user ? $user->getRoleNames() : [],
             'settings' => function () {
                 $settings = \App\Models\Setting::getSettings();
                 return [

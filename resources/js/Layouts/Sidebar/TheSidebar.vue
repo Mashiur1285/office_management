@@ -208,7 +208,7 @@
                     </ul>
                 </li>
 
-                <li>
+                <li v-if="showAccounting">
                     <button
                         type="button"
                         class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
@@ -918,15 +918,29 @@ import Modal from "@/Components/Modal.vue";
 
 const $page = usePage();
 const userPermissions = computed(() => $page.props.userPermissions || []);
+const userRoles = computed(() => $page.props.userRoles || []);
 
 const hasPermission = (permission) =>
     userPermissions.value.includes(permission) ||
     userPermissions.value.includes("*") ||
     userPermissions.value.includes("superadmin");
 
-const showAccessManagement = computed(
-    () => hasPermission("role.view") || hasPermission("user.view")
-);
+const isAdmin = computed(() => {
+    // Check if user has admin/super-admin role
+    const roles = userRoles.value;
+    return (
+        roles.includes("admin") ||
+        roles.includes("super-admin") ||
+        roles.includes("superadmin") ||
+        roles.includes("Admin") ||
+        roles.includes("Super Admin")
+    );
+});
+
+const showAccessManagement = computed(() => {
+    // ACL shudu admin/superadmin dekhte parbe
+    return isAdmin.value;
+});
 const showOperations = computed(
     () => hasPermission("quotation.view") || hasPermission("invoice.view")
 );
@@ -938,6 +952,8 @@ const showRegistrations = computed(
         hasPermission("bd-company.view") ||
         hasPermission("foreign-company.view")
 );
+
+const showAccounting = computed(() => hasPermission("accounting.view"));
 
 const currentPath = computed(() => $page.url.split("?")[0]);
 
