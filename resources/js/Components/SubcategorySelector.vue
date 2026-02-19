@@ -9,7 +9,7 @@
             <span v-if="selectedSubcategory" class="text-gray-900">
                 {{ selectedSubcategory.name }} (VAT: {{ selectedSubcategory.vat_rate }}%)
             </span>
-            <span v-else class="text-gray-500">Select subcategory</span>
+            <span v-else class="text-gray-500">Select {{ label.toLowerCase() }}</span>
             <i class="fa-solid fa-chevron-down text-gray-400"></i>
         </button>
 
@@ -57,7 +57,7 @@
                 class="flex items-center gap-2 px-4 py-2 hover:bg-green-50 cursor-pointer text-green-600 font-medium"
             >
                 <i class="fa-solid fa-plus"></i>
-                <span>Add New Subcategory</span>
+                <span>Add New {{ label }}</span>
             </div>
         </div>
 
@@ -66,7 +66,7 @@
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
                 <div class="p-6 border-b border-gray-200">
                     <h2 class="text-xl font-bold text-gray-900">
-                        {{ editingSubcategory ? 'Edit Subcategory' : 'Add New Subcategory' }}
+                        {{ editingSubcategory ? `Edit ${label}` : `Add New ${label}` }}
                     </h2>
                 </div>
                 <form @submit.prevent="submitForm" class="p-6 space-y-4">
@@ -115,8 +115,8 @@
         <!-- Delete Confirmation Modal -->
         <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4">Delete Subcategory</h2>
-                <p class="text-gray-600 mb-6">Are you sure you want to delete this subcategory? This action cannot be undone.</p>
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Delete {{ label }}</h2>
+                <p class="text-gray-600 mb-6">Are you sure you want to delete this {{ label.toLowerCase() }}? This action cannot be undone.</p>
                 <div class="flex gap-3 justify-end">
                     <button
                         @click="showDeleteConfirm = false"
@@ -151,6 +151,10 @@ const props = defineProps({
     category: {
         type: String,
         required: true,
+    },
+    label: {
+        type: String,
+        default: 'Cost Head',
     },
 });
 

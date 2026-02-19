@@ -57,7 +57,7 @@
             </div>
 
             <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
                         <div class="p-3 bg-emerald-50 rounded-xl">
@@ -65,9 +65,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Paid</p>
-                            <p class="text-xl font-bold text-gray-900">{{ money(client.paid_amount) }}</p>
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider leading-tight">Paid</p>
+                            <p class="text-xl font-bold text-gray-900 break-words leading-tight">{{ money(client.paid_amount) }}</p>
                         </div>
                     </div>
                 </div>
@@ -78,9 +78,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Due</p>
-                            <p class="text-xl font-bold text-gray-900">{{ money(client.current_due) }}</p>
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider leading-tight">Due</p>
+                            <p class="text-xl font-bold text-gray-900 break-words leading-tight">{{ money(client.current_due) }}</p>
                         </div>
                     </div>
                 </div>
@@ -91,9 +91,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
                             </svg>
                         </div>
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Fee</p>
-                            <p class="text-xl font-bold text-gray-900">{{ money(client.total_fee) }}</p>
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider leading-tight">Total Fee</p>
+                            <p class="text-xl font-bold text-gray-900 break-words leading-tight">{{ money(client.total_fee) }}</p>
                         </div>
                     </div>
                 </div>
@@ -104,9 +104,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                             </svg>
                         </div>
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</p>
-                            <p class="text-xl font-bold text-gray-900">{{ progressText }}</p>
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider leading-tight">Progress</p>
+                            <p class="text-xl font-bold text-gray-900 break-words leading-tight">{{ progressText }}</p>
                         </div>
                     </div>
                 </div>
@@ -117,10 +117,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
                             </svg>
                         </div>
-                        <div class="flex-1">
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">VAT Unpaid</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider leading-tight">VAT Unpaid</p>
                             <div class="flex items-center gap-2">
-                                <p class="text-xl font-bold text-gray-900">{{ money(client.vat_unpaid) }}</p>
+                                <p class="text-xl font-bold text-gray-900 break-words leading-tight">{{ money(client.vat_unpaid) }}</p>
                                 <svg v-if="client.vat_paid" class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
@@ -129,6 +129,82 @@
                     </div>
                 </div>
             </div>
+
+            <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Payment Summary</h2>
+                        <p class="text-sm text-gray-600">Total received and refunded for this client.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Total Received</p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-700">{{ money(client.total_received) }}</p>
+                    </div>
+                    <div class="rounded-xl border border-rose-100 bg-rose-50/40 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Total Refunded</p>
+                        <p class="mt-2 text-2xl font-bold text-rose-600">{{ money(client.total_refunded) }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment & Refund History -->
+            <section v-if="paymentHistory.length" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <div class="h-8 w-1 bg-gradient-to-b from-blue-600 to-blue-400 rounded-full"></div>
+                            Payment & Refund History
+                        </h2>
+                        <p class="text-sm text-gray-600">All payment and refund records for this client.</p>
+                    </div>
+                    <span class="text-xs font-semibold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+                        {{ paymentHistory.length }} {{ paymentHistory.length === 1 ? 'record' : 'records' }}
+                    </span>
+                </div>
+                <div class="overflow-hidden rounded-xl border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-700">
+                            <thead class="bg-gray-50 text-xs uppercase text-gray-600">
+                                <tr>
+                                    <th class="px-4 py-3 font-semibold">Date</th>
+                                    <th class="px-4 py-3 font-semibold">Type</th>
+                                    <th class="px-4 py-3 font-semibold">Source</th>
+                                    <th class="px-4 py-3 font-semibold">Agent</th>
+                                    <th class="px-4 py-3 font-semibold text-right">Amount</th>
+                                    <th class="px-4 py-3 font-semibold">Method</th>
+                                    <th class="px-4 py-3 font-semibold">Notes</th>
+                                    <th class="px-4 py-3 font-semibold">Created By</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr v-for="record in paymentHistory" :key="record.id" class="transition hover:bg-gray-50">
+                                    <td class="px-4 py-3 whitespace-nowrap">{{ record.payment_date || '—' }}</td>
+                                    <td class="px-4 py-3">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
+                                            :class="record.type === 'payment'
+                                                ? 'bg-emerald-100 text-emerald-700'
+                                                : 'bg-rose-100 text-rose-700'"
+                                        >
+                                            {{ record.type === 'payment' ? 'Payment' : 'Refund' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 capitalize">{{ record.source || '—' }}</td>
+                                    <td class="px-4 py-3">{{ record.agent_name || '—' }}</td>
+                                    <td class="px-4 py-3 text-right font-semibold" :class="record.type === 'refund' ? 'text-rose-600' : 'text-emerald-700'">
+                                        {{ money(record.amount) }}
+                                    </td>
+                                    <td class="px-4 py-3">{{ record.payment_method || '—' }}</td>
+                                    <td class="px-4 py-3 max-w-xs truncate">{{ record.notes || '—' }}</td>
+                                    <td class="px-4 py-3 text-gray-500">{{ record.created_by || '—' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
             <!-- Tabs -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -568,6 +644,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -591,10 +668,15 @@ const props = defineProps({
         type: Number,
         default: null,
     },
+    paymentHistory: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 // Use computed to maintain reactivity
 const client = computed(() => props.client);
+const paymentHistory = computed(() => props.paymentHistory || []);
 
 const activeTab = ref('overview');
 

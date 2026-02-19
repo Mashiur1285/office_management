@@ -144,6 +144,32 @@ class AgentController extends Controller
     {
         $agent->load('clients:id,agent_id,name,passport_number,nid_number');
 
+        $totalReceived = (float) \App\Models\Payment::where('agent_id', $agent->id)
+            ->where('type', 'payment')
+            ->sum('amount');
+
+        $totalRefunded = (float) \App\Models\Payment::where('agent_id', $agent->id)
+            ->where('type', 'refund')
+            ->sum('amount');
+
+        $refunds = \App\Models\Payment::with(['payable', 'creator:id,name'])
+            ->where('agent_id', $agent->id)
+            ->where('type', 'refund')
+            ->latest('payment_date')
+            ->latest('id')
+            ->get()
+            ->map(function ($payment) {
+                return [
+                    'id' => $payment->id,
+                    'payment_date' => $payment->payment_date?->format('Y-m-d'),
+                    'client_name' => $payment->payable?->name ?? '—',
+                    'amount' => (float) $payment->amount,
+                    'payment_method' => $payment->payment_method,
+                    'notes' => $payment->notes,
+                    'created_by' => $payment->creator?->name,
+                ];
+            });
+
         return Inertia::render('Agents/Show', [
             'agent' => [
                 'id' => $agent->id,
@@ -155,6 +181,8 @@ class AgentController extends Controller
                 'services' => $agent->services ?? [],
                 'nid_file_path' => $agent->nid_file_path,
                 'clients_count' => $agent->clients->count(),
+                'total_received' => $totalReceived,
+                'total_refunded' => $totalRefunded,
             ],
             'clients' => $agent->clients->map(function ($client) {
                 return [
@@ -165,6 +193,7 @@ class AgentController extends Controller
                     'documents_link' => route('clients.documents.show', $client),
                 ];
             }),
+            'refunds' => $refunds,
         ]);
     }
 

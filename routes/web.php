@@ -17,6 +17,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\Reports\RefundReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -53,6 +54,7 @@ Route::middleware('auth')->group(function () {
         Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
         Route::post('clients/{client}/pay-vat', [ClientController::class, 'payVat'])->name('clients.pay-vat');
         Route::post('clients/{client}/unpay-vat', [ClientController::class, 'unpayVat'])->name('clients.unpay-vat');
+        Route::post('clients/{client}/refund', [ClientController::class, 'refund'])->name('clients.refund');
     });
 
     Route::middleware('permission:client.view')->group(function () {
@@ -245,6 +247,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
     });
 
+    // Reports Routes
+    Route::middleware('permission:reports.refund-report')->group(function () {
+        Route::get('/reports/refund-report', [RefundReportController::class, 'index'])->name('reports.refund-report.index');
+        Route::get('/reports/refund-report/export', [RefundReportController::class, 'export'])->name('reports.refund-report.export');
+    });
+
     // Accounting Routes
     Route::prefix('accounting')->name('accounting.')->middleware('permission:accounting.view')->group(function () {
         Route::get('/', [\App\Http\Controllers\Accounting\AccountingDashboardController::class, 'index'])->name('dashboard');
@@ -343,4 +351,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

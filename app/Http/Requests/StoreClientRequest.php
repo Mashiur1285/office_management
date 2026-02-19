@@ -26,7 +26,7 @@ class StoreClientRequest extends FormRequest
             'organization_name' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'photo' => ['nullable', 'image', 'max:2048'],
-            'nid_number' => ['required', 'string', 'max:100', 'unique:clients,nid_number'],
+            'nid_number' => ['nullable', 'string', 'max:100', 'unique:clients,nid_number'],
             'nid_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'passport_number' => ['required', 'string', 'max:100', 'unique:clients,passport_number'],
             'passport_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
@@ -56,8 +56,15 @@ class StoreClientRequest extends FormRequest
             'documents_collected_date' => ['nullable', 'date'],
             'total_fee' => ['nullable', 'numeric', 'min:0'],
             'current_due' => ['nullable', 'numeric', 'min:0'],
-            'partial_paid_amount' => ['nullable', 'numeric', 'min:0'],
+            'partial_paid_amount' => ['nullable', 'numeric', 'min:0', function ($attribute, $value, $fail) {
+                $totalFee = $this->input('total_fee');
+                if ($totalFee !== null && $totalFee !== '' && $value !== null && (float) $value > (float) $totalFee) {
+                    $fail('Paid amount cannot exceed the current fee (৳' . number_format((float) $totalFee, 2) . ').');
+                }
+            }],
             'partial_payment_date' => ['nullable', 'date'],
+            'payment_source' => ['nullable', 'in:client,agent'],
+            'payment_agent_id' => ['nullable', 'integer', 'exists:agents,id'],
             'next_payment_amount' => ['nullable', 'numeric', 'min:0'],
             'next_payment_date' => ['nullable', 'date'],
             'final_payment' => ['nullable', 'numeric', 'min:0'],

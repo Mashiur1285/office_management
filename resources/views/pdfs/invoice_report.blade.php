@@ -3,16 +3,18 @@
 <head>
     <title>Invoice {{ $invoice->invoice_no }}</title>
     <style>
-        body { font-family: sans-serif; color: #111827; }
-        h1, h2, h3 { margin: 0 0 8px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        th, td { border: 1px solid #e5e7eb; padding: 8px; }
-        th { background-color: #f3f4f6; text-align: left; }
-        .muted { color: #6b7280; font-size: 12px; }
-        .summary { width: 100%; margin-top: 16px; }
-        .summary td { border: none; padding: 4px 0; }
+        body { font-family: DejaVu Sans, sans-serif; color: #111827; font-size: 11px; margin: 0; padding: 15px; }
+        h1 { margin: 0 0 4px; font-size: 18px; }
+        h2 { margin: 8px 0 4px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        th, td { border: 1px solid #e5e7eb; padding: 5px 6px; font-size: 10px; }
+        th { background-color: #f3f4f6; text-align: left; font-size: 10px; }
+        .muted { color: #6b7280; font-size: 10px; }
+        .summary { width: 50%; margin-top: 8px; margin-left: auto; }
+        .summary td { border: none; padding: 2px 0; font-size: 10px; }
         .right { text-align: right; }
-        .terms { white-space: pre-line; }
+        .terms { white-space: pre-line; font-size: 9px; line-height: 1.3; }
+        .items-table th, .items-table td { padding: 4px 5px; font-size: 9px; }
     </style>
 </head>
 <body>
@@ -58,11 +60,11 @@
 
     @if(!empty($invoice->description))
         <h2>Description</h2>
-        <p>{{ $invoice->description }}</p>
+        <p style="margin: 2px 0; font-size: 10px;">{{ $invoice->description }}</p>
     @endif
 
     <h2>Invoice Items</h2>
-    <table>
+    <table class="items-table">
         <thead>
             <tr>
                 <th>SL</th>
@@ -81,11 +83,11 @@
                     <td>{{ $item->sl }}</td>
                     <td>{{ $item->service_description }}</td>
                     <td class="right">{{ number_format($item->quantity, 2) }}</td>
-                    <td class="right">{{ number_format($item->unit_price, 2) }}</td>
-                    <td class="right">{{ number_format($item->discount_amount ?? 0, 2) }}</td>
+                    <td class="right">Tk{{ number_format($item->unit_price, 2) }}</td>
+                    <td class="right">Tk{{ number_format($item->discount_amount ?? 0, 2) }}</td>
                     <td class="right">{{ number_format($item->vat_rate ?? 0, 2) }}%</td>
-                    <td class="right">{{ number_format($item->vat_amount ?? 0, 2) }}</td>
-                    <td class="right">{{ number_format($item->line_total, 2) }}</td>
+                    <td class="right">Tk{{ number_format($item->vat_amount ?? 0, 2) }}</td>
+                    <td class="right">Tk{{ number_format($item->line_total, 2) }}</td>
                 </tr>
             @empty
                 <tr>
@@ -98,27 +100,27 @@
     <table class="summary">
         <tr>
             <td>Subtotal</td>
-            <td class="right">{{ number_format($invoice->subtotal, 2) }}</td>
+            <td class="right">Tk{{ number_format($invoice->subtotal, 2) }}</td>
         </tr>
         <tr>
             <td>Discount</td>
-            <td class="right">{{ number_format($invoice->discount_amount, 2) }}</td>
+            <td class="right">Tk{{ number_format($invoice->discount_amount, 2) }}</td>
         </tr>
         <tr>
             <td>VAT Amount</td>
-            <td class="right">{{ number_format($invoice->vat_amount, 2) }}</td>
+            <td class="right">Tk{{ number_format($invoice->vat_amount, 2) }}</td>
         </tr>
         <tr>
             <td><strong>Total Amount</strong></td>
-            <td class="right"><strong>{{ number_format($invoice->total_amount, 2) }}</strong></td>
+            <td class="right"><strong>Tk{{ number_format($invoice->total_amount, 2) }}</strong></td>
         </tr>
         <tr>
             <td>Paid Amount</td>
-            <td class="right">{{ number_format($invoice->paid_amount, 2) }}</td>
+            <td class="right">Tk{{ number_format($invoice->paid_amount, 2) }}</td>
         </tr>
         <tr>
             <td>Due Amount</td>
-            <td class="right">{{ number_format($invoice->due_amount, 2) }}</td>
+            <td class="right">Tk{{ number_format($invoice->due_amount, 2) }}</td>
         </tr>
     </table>
 

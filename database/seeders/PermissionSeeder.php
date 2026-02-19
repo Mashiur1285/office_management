@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
@@ -23,6 +24,7 @@ class PermissionSeeder extends Seeder
             'office-staff' => ['*', 'view', 'add', 'update'],
             'expense' => ['*', 'view', 'add', 'update', 'delete'],
             'accounting' => ['*', 'view', 'add', 'update', 'delete'],
+            'reports' => ['*', 'view', 'refund-report'],
             'document' => ['*', 'view', 'add', 'update'],
             'job-sector' => ['*', 'add'],
             'role' => ['*', 'view', 'add', 'update', 'delete'],
@@ -42,6 +44,12 @@ class PermissionSeeder extends Seeder
                     'guard_name' => 'web',
                 ]);
             }
+        }
+
+        // Auto-assign new permissions to admin role
+        $adminRole = Role::where('name', 'admin')->first();
+        if ($adminRole) {
+            $adminRole->givePermissionTo('reports.refund-report');
         }
     }
 }

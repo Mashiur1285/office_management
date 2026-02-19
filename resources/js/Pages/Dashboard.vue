@@ -27,7 +27,7 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    Filler
+    Filler,
 );
 
 // Route mapping for stat cards
@@ -71,6 +71,7 @@ const state = reactive({
     },
     agentClientSummary: [],
     foreignCountrySummary: [],
+    refundSummary: { total: 0, count: 0, items: [] },
     appName: "",
 });
 
@@ -88,6 +89,8 @@ const agentRangePreset = ref("this_month");
 const agentCustomRange = reactive({ start: "", end: "" });
 const countryRangePreset = ref("this_month");
 const countryCustomRange = reactive({ start: "", end: "" });
+const refundRangePreset = ref("this_month");
+const refundCustomRange = reactive({ start: "", end: "" });
 
 const formatDate = (date) => date.toISOString().split("T")[0];
 
@@ -142,11 +145,27 @@ const agentDateRange = computed(() => {
 const countryDateRange = computed(() => {
     if (countryRangePreset.value === "custom") {
         if (countryCustomRange.start && countryCustomRange.end) {
-            return { start: countryCustomRange.start, end: countryCustomRange.end };
+            return {
+                start: countryCustomRange.start,
+                end: countryCustomRange.end,
+            };
         }
         return null;
     }
     return getPresetRange(countryRangePreset.value);
+});
+
+const refundDateRange = computed(() => {
+    if (refundRangePreset.value === "custom") {
+        if (refundCustomRange.start && refundCustomRange.end) {
+            return {
+                start: refundCustomRange.start,
+                end: refundCustomRange.end,
+            };
+        }
+        return null;
+    }
+    return getPresetRange(refundRangePreset.value);
 });
 
 const fetchData = async () => {
@@ -164,6 +183,10 @@ const fetchData = async () => {
         if (countryDateRange.value) {
             params.country_start_date = countryDateRange.value.start;
             params.country_end_date = countryDateRange.value.end;
+        }
+        if (refundDateRange.value) {
+            params.refund_start_date = refundDateRange.value.start;
+            params.refund_end_date = refundDateRange.value.end;
         }
         const { data } = await axios.get("/dashboard/data", { params });
         state.stats = data.stats;
@@ -188,6 +211,11 @@ const fetchData = async () => {
         };
         state.agentClientSummary = data.agentClientSummary || [];
         state.foreignCountrySummary = data.foreignCountrySummary || [];
+        state.refundSummary = data.refundSummary || {
+            total: 0,
+            count: 0,
+            items: [],
+        };
         state.appName = data.appName || "";
     } finally {
         state.loading = false;
@@ -207,6 +235,9 @@ watch(
         countryRangePreset,
         () => countryCustomRange.start,
         () => countryCustomRange.end,
+        refundRangePreset,
+        () => refundCustomRange.start,
+        () => refundCustomRange.end,
     ],
     () => {
         if (fileRangePreset.value !== "custom") {
@@ -226,7 +257,13 @@ watch(
         } else if (countryCustomRange.start && countryCustomRange.end) {
             fetchData();
         }
-    }
+
+        if (refundRangePreset.value !== "custom") {
+            fetchData();
+        } else if (refundCustomRange.start && refundCustomRange.end) {
+            fetchData();
+        }
+    },
 );
 
 // Entity Distribution Pie Chart with gradient colors
@@ -355,7 +392,7 @@ const pieChartOptions = {
                     const value = context.parsed || 0;
                     const total = context.dataset.data.reduce(
                         (a, b) => a + b,
-                        0
+                        0,
                     );
                     const percentage =
                         total > 0 ? ((value / total) * 100).toFixed(1) : 0;
@@ -408,7 +445,7 @@ const doughnutChartOptions = {
                         }).format(value);
                     const total = context.dataset.data.reduce(
                         (a, b) => a + b,
-                        0
+                        0,
                     );
                     const percentage =
                         total > 0 ? ((value / total) * 100).toFixed(1) : 0;
@@ -714,7 +751,7 @@ const storagePercent = computed(() => {
 });
 
 const mittPipelineTotal = computed(
-    () => state.bdCompanyFiles.agency_total + state.bdCompanyFiles.total
+    () => state.bdCompanyFiles.agency_total + state.bdCompanyFiles.total,
 );
 </script>
 
@@ -722,8 +759,12 @@ const mittPipelineTotal = computed(
     <Head title="Dashboard" />
 
     <div class="p-4 md:p-6 space-y-6">
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div class="w-full max-w-3xl rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 shadow-md px-6 py-5 text-white">
+        <div
+            class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+        >
+            <div
+                class="w-full max-w-3xl rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 shadow-md px-6 py-5 text-white"
+            >
                 <h1 class="text-2xl font-semibold">Dashboard</h1>
                 <p class="text-sm text-blue-100">
                     Overview of sales, expenses, and payables/receivables with
@@ -734,10 +775,14 @@ const mittPipelineTotal = computed(
                 </div>
             </div>
             <div class="w-full lg:w-64">
-                <div class="relative overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm px-4 py-3">
+                <div
+                    class="relative overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm px-4 py-3"
+                >
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-[11px] uppercase tracking-[0.2em] text-blue-600 font-semibold">
+                            <p
+                                class="text-[11px] uppercase tracking-[0.2em] text-blue-600 font-semibold"
+                            >
                                 Storage
                             </p>
                             <p class="text-xs text-gray-500">App usage</p>
@@ -747,25 +792,40 @@ const mittPipelineTotal = computed(
                         </div>
                     </div>
                     <div class="mt-3 flex items-center gap-3">
-                        <div class="relative h-16 w-16 overflow-hidden rounded-2xl bg-blue-50 border border-blue-100">
+                        <div
+                            class="relative h-16 w-16 overflow-hidden rounded-2xl bg-blue-50 border border-blue-100"
+                        >
                             <div
                                 class="absolute inset-x-0 bottom-0 water-wave"
                                 :style="{ height: `${storagePercent}%` }"
                             >
                                 <div class="water-surface"></div>
                             </div>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center text-[11px] font-bold text-blue-700">
-                                <span class="text-xs">{{ storagePercent }}%</span>
-                                <span class="text-[10px] font-semibold text-blue-500">Used</span>
+                            <div
+                                class="absolute inset-0 flex flex-col items-center justify-center text-[11px] font-bold text-blue-700"
+                            >
+                                <span class="text-xs"
+                                    >{{ storagePercent }}%</span
+                                >
+                                <span
+                                    class="text-[10px] font-semibold text-blue-500"
+                                    >Used</span
+                                >
                             </div>
                         </div>
                         <div class="text-[11px] text-gray-500 leading-4">
                             <div class="font-semibold text-gray-700">
                                 {{ formatBytes(state.appUsage.total) }}
                             </div>
-                            <div class="text-[10px] text-gray-400">of 10 GB</div>
-                            <div class="mt-1 flex items-center gap-1 text-[10px] text-blue-500">
-                                <span class="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                            <div class="text-[10px] text-gray-400">
+                                of 10 GB
+                            </div>
+                            <div
+                                class="mt-1 flex items-center gap-1 text-[10px] text-blue-500"
+                            >
+                                <span
+                                    class="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse"
+                                ></span>
                                 Live usage
                             </div>
                         </div>
@@ -801,10 +861,16 @@ const mittPipelineTotal = computed(
         </div>
 
         <!-- File Tracking Section -->
-        <div class="rounded-[28px] border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100/80 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.45)] p-6">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="rounded-[28px] border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100/80 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.45)] p-6"
+        >
+            <div
+                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            >
                 <div>
-                    <div class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white">
+                    <div
+                        class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white"
+                    >
                         <font-awesome-icon icon="file-lines" />
                         File Tracking
                     </div>
@@ -813,12 +879,21 @@ const mittPipelineTotal = computed(
                     </p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <div class="flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm">
-                        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <div
+                        class="flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm"
+                    >
+                        <span
+                            class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"
+                        ></span>
                         Live counts
                     </div>
-                    <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">
-                        <span class="text-[10px] uppercase tracking-wide text-slate-400">Range</span>
+                    <div
+                        class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm"
+                    >
+                        <span
+                            class="text-[10px] uppercase tracking-wide text-slate-400"
+                            >Range</span
+                        >
                         <select
                             v-model="fileRangePreset"
                             class="rounded-lg border border-slate-200 bg-white px-2 py-1 pr-8 text-xs text-slate-700"
@@ -831,7 +906,10 @@ const mittPipelineTotal = computed(
                             <option value="last_year">Last Year</option>
                             <option value="custom">Custom</option>
                         </select>
-                        <div v-if="fileRangePreset === 'custom'" class="flex items-center gap-2">
+                        <div
+                            v-if="fileRangePreset === 'custom'"
+                            class="flex items-center gap-2"
+                        >
                             <input
                                 v-model="fileCustomRange.start"
                                 type="date"
@@ -849,13 +927,23 @@ const mittPipelineTotal = computed(
             </div>
 
             <div class="mt-6 grid gap-3 lg:grid-cols-3">
-                <div class="rounded-2xl border border-indigo-100 bg-white/90 p-5 shadow-[0_18px_40px_-30px_rgba(99,102,241,0.55)]">
+                <div
+                    class="rounded-2xl border border-indigo-100 bg-white/90 p-5 shadow-[0_18px_40px_-30px_rgba(99,102,241,0.55)]"
+                >
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">All Files at MITT</p>
-                            <p class="text-[11px] text-slate-500">Total pipeline (MITT + BD)</p>
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-indigo-600"
+                            >
+                                All Files at MITT
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                Total pipeline (MITT + BD)
+                            </p>
                         </div>
-                        <span class="text-xl font-bold text-indigo-700">{{ mittPipelineTotal }}</span>
+                        <span class="text-xl font-bold text-indigo-700">{{
+                            mittPipelineTotal
+                        }}</span>
                     </div>
                     <div class="mt-4 grid grid-cols-2 gap-2">
                         <button
@@ -863,55 +951,99 @@ const mittPipelineTotal = computed(
                             @click="goToClients({ agency_scope: 1 })"
                             class="rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2.5 text-left transition hover:bg-indigo-100 hover:shadow-sm"
                         >
-                            <div class="flex items-center gap-2 text-[11px] font-semibold text-indigo-700">
-                                <font-awesome-icon icon="file-lines" class="text-indigo-500" />
+                            <div
+                                class="flex items-center gap-2 text-[11px] font-semibold text-indigo-700"
+                            >
+                                <font-awesome-icon
+                                    icon="file-lines"
+                                    class="text-indigo-500"
+                                />
                                 MITT Pending
                             </div>
-                            <div class="mt-1 text-lg font-bold text-indigo-800">{{ state.bdCompanyFiles.agency_total }}</div>
+                            <div class="mt-1 text-lg font-bold text-indigo-800">
+                                {{ state.bdCompanyFiles.agency_total }}
+                            </div>
                         </button>
                         <button
                             type="button"
                             @click="goToClients({ bd_company_scope: 1 })"
                             class="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5 text-left transition hover:bg-blue-100 hover:shadow-sm"
                         >
-                            <div class="flex items-center gap-2 text-[11px] font-semibold text-blue-700">
-                                <font-awesome-icon icon="building" class="text-blue-500" />
+                            <div
+                                class="flex items-center gap-2 text-[11px] font-semibold text-blue-700"
+                            >
+                                <font-awesome-icon
+                                    icon="building"
+                                    class="text-blue-500"
+                                />
                                 At BD Company
                             </div>
-                            <div class="mt-1 text-lg font-bold text-blue-800">{{ state.bdCompanyFiles.total }}</div>
+                            <div class="mt-1 text-lg font-bold text-blue-800">
+                                {{ state.bdCompanyFiles.total }}
+                            </div>
                         </button>
                         <button
                             type="button"
-                            @click="goToClients({ bd_company_status: 'rejected' })"
+                            @click="
+                                goToClients({ bd_company_status: 'rejected' })
+                            "
                             class="rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 text-left transition hover:bg-red-100 hover:shadow-sm"
                         >
-                            <div class="flex items-center gap-2 text-[11px] font-semibold text-red-700">
-                                <font-awesome-icon icon="circle-xmark" class="text-red-500" />
+                            <div
+                                class="flex items-center gap-2 text-[11px] font-semibold text-red-700"
+                            >
+                                <font-awesome-icon
+                                    icon="circle-xmark"
+                                    class="text-red-500"
+                                />
                                 Rejected
                             </div>
-                            <div class="mt-1 text-lg font-bold text-red-800">{{ state.bdCompanyFiles.rejected }}</div>
+                            <div class="mt-1 text-lg font-bold text-red-800">
+                                {{ state.bdCompanyFiles.rejected }}
+                            </div>
                         </button>
                         <button
                             type="button"
-                            @click="goToClients({ bd_company_status: 'completed' })"
+                            @click="
+                                goToClients({ bd_company_status: 'completed' })
+                            "
                             class="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2.5 text-left transition hover:bg-emerald-100 hover:shadow-sm"
                         >
-                            <div class="flex items-center gap-2 text-[11px] font-semibold text-emerald-700">
-                                <font-awesome-icon icon="trophy" class="text-emerald-500" />
+                            <div
+                                class="flex items-center gap-2 text-[11px] font-semibold text-emerald-700"
+                            >
+                                <font-awesome-icon
+                                    icon="trophy"
+                                    class="text-emerald-500"
+                                />
                                 Completed
                             </div>
-                            <div class="mt-1 text-lg font-bold text-emerald-800">{{ state.bdCompanyFiles.completed }}</div>
+                            <div
+                                class="mt-1 text-lg font-bold text-emerald-800"
+                            >
+                                {{ state.bdCompanyFiles.completed }}
+                            </div>
                         </button>
                     </div>
                 </div>
 
-                <div class="rounded-2xl border border-blue-100 bg-white/90 p-5 shadow-[0_18px_40px_-30px_rgba(59,130,246,0.45)] lg:col-span-2">
+                <div
+                    class="rounded-2xl border border-blue-100 bg-white/90 p-5 shadow-[0_18px_40px_-30px_rgba(59,130,246,0.45)] lg:col-span-2"
+                >
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">BD Company Breakdown</p>
-                            <p class="text-[11px] text-slate-500">Status-wise processing</p>
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-blue-600"
+                            >
+                                BD Company Breakdown
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                Status-wise processing
+                            </p>
                         </div>
-                        <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+                        <span
+                            class="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full"
+                        >
                             {{ state.bdCompanyFiles.total }} in BD
                         </span>
                     </div>
@@ -947,24 +1079,30 @@ const mittPipelineTotal = computed(
                             >
                                 <div class="flex items-center gap-2">
                                     <font-awesome-icon
-                                        :icon="tile.tone === 'amber'
-                                            ? 'clock'
-                                            : tile.tone === 'green'
-                                                ? 'circle-check'
-                                                : tile.tone === 'red'
+                                        :icon="
+                                            tile.tone === 'amber'
+                                                ? 'clock'
+                                                : tile.tone === 'green'
+                                                  ? 'circle-check'
+                                                  : tile.tone === 'red'
                                                     ? 'circle-xmark'
                                                     : tile.tone === 'teal'
-                                                        ? 'trophy'
-                                                        : 'building'"
+                                                      ? 'trophy'
+                                                      : 'building'
+                                        "
                                         class="opacity-70"
                                     />
                                     {{ tile.label }}
                                 </div>
                             </div>
-                            <div class="mt-2 text-xl font-bold text-slate-900 group-hover:text-slate-950">
+                            <div
+                                class="mt-2 text-xl font-bold text-slate-900 group-hover:text-slate-950"
+                            >
                                 {{ tile.value }}
                             </div>
-                            <div class="mt-1 text-[11px] text-slate-400 group-hover:text-slate-500">
+                            <div
+                                class="mt-1 text-[11px] text-slate-400 group-hover:text-slate-500"
+                            >
                                 View list →
                             </div>
                         </button>
@@ -973,52 +1111,89 @@ const mittPipelineTotal = computed(
             </div>
 
             <div class="mt-5 grid gap-4 lg:grid-cols-2">
-                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)]">
+                <div
+                    class="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)]"
+                >
                     <div class="flex items-center justify-between mb-3">
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">Tracking Graph</p>
-                            <p class="text-[11px] text-slate-500">Quick breakdown</p>
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-600"
+                            >
+                                Tracking Graph
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                Quick breakdown
+                            </p>
                         </div>
-                        <span class="text-[11px] font-semibold text-slate-500">Live</span>
+                        <span class="text-[11px] font-semibold text-slate-500"
+                            >Live</span
+                        >
                     </div>
                     <div class="flex items-center gap-4">
                         <div class="h-36 w-36">
-                            <Doughnut :data="fileTrackingDonutData" :options="fileTrackingDonutOptions" />
+                            <Doughnut
+                                :data="fileTrackingDonutData"
+                                :options="fileTrackingDonutOptions"
+                            />
                         </div>
                         <div class="space-y-2 text-xs text-slate-600">
                             <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
+                                <span
+                                    class="h-2 w-2 rounded-full bg-indigo-500"
+                                ></span>
                                 MITT Total: {{ mittPipelineTotal }}
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-amber-400"></span>
+                                <span
+                                    class="h-2 w-2 rounded-full bg-amber-400"
+                                ></span>
                                 BD Pending: {{ state.bdCompanyFiles.pending }}
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-green-500"></span>
+                                <span
+                                    class="h-2 w-2 rounded-full bg-green-500"
+                                ></span>
                                 BD Accepted: {{ state.bdCompanyFiles.accepted }}
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                                <span
+                                    class="h-2 w-2 rounded-full bg-red-500"
+                                ></span>
                                 BD Rejected: {{ state.bdCompanyFiles.rejected }}
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full bg-teal-600"></span>
-                                BD Completed: {{ state.bdCompanyFiles.completed }}
+                                <span
+                                    class="h-2 w-2 rounded-full bg-teal-600"
+                                ></span>
+                                BD Completed:
+                                {{ state.bdCompanyFiles.completed }}
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)]">
+                <div
+                    class="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)]"
+                >
                     <div class="flex items-center justify-between mb-3">
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-600">Tracking Bars</p>
-                            <p class="text-[11px] text-slate-500">MITT vs BD company status</p>
+                            <p
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-600"
+                            >
+                                Tracking Bars
+                            </p>
+                            <p class="text-[11px] text-slate-500">
+                                MITT vs BD company status
+                            </p>
                         </div>
-                        <span class="text-[11px] font-semibold text-slate-500">Live</span>
+                        <span class="text-[11px] font-semibold text-slate-500"
+                            >Live</span
+                        >
                     </div>
                     <div class="h-56">
-                        <Bar :data="bdCompanyFilesData" :options="bdCompanyFilesOptions" />
+                        <Bar
+                            :data="bdCompanyFilesData"
+                            :options="bdCompanyFilesOptions"
+                        />
                     </div>
                 </div>
             </div>
@@ -1026,7 +1201,9 @@ const mittPipelineTotal = computed(
 
         <!-- Agent & Foreign Country Summaries -->
         <div class="grid gap-4 lg:grid-cols-2">
-            <div class="rounded-2xl border border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-emerald-100/60 shadow-sm p-6">
+            <div
+                class="rounded-2xl border border-emerald-200 bg-gradient-to-br from-white via-emerald-50 to-emerald-100/60 shadow-sm p-6"
+            >
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0 flex-1">
                         <h2 class="text-lg font-semibold text-gray-900">
@@ -1037,11 +1214,18 @@ const mittPipelineTotal = computed(
                         </p>
                     </div>
                     <div class="flex flex-nowrap items-center gap-2 shrink-0">
-                        <span class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full whitespace-nowrap">
+                        <span
+                            class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full whitespace-nowrap"
+                        >
                             {{ state.agentClientSummary.length }} Agents
                         </span>
-                        <div class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm">
-                            <span class="text-[10px] uppercase tracking-wide text-emerald-400">Range</span>
+                        <div
+                            class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm"
+                        >
+                            <span
+                                class="text-[10px] uppercase tracking-wide text-emerald-400"
+                                >Range</span
+                            >
                             <select
                                 v-model="agentRangePreset"
                                 class="rounded-lg border border-emerald-200 bg-white px-2 py-1 pr-8 text-xs text-emerald-700 whitespace-nowrap"
@@ -1054,13 +1238,18 @@ const mittPipelineTotal = computed(
                                 <option value="last_year">Last Year</option>
                                 <option value="custom">Custom</option>
                             </select>
-                            <div v-if="agentRangePreset === 'custom'" class="flex items-center gap-2">
+                            <div
+                                v-if="agentRangePreset === 'custom'"
+                                class="flex items-center gap-2"
+                            >
                                 <input
                                     v-model="agentCustomRange.start"
                                     type="date"
                                     class="rounded-lg border border-emerald-200 bg-white px-2 py-1 text-xs text-emerald-700"
                                 />
-                                <span class="text-[10px] text-emerald-400">to</span>
+                                <span class="text-[10px] text-emerald-400"
+                                    >to</span
+                                >
                                 <input
                                     v-model="agentCustomRange.end"
                                     type="date"
@@ -1080,17 +1269,24 @@ const mittPipelineTotal = computed(
                         <div class="text-sm font-semibold text-gray-900">
                             {{ agent.name }}
                         </div>
-                        <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                        <span
+                            class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700"
+                        >
                             {{ agent.clients_count }} Clients
                         </span>
                     </div>
-                    <div v-if="!state.agentClientSummary.length" class="text-sm text-gray-500">
+                    <div
+                        v-if="!state.agentClientSummary.length"
+                        class="text-sm text-gray-500"
+                    >
                         No agent data found.
                     </div>
                 </div>
             </div>
 
-            <div class="rounded-2xl border border-indigo-200 bg-gradient-to-br from-white via-indigo-50 to-indigo-100/60 shadow-sm p-6">
+            <div
+                class="rounded-2xl border border-indigo-200 bg-gradient-to-br from-white via-indigo-50 to-indigo-100/60 shadow-sm p-6"
+            >
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0 flex-1">
                         <h2 class="text-lg font-semibold text-gray-900">
@@ -1101,11 +1297,18 @@ const mittPipelineTotal = computed(
                         </p>
                     </div>
                     <div class="flex flex-nowrap items-center gap-2 shrink-0">
-                        <span class="text-xs font-semibold text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full whitespace-nowrap">
+                        <span
+                            class="text-xs font-semibold text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full whitespace-nowrap"
+                        >
                             {{ state.foreignCountrySummary.length }} Countries
                         </span>
-                        <div class="flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold text-indigo-700 shadow-sm ml-2">
-                            <span class="text-[10px] uppercase tracking-wide text-indigo-400">Range</span>
+                        <div
+                            class="flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold text-indigo-700 shadow-sm ml-2"
+                        >
+                            <span
+                                class="text-[10px] uppercase tracking-wide text-indigo-400"
+                                >Range</span
+                            >
                             <select
                                 v-model="countryRangePreset"
                                 class="rounded-lg border border-indigo-200 bg-white px-2 py-1 pr-8 text-xs text-indigo-700 whitespace-nowrap"
@@ -1118,13 +1321,18 @@ const mittPipelineTotal = computed(
                                 <option value="last_year">Last Year</option>
                                 <option value="custom">Custom</option>
                             </select>
-                            <div v-if="countryRangePreset === 'custom'" class="flex items-center gap-2">
+                            <div
+                                v-if="countryRangePreset === 'custom'"
+                                class="flex items-center gap-2"
+                            >
                                 <input
                                     v-model="countryCustomRange.start"
                                     type="date"
                                     class="rounded-lg border border-indigo-200 bg-white px-2 py-1 text-xs text-indigo-700"
                                 />
-                                <span class="text-[10px] text-indigo-400">to</span>
+                                <span class="text-[10px] text-indigo-400"
+                                    >to</span
+                                >
                                 <input
                                     v-model="countryCustomRange.end"
                                     type="date"
@@ -1144,11 +1352,16 @@ const mittPipelineTotal = computed(
                         <div class="text-sm font-semibold text-gray-900">
                             {{ countryItem.country }}
                         </div>
-                        <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
+                        <span
+                            class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+                        >
                             {{ countryItem.total }} Clients
                         </span>
                     </div>
-                    <div v-if="!state.foreignCountrySummary.length" class="text-sm text-gray-500">
+                    <div
+                        v-if="!state.foreignCountrySummary.length"
+                        class="text-sm text-gray-500"
+                    >
                         No foreign country data found.
                     </div>
                 </div>
@@ -1373,6 +1586,154 @@ const mittPipelineTotal = computed(
                 </ul>
             </div>
         </div>
+
+        <!-- Refund Summary -->
+        <div
+            class="rounded-2xl border border-rose-200 bg-gradient-to-br from-white via-rose-50 to-rose-100/60 shadow-sm p-6"
+        >
+            <div
+                class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-4"
+            >
+                <div>
+                    <h2
+                        class="text-lg font-semibold text-gray-900 flex items-center gap-2"
+                    >
+                        <span class="w-1 h-6 bg-rose-500 rounded-full"></span>
+                        Refund Summary
+                    </h2>
+                    <p class="text-xs text-gray-600">
+                        All refunds issued to clients and agents
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span
+                        class="text-xs font-semibold text-rose-700 bg-rose-100 px-3 py-1 rounded-full"
+                    >
+                        {{ state.refundSummary.count }} Refunds
+                    </span>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-500">Total Refunded</p>
+                        <p class="text-lg font-bold text-rose-600">
+                            {{
+                                "৳" +
+                                new Intl.NumberFormat("en-BD", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                }).format(state.refundSummary.total)
+                            }}
+                        </p>
+                    </div>
+                    <div
+                        class="flex items-center gap-2 rounded-xl border border-rose-200 bg-white px-3 py-2 text-xs font-semibold text-rose-700 shadow-sm"
+                    >
+                        <span
+                            class="text-[10px] uppercase tracking-wide text-rose-400"
+                            >Range</span
+                        >
+                        <select
+                            v-model="refundRangePreset"
+                            class="rounded-lg border border-rose-200 bg-white px-2 py-1 pr-8 text-xs text-rose-700 whitespace-nowrap"
+                        >
+                            <option value="this_week">This Week</option>
+                            <option value="last_week">Last Week</option>
+                            <option value="this_month">This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="this_year">This Year</option>
+                            <option value="last_year">Last Year</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <div
+                            v-if="refundRangePreset === 'custom'"
+                            class="flex items-center gap-2"
+                        >
+                            <input
+                                v-model="refundCustomRange.start"
+                                type="date"
+                                class="rounded-lg border border-rose-200 bg-white px-2 py-1 text-xs text-rose-700"
+                            />
+                            <span class="text-[10px] text-rose-400">to</span>
+                            <input
+                                v-model="refundCustomRange.end"
+                                type="date"
+                                class="rounded-lg border border-rose-200 bg-white px-2 py-1 text-xs text-rose-700"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="h-px w-full bg-gradient-to-r from-transparent via-rose-200 to-transparent mb-4"
+            ></div>
+            <div
+                class="overflow-hidden rounded-xl border border-rose-100 bg-white"
+            >
+                <div class="max-h-[280px] overflow-y-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead
+                            class="bg-rose-50 text-xs uppercase text-rose-600 sticky top-0"
+                        >
+                            <tr>
+                                <th class="px-4 py-2.5 font-semibold">Name</th>
+                                <th class="px-4 py-2.5 font-semibold">Type</th>
+                                <th class="px-4 py-2.5 font-semibold">Date</th>
+                                <th
+                                    class="px-4 py-2.5 font-semibold text-right"
+                                >
+                                    Amount
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-rose-50">
+                            <tr
+                                v-for="(item, idx) in state.refundSummary.items"
+                                :key="idx"
+                                class="hover:bg-rose-50/50 transition"
+                            >
+                                <td
+                                    class="px-4 py-2.5 font-semibold text-gray-900"
+                                >
+                                    {{ item.name }}
+                                </td>
+                                <td class="px-4 py-2.5">
+                                    <span
+                                        :class="[
+                                            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+                                            item.type === 'Agent'
+                                                ? 'bg-purple-100 text-purple-800'
+                                                : 'bg-blue-100 text-blue-800',
+                                        ]"
+                                    >
+                                        {{ item.type }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2.5 text-gray-500">
+                                    {{ item.date || "—" }}
+                                </td>
+                                <td
+                                    class="px-4 py-2.5 text-right font-semibold text-rose-600"
+                                >
+                                    {{
+                                        "৳" +
+                                        new Intl.NumberFormat("en-BD", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        }).format(item.amount)
+                                    }}
+                                </td>
+                            </tr>
+                            <tr v-if="!state.refundSummary.items.length">
+                                <td
+                                    colspan="4"
+                                    class="px-4 py-6 text-center text-sm text-gray-500"
+                                >
+                                    No refunds recorded yet.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -1380,7 +1741,12 @@ const mittPipelineTotal = computed(
 .water-wave {
     transition: height 0.8s ease;
     animation: waterFloat 3.5s ease-in-out infinite;
-    background: linear-gradient(120deg, rgba(59,130,246,0.85), rgba(34,211,238,0.9), rgba(59,130,246,0.85));
+    background: linear-gradient(
+        120deg,
+        rgba(59, 130, 246, 0.85),
+        rgba(34, 211, 238, 0.9),
+        rgba(59, 130, 246, 0.85)
+    );
 }
 
 .water-surface {

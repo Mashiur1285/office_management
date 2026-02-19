@@ -156,7 +156,7 @@
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Head</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
@@ -266,12 +266,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Subcategory *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cost Head *</label>
                         <SubcategorySelector
                             v-model="form.category"
                             :subcategories="form.type === 'income' ? incomeSubcategoryObjects : expenseSubcategoryObjects"
                             type="non_operating"
                             :category="form.type"
+                            label="Cost Head"
                         />
                     </div>
 

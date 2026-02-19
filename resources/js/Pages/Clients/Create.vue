@@ -11,10 +11,14 @@
                     Clients
                 </p>
                 <h1 class="text-2xl font-bold text-gray-900">
-                    {{ isEdit ? "Edit client" : "Add a client" }}
+                    {{ isEdit ? "Edit Client" : "Add New Client" }}
                 </h1>
                 <p class="text-sm text-gray-600">
-                    {{ isEdit ? "Update passport, placement, payments, and status." : "Capture passport, placement, payments, and status in one place." }}
+                    {{
+                        isEdit
+                            ? "Update passport, placement, payments, and status."
+                            : "Capture passport, placement, payments, and status in one place."
+                    }}
                 </p>
             </div>
             <div class="flex gap-3">
@@ -73,21 +77,13 @@
                         />
                     </FormGroup>
                     <FormGroup
-                        label="Organization Name"
-                        :error="form.errors.organization_name"
+                        label="Passport Number *"
+                        :error="form.errors.passport_number"
                     >
                         <input
-                            v-model="form.organization_name"
-                            :class="inputClass('organization_name')"
-                            placeholder="Ex: ABC Travel & Tours"
-                        />
-                    </FormGroup>
-                    <FormGroup label="Email" :error="form.errors.email">
-                        <input
-                            v-model="form.email"
-                            :class="inputClass('email')"
-                            type="email"
-                            placeholder="Ex: client@email.com"
+                            v-model="form.passport_number"
+                            :class="inputClass('passport_number')"
+                            required
                         />
                     </FormGroup>
                     <FormGroup
@@ -100,53 +96,73 @@
                             placeholder="Ex: 01XXXXXXXXX"
                         />
                     </FormGroup>
-
                     <FormGroup
-                        label="NID Number *"
-                        :error="form.errors.nid_number"
+                        label="Select Agent"
+                        :error="form.errors.agent_id"
                     >
-                        <input
-                            v-model="form.nid_number"
-                            :class="inputClass('nid_number')"
-                            required
-                        />
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <input
+                                    v-model="agentSearch"
+                                    @focus="showAgentDropdown = true"
+                                    @blur="hideAgentDropdown"
+                                    type="text"
+                                    :class="inputClass('agent_id')"
+                                    :placeholder="
+                                        selectedAgentName ||
+                                        'Search agent by name or phone...'
+                                    "
+                                />
+                                <div
+                                    v-if="showAgentDropdown"
+                                    class="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
+                                >
+                                    <div
+                                        v-for="agent in filteredAgents"
+                                        :key="agent.id"
+                                        @mousedown.prevent="selectAgent(agent)"
+                                        class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                                    >
+                                        <div class="font-medium text-gray-900">
+                                            {{ agent.name }}
+                                        </div>
+                                        <div
+                                            v-if="agent.mobile"
+                                            class="text-xs text-gray-500"
+                                        >
+                                            Mobile: {{ agent.mobile }}
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-if="filteredAgents.length === 0"
+                                        class="px-4 py-3 text-sm text-gray-500 text-center"
+                                    >
+                                        No agents found
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                @click="openAddAgentModal"
+                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-blue-600 p-2.5 text-white hover:bg-blue-700 transition"
+                                title="Add new agent"
+                            >
+                                <svg
+                                    class="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 4v16m8-8H4"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
                     </FormGroup>
-                    <FormGroup
-                        label="NID Upload"
-                        :error="form.errors.nid_file"
-                        hint="PDF or image"
-                    >
-                        <input
-                            type="file"
-                            :class="fileClass"
-                            accept=".pdf,image/*"
-                            @change="(e) => handleFile(e, 'nid_file')"
-                        />
-                    </FormGroup>
-
-                    <FormGroup
-                        label="Passport Number *"
-                        :error="form.errors.passport_number"
-                    >
-                        <input
-                            v-model="form.passport_number"
-                            :class="inputClass('passport_number')"
-                            required
-                        />
-                    </FormGroup>
-                    <FormGroup
-                        label="Passport Upload"
-                        :error="form.errors.passport_file"
-                        hint="PDF or image"
-                    >
-                        <input
-                            type="file"
-                            :class="fileClass"
-                            accept=".pdf,image/*"
-                            @change="(e) => handleFile(e, 'passport_file')"
-                        />
-                    </FormGroup>
-
                     <FormGroup
                         label="Date of Birth"
                         :error="form.errors.date_of_birth"
@@ -159,23 +175,93 @@
                             :input-class="dateInputClass('date_of_birth')"
                         />
                     </FormGroup>
-
-                    <FormGroup label="Client Photo" :error="form.errors.photo">
+                    <FormGroup
+                        label="NID Number"
+                        :error="form.errors.nid_number"
+                    >
                         <input
-                            type="file"
-                            :class="fileClass"
-                            accept="image/*"
-                            @change="(e) => handleFile(e, 'photo')"
+                            v-model="form.nid_number"
+                            :class="inputClass('nid_number')"
+                        />
+                    </FormGroup>
+                    <FormGroup
+                        class="md:col-span-2"
+                        label="Organization Name"
+                        :error="form.errors.organization_name"
+                    >
+                        <input
+                            v-model="form.organization_name"
+                            :class="inputClass('organization_name')"
+                            placeholder="Ex: ABC Travel & Tours"
                         />
                     </FormGroup>
 
-                    <FormGroup label="District" :error="form.errors.district">
+                    <div class="md:col-span-2 grid gap-4 md:grid-cols-3">
+                        <FormGroup
+                            label="Passport Upload"
+                            :error="form.errors.passport_file"
+                            hint="PDF or image"
+                        >
+                            <input
+                                type="file"
+                                :class="fileClass"
+                                accept=".pdf,image/*"
+                                @change="(e) => handleFile(e, 'passport_file')"
+                            />
+                        </FormGroup>
+                        <FormGroup
+                            label="NID Upload"
+                            :error="form.errors.nid_file"
+                            hint="PDF or image"
+                        >
+                            <input
+                                type="file"
+                                :class="fileClass"
+                                accept=".pdf,image/*"
+                                @change="(e) => handleFile(e, 'nid_file')"
+                            />
+                        </FormGroup>
+                        <FormGroup
+                            label="Client Photo"
+                            :error="form.errors.photo"
+                        >
+                            <input
+                                type="file"
+                                :class="fileClass"
+                                accept="image/*"
+                                @change="(e) => handleFile(e, 'photo')"
+                            />
+                        </FormGroup>
+                    </div>
+
+                    <FormGroup label="Email" :error="form.errors.email">
                         <input
+                            v-model="form.email"
+                            :class="inputClass('email')"
+                            type="email"
+                            placeholder="Ex: client@email.com"
+                        />
+                    </FormGroup>
+                    <FormGroup label="District" :error="form.errors.district">
+                        <select
                             v-model="form.district"
                             :class="inputClass('district')"
-                        />
+                        >
+                            <option value="">Select district</option>
+                            <option
+                                v-for="district in districts"
+                                :key="district"
+                                :value="district"
+                            >
+                                {{ district }}
+                            </option>
+                        </select>
                     </FormGroup>
-                    <FormGroup label="Address" :error="form.errors.address">
+                    <FormGroup
+                        class="md:col-span-2"
+                        label="Address"
+                        :error="form.errors.address"
+                    >
                         <input
                             v-model="form.address"
                             :class="inputClass('address')"
@@ -294,7 +380,9 @@
                                     @focus="showCountryDropdown = true"
                                     @blur="hideCountryDropdown"
                                     type="text"
-                                    :class="inputClass('foreign_company_country')"
+                                    :class="
+                                        inputClass('foreign_company_country')
+                                    "
                                     :placeholder="
                                         selectedCountry ||
                                         'Search or select country...'
@@ -307,7 +395,9 @@
                                     <div
                                         v-for="country in filteredCountries"
                                         :key="country"
-                                        @mousedown.prevent="selectCountry(country)"
+                                        @mousedown.prevent="
+                                            selectCountry(country)
+                                        "
                                         class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
                                     >
                                         <div class="font-medium text-gray-900">
@@ -416,72 +506,6 @@
                             :class="inputClass('foreign_company_phone')"
                             placeholder="Contact phone number"
                         />
-                    </FormGroup>
-
-                    <!-- Assign Agent Searchable Dropdown -->
-                    <FormGroup label="Assign Agent" :error="form.errors.agent_id">
-                        <div class="flex gap-2">
-                            <div class="relative flex-1">
-                                <input
-                                    v-model="agentSearch"
-                                    @focus="showAgentDropdown = true"
-                                    @blur="hideAgentDropdown"
-                                    type="text"
-                                    :class="inputClass('agent_id')"
-                                    :placeholder="
-                                        selectedAgentName ||
-                                        'Search agent by name or phone...'
-                                    "
-                                />
-                                <div
-                                    v-if="showAgentDropdown"
-                                    class="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
-                                >
-                                    <div
-                                        v-for="agent in filteredAgents"
-                                        :key="agent.id"
-                                        @mousedown.prevent="selectAgent(agent)"
-                                        class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
-                                    >
-                                        <div class="font-medium text-gray-900">
-                                            {{ agent.name }}
-                                        </div>
-                                        <div
-                                            v-if="agent.mobile"
-                                            class="text-xs text-gray-500"
-                                        >
-                                            Mobile: {{ agent.mobile }}
-                                        </div>
-                                    </div>
-                                    <div
-                                        v-if="filteredAgents.length === 0"
-                                        class="px-4 py-3 text-sm text-gray-500 text-center"
-                                    >
-                                        No agents found
-                                    </div>
-                                </div>
-                            </div>
-                            <button
-                                type="button"
-                                @click="openAddAgentModal"
-                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-blue-600 p-2.5 text-white hover:bg-blue-700 transition"
-                                title="Add new agent"
-                            >
-                                <svg
-                                    class="h-5 w-5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M12 4v16m8-8H4"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
                     </FormGroup>
 
                     <FormGroup
@@ -636,7 +660,9 @@
                                     </div>
                                 </div>
                                 <div
-                                    v-if="filteredDocumentsCompanies.length === 0"
+                                    v-if="
+                                        filteredDocumentsCompanies.length === 0
+                                    "
                                     class="px-4 py-3 text-sm text-gray-500 text-center"
                                 >
                                     No BD companies found
@@ -677,15 +703,116 @@
             <section
                 class="rounded-xl border border-gray-100 bg-white shadow-sm"
             >
-                <div class="border-b border-gray-100 px-6 py-4">
-                    <h2 class="text-lg font-semibold text-gray-900">
-                        Payments
-                    </h2>
-                    <p class="text-sm text-gray-600">
-                        Track total fee, dues, and instalments.
-                    </p>
+                <div
+                    class="flex items-center justify-between border-b border-gray-100 px-6 py-4"
+                >
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            Payments
+                        </h2>
+                        <p class="text-sm text-gray-600">
+                            Track total fee, dues, and instalments.
+                        </p>
+                    </div>
+                    <button
+                        v-if="isEdit"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold shadow-sm transition-all duration-200 text-sm"
+                        :class="
+                            canRefund
+                                ? 'bg-rose-50 text-rose-700 hover:bg-rose-100'
+                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        "
+                        :disabled="!canRefund"
+                        @click="showRefundModal = true"
+                    >
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                            />
+                        </svg>
+                        Refund
+                    </button>
                 </div>
+
+                <!-- Payment Summary (edit mode only) -->
+                <div
+                    v-if="isEdit && (totalReceived > 0 || totalRefunded > 0)"
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4 px-6 pt-4"
+                >
+                    <div
+                        class="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3"
+                    >
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                        >
+                            Total Received
+                        </p>
+                        <p class="mt-1 text-lg font-bold text-emerald-700">
+                            {{ money(totalReceived) }}
+                        </p>
+                    </div>
+                    <div
+                        class="rounded-xl border border-rose-100 bg-rose-50/40 p-3"
+                    >
+                        <p
+                            class="text-xs font-semibold uppercase tracking-wide text-rose-600"
+                        >
+                            Total Refunded
+                        </p>
+                        <p class="mt-1 text-lg font-bold text-rose-600">
+                            {{ money(totalRefunded) }}
+                        </p>
+                    </div>
+                </div>
+
                 <div class="grid gap-4 p-6 md:grid-cols-2">
+                    <FormGroup
+                        label="Payment Received From"
+                        :error="form.errors.payment_source"
+                    >
+                        <select
+                            v-model="form.payment_source"
+                            :class="inputClass('payment_source')"
+                        >
+                            <option value="client">Client</option>
+                            <option value="agent">Agent</option>
+                        </select>
+                    </FormGroup>
+                    <FormGroup
+                        v-if="form.payment_source === 'agent'"
+                        label="Payment Agent"
+                        :error="form.errors.payment_agent_id"
+                    >
+                        <select
+                            v-model="form.payment_agent_id"
+                            :class="inputClass('payment_agent_id')"
+                        >
+                            <option value="">Select agent</option>
+                            <option
+                                v-for="agent in agents"
+                                :key="agent.id"
+                                :value="agent.id"
+                            >
+                                {{ agent.name }}
+                            </option>
+                        </select>
+                    </FormGroup>
+                    <FormGroup v-else label="Client Name">
+                        <input
+                            :value="form.name"
+                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            readonly
+                        />
+                    </FormGroup>
                     <FormGroup
                         label="Current Fee"
                         :error="form.errors.total_fee"
@@ -701,12 +828,22 @@
                     <FormGroup
                         label="Paid Amount"
                         :error="form.errors.partial_paid_amount"
-                        hint="Add new payment to update due"
+                        :hint="
+                            isEdit
+                                ? `Cannot be less than ৳${Number(props.client?.partial_paid_amount || 0).toLocaleString()}. Use Refund for returns.`
+                                : 'Add new payment to update due'
+                        "
                     >
                         <input
                             v-model="form.partial_paid_amount"
                             type="number"
                             step="0.01"
+                            :min="
+                                isEdit
+                                    ? props.client?.partial_paid_amount || 0
+                                    : 0
+                            "
+                            :max="form.total_fee || undefined"
                             :class="inputClass('partial_paid_amount')"
                         />
                     </FormGroup>
@@ -729,7 +866,270 @@
                         :error="form.errors.partial_payment_date"
                     />
                 </div>
+
+                <!-- Payment & Refund History (edit mode only) -->
+                <div
+                    v-if="isEdit && paymentHistory.length"
+                    class="border-t border-gray-100 px-6 py-4"
+                >
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-gray-900">
+                            Payment & Refund History
+                        </h3>
+                        <span
+                            class="text-xs font-semibold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full"
+                        >
+                            {{ paymentHistory.length }}
+                            {{
+                                paymentHistory.length === 1
+                                    ? "record"
+                                    : "records"
+                            }}
+                        </span>
+                    </div>
+                    <div
+                        class="overflow-hidden rounded-lg border border-gray-100"
+                    >
+                        <div class="overflow-x-auto">
+                            <table
+                                class="w-full text-left text-sm text-gray-700"
+                            >
+                                <thead
+                                    class="bg-gray-50 text-xs uppercase text-gray-600"
+                                >
+                                    <tr>
+                                        <th class="px-3 py-2 font-semibold">
+                                            Date
+                                        </th>
+                                        <th class="px-3 py-2 font-semibold">
+                                            Type
+                                        </th>
+                                        <th class="px-3 py-2 font-semibold">
+                                            Source
+                                        </th>
+                                        <th
+                                            class="px-3 py-2 font-semibold text-right"
+                                        >
+                                            Amount
+                                        </th>
+                                        <th class="px-3 py-2 font-semibold">
+                                            Method
+                                        </th>
+                                        <th class="px-3 py-2 font-semibold">
+                                            Notes
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr
+                                        v-for="record in paymentHistory"
+                                        :key="record.id"
+                                        class="transition hover:bg-gray-50"
+                                    >
+                                        <td
+                                            class="px-3 py-2 whitespace-nowrap text-xs"
+                                        >
+                                            {{ record.payment_date || "—" }}
+                                        </td>
+                                        <td class="px-3 py-2">
+                                            <span
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold"
+                                                :class="
+                                                    record.type === 'payment'
+                                                        ? 'bg-emerald-100 text-emerald-700'
+                                                        : 'bg-rose-100 text-rose-700'
+                                                "
+                                            >
+                                                {{
+                                                    record.type === "payment"
+                                                        ? "Payment"
+                                                        : "Refund"
+                                                }}
+                                            </span>
+                                        </td>
+                                        <td
+                                            class="px-3 py-2 capitalize text-xs"
+                                        >
+                                            {{ record.source || "—" }}
+                                        </td>
+                                        <td
+                                            class="px-3 py-2 text-right font-semibold text-xs"
+                                            :class="
+                                                record.type === 'refund'
+                                                    ? 'text-rose-600'
+                                                    : 'text-emerald-700'
+                                            "
+                                        >
+                                            {{ money(record.amount) }}
+                                        </td>
+                                        <td class="px-3 py-2 text-xs">
+                                            {{ record.payment_method || "—" }}
+                                        </td>
+                                        <td
+                                            class="px-3 py-2 text-xs max-w-[150px] truncate"
+                                        >
+                                            {{ record.notes || "—" }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </section>
+
+            <!-- Refund Modal -->
+            <div
+                v-if="showRefundModal"
+                class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
+                @click="closeRefund"
+            >
+                <div
+                    class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6"
+                    @click.stop
+                >
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900">
+                            Refund Client Payment
+                        </h3>
+                        <button
+                            type="button"
+                            class="text-gray-400 hover:text-gray-600"
+                            @click="closeRefund"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-600">
+                        Issue a refund and update the client payment status.
+                    </p>
+                    <form class="mt-4 space-y-4" @submit.prevent="submitRefund">
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div>
+                                <label
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Refund Amount</label
+                                >
+                                <input
+                                    v-model="refundForm.amount"
+                                    type="number"
+                                    min="0.01"
+                                    step="0.01"
+                                    class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    placeholder="0.00"
+                                />
+                                <p
+                                    v-if="refundForm.errors.amount"
+                                    class="mt-1 text-xs text-red-600"
+                                >
+                                    {{ refundForm.errors.amount }}
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Refund Date</label
+                                >
+                                <input
+                                    v-model="refundForm.payment_date"
+                                    type="date"
+                                    class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                />
+                                <p
+                                    v-if="refundForm.errors.payment_date"
+                                    class="mt-1 text-xs text-red-600"
+                                >
+                                    {{ refundForm.errors.payment_date }}
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Refund Method</label
+                                >
+                                <input
+                                    v-model="refundForm.payment_method"
+                                    class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    placeholder="Cash/Bank/Mobile"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Refund Source</label
+                                >
+                                <select
+                                    v-model="refundForm.payment_source"
+                                    class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    disabled
+                                >
+                                    <option value="client">Client</option>
+                                    <option value="agent">Agent</option>
+                                </select>
+                                <p
+                                    v-if="refundForm.errors.payment_source"
+                                    class="mt-1 text-xs text-red-600"
+                                >
+                                    {{ refundForm.errors.payment_source }}
+                                </p>
+                            </div>
+                            <div v-if="refundForm.payment_source === 'agent'">
+                                <label
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Agent</label
+                                >
+                                <select
+                                    v-model="refundForm.payment_agent_id"
+                                    class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    disabled
+                                >
+                                    <option value="">Select agent</option>
+                                    <option
+                                        v-for="agent in agents"
+                                        :key="agent.id"
+                                        :value="agent.id"
+                                    >
+                                        {{ agent.name }}
+                                    </option>
+                                </select>
+                                <p
+                                    v-if="refundForm.errors.payment_agent_id"
+                                    class="mt-1 text-xs text-red-600"
+                                >
+                                    {{ refundForm.errors.payment_agent_id }}
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    class="text-sm font-semibold text-gray-700"
+                                    >Notes (Optional)</label
+                                >
+                                <input
+                                    v-model="refundForm.notes"
+                                    class="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                    placeholder="Reason or reference"
+                                />
+                            </div>
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button
+                                type="button"
+                                class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                                @click="closeRefund"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                class="flex-1 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors font-medium"
+                                :disabled="refundForm.processing"
+                            >
+                                Refund Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
             <!-- Notes -->
             <section
@@ -1032,7 +1432,9 @@
                             class="mb-1 block text-sm font-medium text-gray-700"
                         >
                             Company Name
-                            <span class="text-gray-400 text-xs">(Optional)</span>
+                            <span class="text-gray-400 text-xs"
+                                >(Optional)</span
+                            >
                         </label>
                         <input
                             v-model="newCountry.companyName"
@@ -1124,7 +1526,9 @@
                             class="mb-1 block text-sm font-medium text-gray-700"
                         >
                             Mobile
-                            <span class="text-gray-400 text-xs">(Optional)</span>
+                            <span class="text-gray-400 text-xs"
+                                >(Optional)</span
+                            >
                         </label>
                         <input
                             v-model="newAgent.mobile"
@@ -1139,7 +1543,9 @@
                             class="mb-1 block text-sm font-medium text-gray-700"
                         >
                             District
-                            <span class="text-gray-400 text-xs">(Optional)</span>
+                            <span class="text-gray-400 text-xs"
+                                >(Optional)</span
+                            >
                         </label>
                         <input
                             v-model="newAgent.district"
@@ -1154,7 +1560,9 @@
                             class="mb-1 block text-sm font-medium text-gray-700"
                         >
                             Address
-                            <span class="text-gray-400 text-xs">(Optional)</span>
+                            <span class="text-gray-400 text-xs"
+                                >(Optional)</span
+                            >
                         </label>
                         <textarea
                             v-model="newAgent.address"
@@ -1189,7 +1597,7 @@
 
 <script setup>
 import { computed, defineComponent, h, ref, watch } from "vue";
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import axios from "axios";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -1227,14 +1635,152 @@ const props = defineProps({
         type: String,
         default: "create",
     },
+    totalReceived: {
+        type: Number,
+        default: 0,
+    },
+    totalRefunded: {
+        type: Number,
+        default: 0,
+    },
+    paymentHistory: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const isEdit = computed(() => !!props.client);
+
+// Refund state (edit mode only)
+const showRefundModal = ref(false);
+
+const refundForm = useForm({
+    amount: "",
+    payment_date: new Date().toISOString().split("T")[0],
+    payment_method: "",
+    payment_source: "client",
+    payment_agent_id: "",
+    notes: "",
+});
+
+const canRefund = computed(() => {
+    const received = Number(props.totalReceived || 0);
+    const refunded = Number(props.totalRefunded || 0);
+    return received > 0 && received > refunded;
+});
+
+const refundableAmount = computed(() => {
+    const received = Number(props.totalReceived || 0);
+    const refunded = Number(props.totalRefunded || 0);
+    return Math.max(received - refunded, 0);
+});
+
+const closeRefund = () => {
+    showRefundModal.value = false;
+    refundForm.reset();
+    refundForm.clearErrors();
+};
+
+const syncRefundDefaults = () => {
+    refundForm.amount = refundableAmount.value
+        ? refundableAmount.value.toFixed(2)
+        : "";
+    refundForm.payment_source = props.client?.payment_source ?? "client";
+    refundForm.payment_agent_id = props.client?.payment_agent_id ?? "";
+};
+
+const submitRefund = () => {
+    refundForm.post(route("clients.refund", props.client.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeRefund();
+            router.reload();
+        },
+    });
+};
+
+const money = (value) => {
+    if (value === null || value === undefined || value === "") return "—";
+    return (
+        "৳" +
+        new Intl.NumberFormat("en-BD", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(Number(value || 0))
+    );
+};
 
 const statusOptions = [
     { value: "pending", label: "Pending" },
     { value: "ok", label: "OK" },
     { value: "rejected", label: "Reject" },
+];
+
+const districts = [
+    "Bagerhat",
+    "Bandarban",
+    "Barguna",
+    "Barishal",
+    "Bhola",
+    "Bogura",
+    "Brahmanbaria",
+    "Chandpur",
+    "Chapainawabganj",
+    "Chattogram",
+    "Chuadanga",
+    "Cox's Bazar",
+    "Cumilla",
+    "Dhaka",
+    "Dinajpur",
+    "Faridpur",
+    "Feni",
+    "Gaibandha",
+    "Gazipur",
+    "Gopalganj",
+    "Habiganj",
+    "Jamalpur",
+    "Jashore",
+    "Jhalokati",
+    "Jhenaidah",
+    "Joypurhat",
+    "Khagrachhari",
+    "Khulna",
+    "Kishoreganj",
+    "Kurigram",
+    "Kushtia",
+    "Lakshmipur",
+    "Lalmonirhat",
+    "Madaripur",
+    "Magura",
+    "Manikganj",
+    "Meherpur",
+    "Moulvibazar",
+    "Munshiganj",
+    "Mymensingh",
+    "Naogaon",
+    "Narail",
+    "Narayanganj",
+    "Narsingdi",
+    "Natore",
+    "Netrokona",
+    "Nilphamari",
+    "Noakhali",
+    "Pabna",
+    "Panchagarh",
+    "Patuakhali",
+    "Pirojpur",
+    "Rajbari",
+    "Rajshahi",
+    "Rangamati",
+    "Rangpur",
+    "Satkhira",
+    "Shariatpur",
+    "Sherpur",
+    "Sirajganj",
+    "Sunamganj",
+    "Sylhet",
+    "Tangail",
+    "Thakurgaon",
 ];
 
 const buildFormState = () => ({
@@ -1264,8 +1810,7 @@ const buildFormState = () => ({
     fit_status: props.client?.fit_status ?? "pending",
     fit_report: null,
     documents_submitted_to: props.client?.documents_submitted_to ?? "",
-    documents_submission_phone:
-        props.client?.documents_submission_phone ?? "",
+    documents_submission_phone: props.client?.documents_submission_phone ?? "",
     date_of_submission: props.client?.date_of_submission ?? "",
     expected_date_to_collect: props.client?.expected_date_to_collect ?? "",
     documents_collected_date: props.client?.documents_collected_date ?? "",
@@ -1273,6 +1818,8 @@ const buildFormState = () => ({
     current_due: props.client?.current_due ?? "",
     partial_paid_amount: props.client?.partial_paid_amount ?? "",
     partial_payment_date: props.client?.partial_payment_date ?? "",
+    payment_source: props.client?.payment_source ?? "client",
+    payment_agent_id: props.client?.payment_agent_id ?? "",
     notes: props.client?.notes ?? "",
     online_status: props.client?.online_status ?? "pending",
     calling_status: props.client?.calling_status ?? "pending",
@@ -1300,7 +1847,54 @@ const computeDue = () => {
 
 watch(
     () => [form.total_fee, form.partial_paid_amount],
-    () => computeDue()
+    () => {
+        const totalFee = parseFloat(form.total_fee);
+        const paid = parseFloat(form.partial_paid_amount);
+        if (
+            !Number.isNaN(totalFee) &&
+            !Number.isNaN(paid) &&
+            paid > totalFee
+        ) {
+            form.partial_paid_amount = totalFee;
+        }
+        computeDue();
+    },
+);
+
+watch(
+    () => form.payment_source,
+    (value) => {
+        if (value !== "agent") {
+            form.payment_agent_id = "";
+        }
+    },
+);
+
+watch(
+    () => refundForm.payment_source,
+    (value) => {
+        if (value !== "agent") {
+            refundForm.payment_agent_id = "";
+        }
+    },
+);
+
+watch(
+    () => showRefundModal.value,
+    (value) => {
+        if (value) {
+            syncRefundDefaults();
+        }
+    },
+);
+
+watch(
+    () => showRefundModal.value,
+    (value) => {
+        if (value) {
+            syncRefundDefaults();
+        }
+    },
 );
 
 // initialize due on load
@@ -1343,14 +1937,14 @@ const filteredJobSectors = computed(() => {
     }
     const query = jobSectorSearch.value.toLowerCase();
     return (props.jobSectors || []).filter((sector) =>
-        sector.name.toLowerCase().includes(query)
+        sector.name.toLowerCase().includes(query),
     );
 });
 
 // Available sub-sectors when a parent sector is selected
 const availableSubSectors = computed(() => {
     const sector = props.jobSectors.find(
-        (item) => item.id === selectedJobSectorId.value
+        (item) => item.id === selectedJobSectorId.value,
     );
     return sector?.children || [];
 });
@@ -1426,8 +2020,7 @@ const submitNewCountry = async () => {
     newCountryError.value = "";
 
     try {
-        const companyName =
-            newCountry.value.companyName.trim() || countryValue;
+        const companyName = newCountry.value.companyName.trim() || countryValue;
 
         const response = await axios.post(
             "/foreign-companies",
@@ -1439,7 +2032,7 @@ const submitNewCountry = async () => {
                 headers: {
                     Accept: "application/json",
                 },
-            }
+            },
         );
 
         const company = response.data.foreignCompany;
@@ -1473,8 +2066,7 @@ const submitNewCountry = async () => {
                 error.response.data.message ||
                 "Failed to add country. Please check the fields.";
         } else {
-            newCountryError.value =
-                "Failed to add country. Please try again.";
+            newCountryError.value = "Failed to add country. Please try again.";
         }
     } finally {
         addingCountry.value = false;
@@ -1504,7 +2096,7 @@ const submitNewJobSector = async () => {
         // If it's a child, add to parent's children
         if (newSector.parent_id) {
             const parent = props.jobSectors.find(
-                (s) => s.id === newSector.parent_id
+                (s) => s.id === newSector.parent_id,
             );
             if (parent) {
                 parent.children = parent.children || [];
@@ -1591,7 +2183,7 @@ const submitNewAgent = async () => {
                 headers: {
                     Accept: "application/json",
                 },
-            }
+            },
         );
 
         const agent = response.data.agent;
@@ -1615,8 +2207,7 @@ const submitNewAgent = async () => {
                 error.response.data.message ||
                 "Failed to add agent. Please check the fields.";
         } else {
-            newAgentError.value =
-                "Failed to add agent. Please try again.";
+            newAgentError.value = "Failed to add agent. Please try again.";
         }
     } finally {
         addingAgent.value = false;
@@ -1639,20 +2230,20 @@ const filteredCountries = computed(() => {
     }
     const query = countrySearch.value.toLowerCase();
     return (props.countries || []).filter((country) =>
-        country.toLowerCase().includes(query)
+        country.toLowerCase().includes(query),
     );
 });
 
 // Filtered foreign companies based on selected country and search
 const filteredForeignCompanies = computed(() => {
     let companies = (props.foreignCompanies || []).filter(
-        (company) => company.country === selectedCountry.value
+        (company) => company.country === selectedCountry.value,
     );
 
     if (companySearch.value) {
         const query = companySearch.value.toLowerCase();
         companies = companies.filter((company) =>
-            company.name.toLowerCase().includes(query)
+            company.name.toLowerCase().includes(query),
         );
     }
 
@@ -1722,7 +2313,7 @@ const filteredAgents = computed(() => {
     return (props.agents || []).filter(
         (agent) =>
             agent.name?.toLowerCase().includes(query) ||
-            agent.mobile?.toLowerCase().includes(query)
+            agent.mobile?.toLowerCase().includes(query),
     );
 });
 
@@ -1761,7 +2352,7 @@ const filteredDocumentsCompanies = computed(() => {
         (company) =>
             company.name?.toLowerCase().includes(query) ||
             company.contact_person_phone?.toLowerCase().includes(query) ||
-            company.owner_phone?.toLowerCase().includes(query)
+            company.owner_phone?.toLowerCase().includes(query),
     );
 });
 
@@ -1789,7 +2380,7 @@ const initializeSelectionsFromClient = () => {
 
     selectedJobSectorName.value = props.client.job_sector || "";
     const sector = props.jobSectors.find(
-        (item) => item.name === props.client.job_sector
+        (item) => item.name === props.client.job_sector,
     );
     if (sector) {
         selectedJobSectorId.value = sector.id;
@@ -1798,7 +2389,7 @@ const initializeSelectionsFromClient = () => {
     selectedCountry.value = props.client.foreign_company_country || "";
 
     const foreignCompany = (props.foreignCompanies || []).find(
-        (company) => company.id === props.client.foreign_company_id
+        (company) => company.id === props.client.foreign_company_id,
     );
     if (foreignCompany) {
         selectedCompanyId.value = foreignCompany.id;
@@ -1808,7 +2399,7 @@ const initializeSelectionsFromClient = () => {
     }
 
     const agent = (props.agents || []).find(
-        (item) => item.id === props.client.agent_id
+        (item) => item.id === props.client.agent_id,
     );
     if (agent) {
         selectedAgentId.value = agent.id;
@@ -1887,7 +2478,6 @@ const submit = () => {
 
     const requiredFields = [
         { key: "name", message: "Client name is required." },
-        { key: "nid_number", message: "NID number is required." },
         { key: "passport_number", message: "Passport number is required." },
     ];
 
@@ -1902,7 +2492,10 @@ const submit = () => {
 
     if (hasError) return;
 
-    const url = isEdit.value && props.client ? `/clients/${props.client.id}` : "/clients";
+    const url =
+        isEdit.value && props.client
+            ? `/clients/${props.client.id}`
+            : "/clients";
 
     if (isEdit.value) {
         form.put(url, {
@@ -1938,7 +2531,7 @@ const FormGroup = defineComponent({
                     h(
                         "label",
                         { class: "text-sm font-medium text-gray-700" },
-                        props.label
+                        props.label,
                     ),
                     slots.default ? slots.default() : null,
                     props.hint
@@ -1947,7 +2540,7 @@ const FormGroup = defineComponent({
                     props.error
                         ? h("p", { class: "text-xs text-red-600" }, props.error)
                         : null,
-                ].filter(Boolean)
+                ].filter(Boolean),
             );
     },
 });
@@ -1966,7 +2559,7 @@ const DateField = defineComponent({
                 h(
                     "label",
                     { class: "text-sm font-medium text-gray-700" },
-                    props.label
+                    props.label,
                 ),
                 h(VueDatePicker, {
                     modelType: "yyyy-MM-dd",

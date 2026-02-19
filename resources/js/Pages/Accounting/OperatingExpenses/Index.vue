@@ -59,7 +59,7 @@
                 <!-- Table Header -->
                 <div class="mb-2">
                     <div class="grid grid-cols-12 gap-2 px-2 py-2 bg-gray-50 rounded-lg font-semibold text-xs text-gray-600 uppercase">
-                        <div class="col-span-4">Subcategory</div>
+                        <div class="col-span-4">Cost Head</div>
                         <div class="col-span-2 text-right">Amount</div>
                         <div class="col-span-2 text-right">VAT</div>
                         <div class="col-span-2 text-right">Tax</div>
@@ -136,7 +136,7 @@
                     <table class="w-full">
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Head</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client/Staff</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
@@ -259,12 +259,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Subcategory *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cost Head *</label>
                         <SubcategorySelector
                             v-model="form.subcategory"
                             :subcategories="subcategories"
                             type="operating_expenses"
                             :category="category"
+                            label="Cost Head"
                             @update:vatRate="form.vat_rate = $event"
                         />
                     </div>

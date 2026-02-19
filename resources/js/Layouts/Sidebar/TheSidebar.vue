@@ -760,6 +760,62 @@
                     </ul>
                 </li>
 
+                <li v-if="showReports">
+                    <button
+                        type="button"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        @click="toggleReports"
+                    >
+                        <div
+                            class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-500"
+                        >
+                            <font-awesome-icon
+                                icon="chart-bar"
+                                class="w-5 h-5 text-white"
+                            />
+                        </div>
+                        <span class="flex-1 ml-3 text-left whitespace-nowrap"
+                            >Reports</span
+                        >
+                        <svg
+                            class="w-3 h-3 transition-transform duration-200"
+                            :class="{ 'rotate-180': reportsOpen }"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 10 6"
+                        >
+                            <path
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="m1 1 4 4 4-4"
+                            />
+                        </svg>
+                    </button>
+                    <ul v-show="reportsOpen" class="py-2 space-y-2 ml-3">
+                        <li>
+                            <Link
+                                href="/reports/refund-report"
+                                :class="
+                                    linkClass('/reports/refund-report', true)
+                                "
+                            >
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-rose-500"
+                                >
+                                    <font-awesome-icon
+                                        icon="money-bill"
+                                        class="w-4 h-4 text-white"
+                                    />
+                                </div>
+                                <span class="ml-3">Refund Report</span>
+                            </Link>
+                        </li>
+                    </ul>
+                </li>
+
                 <li v-if="showAccessManagement">
                     <button
                         type="button"
@@ -954,6 +1010,14 @@ const showRegistrations = computed(
 );
 
 const showAccounting = computed(() => hasPermission("accounting.view"));
+const showReports = computed(
+    () =>
+        hasPermission("accounting.view") ||
+        hasPermission("reports.view") ||
+        hasPermission("reports.*") ||
+        hasPermission("invoice.view") ||
+        hasPermission("client.view")
+);
 
 const currentPath = computed(() => $page.url.split("?")[0]);
 
@@ -979,6 +1043,11 @@ const toggleAccess = () => {
 const accountingOpen = ref(false);
 const toggleAccounting = () => {
     accountingOpen.value = !accountingOpen.value;
+};
+
+const reportsOpen = ref(false);
+const toggleReports = () => {
+    reportsOpen.value = !reportsOpen.value;
 };
 
 const operationsOpen = ref(false);

@@ -11,6 +11,7 @@ use App\Models\NonOperatingEntry;
 use App\Models\OfficeStaff;
 use App\Models\OperatingExpense;
 use App\Models\DocumentLocation;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
@@ -37,6 +38,10 @@ class DashboardController extends Controller
         $countryDateRange = $this->resolveDateRange(
             $request->input('country_start_date'),
             $request->input('country_end_date')
+        );
+        $refundDateRange = $this->resolveDateRange(
+            $request->input('refund_start_date'),
+            $request->input('refund_end_date')
         );
 
         $monthWindow = collect(range(5, 0))->map(fn ($i) => $now->copy()->subMonths($i));
@@ -195,6 +200,26 @@ class DashboardController extends Controller
             ])
             ->values();
 
+        $refundQuery = Payment::where('type', 'refund')
+            ->with(['payable', 'agent:id,name']);
+        if ($refundDateRange) {
+            $refundQuery->whereBetween('payment_date', $refundDateRange);
+        }
+        $refundItems = $refundQuery->latest('payment_date')->get();
+        $refundSummary = [
+            'total' => (float) $refundItems->sum('amount'),
+            'count' => $refundItems->count(),
+            'items' => $refundItems->map(function ($payment) {
+                $name = $payment->payable?->name ?? 'Unknown';
+                return [
+                    'name' => $name,
+                    'type' => $payment->source === 'agent' ? 'Agent' : 'Client',
+                    'date' => $payment->payment_date?->format('Y-m-d'),
+                    'amount' => (float) $payment->amount,
+                ];
+            })->values(),
+        ];
+
         return response()->json([
             'stats' => [
                 'total_clients' => Client::count(),
@@ -230,6 +255,7 @@ class DashboardController extends Controller
             ],
             'agentClientSummary' => $agentClientSummary,
             'foreignCountrySummary' => $foreignCountrySummary,
+            'refundSummary' => $refundSummary,
             'appName' => config('app.name'),
         ]);
     }

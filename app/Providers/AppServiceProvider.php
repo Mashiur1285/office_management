@@ -4,9 +4,12 @@ namespace App\Providers;
 
 use App\Models\Agent;
 use App\Models\BdCompany;
+use App\Models\Client;
 use App\Models\DocumentHolderType;
 use App\Models\ForeignCompany;
+use App\Models\Invoice;
 use App\Models\OfficeStaff;
+use App\Models\Quotation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Schema;
@@ -35,7 +38,10 @@ class AppServiceProvider extends ServiceProvider
             'agency' => OfficeStaff::class,
             'agent' => Agent::class,
             'bd_company' => BdCompany::class,
+            'client' => Client::class,
             'foreign_company' => ForeignCompany::class,
+            'invoice' => Invoice::class,
+            'quotation' => Quotation::class,
             'user' => User::class,
         ];
 

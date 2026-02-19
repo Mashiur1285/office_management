@@ -363,11 +363,11 @@ const formatDays = (value) => {
 };
 
 const form = useForm({
-    to_holder_type: "",
-    to_holder_id: null,
-    expected_return_at: "",
-    processing_status: "",
-    processing_notes: "",
+    to_holder_type: props.current?.holder_type ?? "",
+    to_holder_id: props.current?.holder_id ?? null,
+    expected_return_at: props.current?.expected_return_at ?? "",
+    processing_status: props.current?.processing_status ?? "",
+    processing_notes: props.current?.processing_notes ?? "",
     notes: "",
 });
 
@@ -404,19 +404,37 @@ const filteredMittStaff = computed(() => {
 // LocalStorage key for this client's form
 const storageKey = `document_tracking_form_${props.client.id}`;
 
-// Restore form from localStorage on mount
+// Restore form on mount: prefer server data (current), fall back to localStorage
 onMounted(() => {
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-        try {
-            const data = JSON.parse(saved);
-            Object.keys(data).forEach(key => {
-                if (form.hasOwnProperty(key)) {
-                    form[key] = data[key];
+    if (props.current?.holder_type) {
+        // Pre-populated from current — set mittStaffSearch if agency_user
+        if (props.current.holder_type === 'agency_user' && props.current.holder_id) {
+            const staff = mittStaffOptions.value.find(u => u.value === props.current.holder_id);
+            if (staff) {
+                mittStaffSearch.value = staff.label;
+            }
+        }
+    } else {
+        // No current location — try localStorage
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    if (form.hasOwnProperty(key)) {
+                        form[key] = data[key];
+                    }
+                });
+                // Restore mittStaffSearch if applicable
+                if (data.to_holder_type === 'agency_user' && data.to_holder_id) {
+                    const staff = mittStaffOptions.value.find(u => u.value === data.to_holder_id);
+                    if (staff) {
+                        mittStaffSearch.value = staff.label;
+                    }
                 }
-            });
-        } catch (e) {
-            console.error('Failed to restore form data:', e);
+            } catch (e) {
+                console.error('Failed to restore form data:', e);
+            }
         }
     }
     isRestoringForm.value = false;
@@ -446,6 +464,9 @@ watch(
 const submit = () => {
     form.post(`/clients/${props.client.id}/documents`, {
         preserveScroll: true,
+        onSuccess: () => {
+            localStorage.removeItem(storageKey);
+        },
     });
 };
 

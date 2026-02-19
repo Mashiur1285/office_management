@@ -104,7 +104,7 @@ class ClientController extends Controller
                     'vat_unpaid' => $vatUnpaid,
                     'vat_paid' => $client->vat_paid && $vatUnpaid == 0,
                     'vat_chalan_number' => $client->vat_chalan_number,
-                    'photo_url' => $client->photo_path ? asset('storage/'.$client->photo_path) : null,
+                    'photo_url' => $client->photo_path ? asset('storage/' . $client->photo_path) : null,
                     'current_holder_type' => $holder?->holder_type,
                     'current_holder_label' => $holder?->holder_type ? ($holderLabelMap[$holder->holder_type] ?? $holder->holder_type) : null,
                     'processing_status' => $holder?->processing_status,
@@ -249,9 +249,45 @@ class ClientController extends Controller
 
     public function edit(Client $client)
     {
+        // For old clients without payment records, fall back to calculated paid amount
+        $hasPaymentRecords = $client->payments()->exists();
+        $totalFee = (float) ($client->total_fee ?? 0);
+        $due = (float) ($client->current_due ?? 0);
+        $paid = max(0, $totalFee - $due);
+
+        $totalReceived = $hasPaymentRecords
+            ? (float) $client->payments()->where('type', 'payment')->sum('amount')
+            : $paid;
+
+        $totalRefunded = (float) $client->payments()
+            ->where('type', 'refund')
+            ->sum('amount');
+
+        $paymentHistory = $client->payments()
+            ->with(['agent:id,name', 'creator:id,name'])
+            ->latest('payment_date')
+            ->latest('id')
+            ->get()
+            ->map(function ($payment) {
+                return [
+                    'id'             => $payment->id,
+                    'payment_date'   => $payment->payment_date?->format('Y-m-d'),
+                    'type'           => $payment->type,
+                    'source'         => $payment->source,
+                    'agent_name'     => $payment->agent?->name,
+                    'amount'         => (float) $payment->amount,
+                    'payment_method' => $payment->payment_method,
+                    'notes'          => $payment->notes,
+                    'created_by'     => $payment->creator?->name,
+                ];
+            });
+
         return Inertia::render('Clients/Create', [
             ...$this->formData(),
             'client' => $this->transformClient($client),
+            'totalReceived' => (float) $totalReceived,
+            'totalRefunded' => (float) $totalRefunded,
+            'paymentHistory' => $paymentHistory,
             'mode' => 'edit',
         ]);
     }
@@ -274,6 +310,32 @@ class ClientController extends Controller
         $totalFee = (float) ($client->total_fee ?? 0);
         $due = (float) ($client->current_due ?? 0);
         $paid = max(0, $totalFee - $due);
+
+        // For old clients without payment records, fall back to calculated paid amount
+        $hasPaymentRecords = $client->payments()->exists();
+        $totalReceived = $hasPaymentRecords
+            ? (float) $client->payments()->where('type', 'payment')->sum('amount')
+            : $paid;
+        $totalRefunded = (float) $client->payments()->where('type', 'refund')->sum('amount');
+
+        $paymentHistory = $client->payments()
+            ->with(['agent:id,name', 'creator:id,name'])
+            ->latest('payment_date')
+            ->latest('id')
+            ->get()
+            ->map(function ($payment) {
+                return [
+                    'id'             => $payment->id,
+                    'payment_date'   => $payment->payment_date?->format('Y-m-d'),
+                    'type'           => $payment->type,
+                    'source'         => $payment->source,
+                    'agent_name'     => $payment->agent?->name,
+                    'amount'         => (float) $payment->amount,
+                    'payment_method' => $payment->payment_method,
+                    'notes'          => $payment->notes,
+                    'created_by'     => $payment->creator?->name,
+                ];
+            });
 
         // Build stages dynamically based on document flow
         $stages = [];
@@ -357,27 +419,30 @@ class ClientController extends Controller
                 'bd_company' => $client->bdCompany?->name,
                 'foreign_company' => $client->foreignCompany?->name,
                 'agent_name' => $client->agent?->name ?? $client->agent_name,
-            'documents_submitted_to' => $client->documents_submitted_to,
-            'documents_submission_phone' => $client->documents_submission_phone,
-            'current_holder_label' => $holder?->holder_type ? ($holderLabelMap[$holder->holder_type] ?? $holder->holder_type) : null,
-            'current_holder_name' => $holder?->holder_name,
-            'processing_status' => $holder?->processing_status,
-            'notes' => $client->notes,
-            'online_status' => $client->online_status,
-            'calling_status' => $client->calling_status,
-            'evisa_status' => $client->evisa_status,
-            'total_fee' => $totalFee,
-            'current_due' => $due,
-            'paid_amount' => $paid,
-            'vat_receivable' => (float) $vatReceivable,
-            'vat_paid_amount' => $vatPaidAmount,
-            'vat_unpaid' => $vatUnpaid,
-            'vat_paid' => $client->vat_paid && $vatUnpaid == 0,
-            'vat_chalan_number' => $client->vat_chalan_number,
-            'vat_payment_date' => $client->vat_payment_date?->format('Y-m-d'),
-        ],
+                'documents_submitted_to' => $client->documents_submitted_to,
+                'documents_submission_phone' => $client->documents_submission_phone,
+                'current_holder_label' => $holder?->holder_type ? ($holderLabelMap[$holder->holder_type] ?? $holder->holder_type) : null,
+                'current_holder_name' => $holder?->holder_name,
+                'processing_status' => $holder?->processing_status,
+                'notes' => $client->notes,
+                'online_status' => $client->online_status,
+                'calling_status' => $client->calling_status,
+                'evisa_status' => $client->evisa_status,
+                'total_fee' => $totalFee,
+                'current_due' => $due,
+                'paid_amount' => $paid,
+                'vat_receivable' => (float) $vatReceivable,
+                'vat_paid_amount' => $vatPaidAmount,
+                'vat_unpaid' => $vatUnpaid,
+                'vat_paid' => $client->vat_paid && $vatUnpaid == 0,
+                'vat_chalan_number' => $client->vat_chalan_number,
+                'vat_payment_date' => $client->vat_payment_date?->format('Y-m-d'),
+                'total_received' => $totalReceived,
+                'total_refunded' => $totalRefunded,
+            ],
             'stages' => $stages,
             'currentStageIndex' => $stageIndex === false ? null : $stageIndex,
+            'paymentHistory' => $paymentHistory,
         ]);
     }
 
@@ -399,9 +464,24 @@ class ClientController extends Controller
             }
         }
 
-        $data = collect($data)->except(array_keys($fileFields))->toArray();
+        $paymentSource = $data['payment_source'] ?? 'client';
+        $paymentAgentId = $data['payment_agent_id'] ?? null;
+        $paidAmount = (float) ($data['partial_paid_amount'] ?? 0);
 
-        Client::create($data);
+        $data = collect($data)->except(array_keys($fileFields))->except(['payment_source', 'payment_agent_id'])->toArray();
+
+        $client = Client::create($data);
+
+        if ($paidAmount > 0) {
+            $client->payments()->create([
+                'type' => 'payment',
+                'source' => $paymentSource,
+                'agent_id' => $paymentSource === 'agent' ? $paymentAgentId : null,
+                'amount' => $paidAmount,
+                'payment_date' => $data['partial_payment_date'] ?? now()->toDateString(),
+                'created_by' => auth()->id(),
+            ]);
+        }
 
         return redirect()
             ->route('clients.index')
@@ -411,6 +491,9 @@ class ClientController extends Controller
     public function update(UpdateClientRequest $request, Client $client)
     {
         $data = $request->validated();
+        $paymentSource = $data['payment_source'] ?? null;
+        $paymentAgentId = $data['payment_agent_id'] ?? null;
+        unset($data['payment_source'], $data['payment_agent_id']);
 
         $fileFields = [
             'photo' => 'photo_path',
@@ -428,7 +511,40 @@ class ClientController extends Controller
             unset($data[$input]);
         }
 
+        $previousPaid = (float) ($client->partial_paid_amount ?? 0);
+        $newPaid = (float) ($data['partial_paid_amount'] ?? 0);
+        $delta = $newPaid - $previousPaid;
+
+        if ($delta < 0) {
+            return back()
+                ->withErrors(['partial_paid_amount' => 'Paid amount cannot be less than current paid amount (৳' . number_format($previousPaid) . '). Use the Refund option instead.'])
+                ->withInput();
+        }
+
+        if ($delta > 0 && ! $paymentSource) {
+            return back()
+                ->withErrors(['payment_source' => 'Please select who made the payment.'])
+                ->withInput();
+        }
+
+        if ($delta > 0 && $paymentSource === 'agent' && ! $paymentAgentId) {
+            return back()
+                ->withErrors(['payment_agent_id' => 'Please select an agent for agent payments.'])
+                ->withInput();
+        }
+
         $client->update($data);
+
+        if ($delta > 0) {
+            $client->payments()->create([
+                'type' => 'payment',
+                'source' => $paymentSource ?? 'client',
+                'agent_id' => ($paymentSource === 'agent') ? $paymentAgentId : null,
+                'amount' => $delta,
+                'payment_date' => $data['partial_payment_date'] ?? now()->toDateString(),
+                'created_by' => auth()->id(),
+            ]);
+        }
 
         return redirect()
             ->route('clients.index')
@@ -492,6 +608,55 @@ class ClientController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'VAT payment status reset successfully.');
+    }
+
+    public function refund(Request $request, Client $client)
+    {
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'payment_date' => 'required|date',
+            'payment_method' => 'nullable|string|max:255',
+            'payment_source' => 'required|in:client,agent',
+            'agent_id' => 'nullable|required_if:payment_source,agent|exists:agents,id',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        // For old clients without payment records, fall back to calculated paid amount
+        $hasPaymentRecords = $client->payments()->exists();
+        $totalFee = (float) ($client->total_fee ?? 0);
+        $due = (float) ($client->current_due ?? 0);
+        $paid = max(0, $totalFee - $due);
+
+        $totalReceived = $hasPaymentRecords
+            ? (float) $client->payments()->where('type', 'payment')->sum('amount')
+            : $paid;
+        $totalRefunded = (float) $client->payments()->where('type', 'refund')->sum('amount');
+        $maxRefundable = $totalReceived - $totalRefunded;
+
+        if ($validated['amount'] > $maxRefundable) {
+            return back()->withErrors([
+                'amount' => 'Refund amount cannot exceed refundable balance (৳' . number_format($maxRefundable, 2) . ').',
+            ])->withInput();
+        }
+
+        $client->payments()->create([
+            'type' => 'refund',
+            'source' => $validated['payment_source'],
+            'agent_id' => $validated['payment_source'] === 'agent' ? $validated['agent_id'] : null,
+            'amount' => $validated['amount'],
+            'payment_method' => $validated['payment_method'],
+            'payment_date' => $validated['payment_date'],
+            'notes' => $validated['notes'],
+            'created_by' => auth()->id(),
+        ]);
+
+        $client->update([
+            'partial_paid_amount' => max(0, (float) $client->partial_paid_amount - $validated['amount']),
+            'current_due' => (float) $client->current_due + $validated['amount'],
+        ]);
+
+        return redirect()->route('clients.edit', $client)
+            ->with('success', 'Refund of ৳' . number_format($validated['amount'], 2) . ' processed successfully.');
     }
 
     private function formData(): array
@@ -598,7 +763,7 @@ class ClientController extends Controller
 
     private function resolveStatus($holder): array
     {
-        if (! $holder) {
+        if (!$holder) {
             return ['value' => 'pending', 'label' => 'Pending at MITT', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
         }
 

@@ -66,12 +66,12 @@ const submit = () => {
                     <div class="flex flex-col items-center gap-3">
                         <img
                             src="/images/mtt-logo.png"
-                            alt="Mefway InterNational Travel & Tours"
+                            alt="Mefway International Travel & Tours"
                             class="h-16 w-16 object-contain"
                         />
                         <div>
                             <h2 class="text-2xl font-semibold text-gray-900">
-                                Mefway InterNational Travel & Tours
+                                Mefway International Travel & Tours
                             </h2>
                             <p class="text-sm text-gray-600">
                                 Sign in to continue

@@ -339,7 +339,7 @@
         <div
             class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md"
         >
-            <div class="overflow-x-auto max-h-[70vh] overflow-y-auto">
+            <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead
                         class="sticky top-0 z-10 bg-gradient-to-r from-gray-50 to-gray-100 text-xs uppercase text-gray-700 border-b border-gray-200"
@@ -409,7 +409,7 @@
                                             >{{ client.name }}</span
                                         >
                                         <span class="text-xs text-gray-500"
-                                            >NID: {{ client.nid_number }}</span
+                                            >PS: {{ client.passport_number }}</span
                                         >
                                     </div>
                                 </div>

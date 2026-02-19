@@ -2,6 +2,12 @@
     <Head title="Create Quotation" />
 
     <div class="space-y-6">
+        <div
+            v-if="toastVisible"
+            class="fixed right-6 top-6 z-50 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg"
+        >
+            {{ toastMessage }}
+        </div>
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">Create Quotation</h1>
@@ -60,9 +66,23 @@
                             placeholder="Organization name"
                         />
                     </FormGroup>
+                    <FormGroup label="Passport Number">
+                        <input
+                            v-model="form.client_passport"
+                            readonly
+                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                        />
+                    </FormGroup>
                     <FormGroup label="Mobile Number">
                         <input
                             v-model="form.client_mobile"
+                            readonly
+                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                        />
+                    </FormGroup>
+                    <FormGroup label="Agent Name">
+                        <input
+                            v-model="form.client_agent"
                             readonly
                             class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
                         />
@@ -93,12 +113,13 @@
                             <option value="other_income">Other Income</option>
                         </select>
                     </FormGroup>
-                    <FormGroup label="Service Type" :error="form.errors.service_type">
+                    <FormGroup label="Cost Head" :error="form.errors.service_type">
                         <SubcategorySelector
                             v-model="form.service_type"
                             :subcategories="subcategoryOptions"
                             type="income"
                             :category="form.service_category"
+                            label="Cost Head"
                         />
                     </FormGroup>
                 </div>
@@ -130,6 +151,7 @@
                     </button>
                 </div>
                 <div class="overflow-x-auto">
+                    <p v-if="form.errors.items" class="mb-3 text-sm text-red-600">{{ form.errors.items }}</p>
                     <table class="min-w-full text-sm">
                         <thead class="bg-gray-50 text-left text-xs font-semibold uppercase text-gray-600">
                             <tr>
@@ -153,6 +175,9 @@
                                         class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                                         placeholder="Service description"
                                     />
+                                    <p v-if="form.errors[`items.${index}.service_description`]" class="mt-1 text-xs text-red-600">
+                                        {{ form.errors[`items.${index}.service_description`] }}
+                                    </p>
                                 </td>
                                 <td class="px-3 py-2">
                                     <input
@@ -164,6 +189,9 @@
                                         class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                                         placeholder="1"
                                     />
+                                    <p v-if="form.errors[`items.${index}.quantity`]" class="mt-1 text-xs text-red-600">
+                                        {{ form.errors[`items.${index}.quantity`] }}
+                                    </p>
                                 </td>
                                 <td class="px-3 py-2">
                                     <input
@@ -175,6 +203,9 @@
                                         class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                                         placeholder="0.00"
                                     />
+                                    <p v-if="form.errors[`items.${index}.unit_price`]" class="mt-1 text-xs text-red-600">
+                                        {{ form.errors[`items.${index}.unit_price`] }}
+                                    </p>
                                 </td>
                                 <td class="px-3 py-2">
                                     <div class="flex items-center gap-2">
@@ -317,7 +348,7 @@
 </template>
 
 <script setup>
-import { computed, defineComponent, h, onMounted, watch } from 'vue';
+import { computed, defineComponent, h, onMounted, ref, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import SubcategorySelector from '@/Components/SubcategorySelector.vue';
 
@@ -333,7 +364,9 @@ const quotationDate = new Date().toISOString().split('T')[0];
 const form = useForm({
     client_id: '',
     organization_name: '',
+    client_passport: '',
     client_mobile: '',
+    client_agent: '',
     client_email: '',
     service_category: 'travel_tourism',
     service_type: '',
@@ -342,6 +375,7 @@ const form = useForm({
     terms_type: 'default',
     terms_text: props.defaultTerms,
     valid_until: '',
+
     items: [
         {
             service_description: '',
@@ -363,6 +397,21 @@ const descriptionWordCount = computed(() => {
 const subcategoryOptions = computed(() => {
     return (props.subcategories || []).filter((item) => item.category === form.service_category);
 });
+
+const toastMessage = ref('');
+const toastVisible = ref(false);
+let toastTimer = null;
+
+const showToast = (message) => {
+    toastMessage.value = message;
+    toastVisible.value = true;
+    if (toastTimer) {
+        clearTimeout(toastTimer);
+    }
+    toastTimer = setTimeout(() => {
+        toastVisible.value = false;
+    }, 3000);
+};
 
 const itemCalculations = computed(() => {
     return form.items.map(item => {
@@ -410,6 +459,8 @@ const handleClientChange = () => {
     form.organization_name = client.organization_name || '';
     form.client_email = client.email || '';
     form.client_mobile = client.mobile || '';
+    form.client_passport = client.passport_number || '';
+    form.client_agent = client.agent_name || '';
 };
 
 const handleServiceCategoryChange = () => {
@@ -432,12 +483,18 @@ const removeItem = (index) => {
 };
 
 const submit = () => {
-    if (descriptionWordCount.value > 350) {
+    if (form.description && descriptionWordCount.value > 350) {
         form.setError('description', 'Description must be within 350 words.');
         return;
     }
 
-    form.post(route('quotations.store'));
+    form.post(route('quotations.store'), {
+        onError: (errors) => {
+            if (Object.keys(errors).length > 0) {
+                showToast('Required fields are missing. Please fill them in and try again.');
+            }
+        },
+    });
 };
 
 watch(

@@ -53,7 +53,7 @@
             </div>
 
             <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
                         <div class="p-3 bg-blue-50 rounded-xl">
@@ -82,6 +82,32 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
+                        <div class="p-3 bg-emerald-50 rounded-xl">
+                            <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3-1.343 3-3S13.657 2 12 2s-3 1.343-3 3 1.343 3 3 3zm0 2c-2.761 0-5 2.239-5 5v3h10v-3c0-2.761-2.239-5-5-5z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Received</p>
+                            <p class="text-xl font-bold text-emerald-700">{{ formatMoney(agent.total_received) }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-rose-50 rounded-xl">
+                            <svg class="h-6 w-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3-1.343 3-3S13.657 2 12 2s-3 1.343-3 3 1.343 3 3 3zm0 2c-2.761 0-5 2.239-5 5v3h10v-3c0-2.761-2.239-5-5-5z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Refunded</p>
+                            <p class="text-xl font-bold text-rose-600">{{ formatMoney(agent.total_refunded) }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-3">
                         <div class="p-3 bg-purple-50 rounded-xl">
                             <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -95,6 +121,68 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Payment Summary -->
+            <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Payment Summary</h2>
+                        <p class="text-sm text-gray-600">Total received and refunded for this agent.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Total Received</p>
+                        <p class="mt-2 text-2xl font-bold text-emerald-700">{{ formatMoney(agent.total_received) }}</p>
+                    </div>
+                    <div class="rounded-xl border border-rose-100 bg-rose-50/40 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Total Refunded</p>
+                        <p class="mt-2 text-2xl font-bold text-rose-600">{{ formatMoney(agent.total_refunded) }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Refund History -->
+            <section v-if="refunds.length" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <div class="h-8 w-1 bg-gradient-to-b from-rose-600 to-rose-400 rounded-full"></div>
+                            Refund History
+                        </h2>
+                        <p class="text-sm text-gray-600">All refunds associated with this agent.</p>
+                    </div>
+                    <span class="text-xs font-semibold text-rose-700 bg-rose-100 px-3 py-1 rounded-full">
+                        {{ refunds.length }} {{ refunds.length === 1 ? 'refund' : 'refunds' }}
+                    </span>
+                </div>
+                <div class="overflow-hidden rounded-xl border border-gray-100">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-700">
+                            <thead class="bg-gray-50 text-xs uppercase text-gray-600">
+                                <tr>
+                                    <th class="px-4 py-3 font-semibold">Date</th>
+                                    <th class="px-4 py-3 font-semibold">Client</th>
+                                    <th class="px-4 py-3 font-semibold">Method</th>
+                                    <th class="px-4 py-3 font-semibold text-right">Amount</th>
+                                    <th class="px-4 py-3 font-semibold">Notes</th>
+                                    <th class="px-4 py-3 font-semibold">Created By</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr v-for="refund in refunds" :key="refund.id" class="transition hover:bg-gray-50">
+                                    <td class="px-4 py-3 whitespace-nowrap">{{ refund.payment_date || '—' }}</td>
+                                    <td class="px-4 py-3 font-semibold text-gray-900">{{ refund.client_name || '—' }}</td>
+                                    <td class="px-4 py-3">{{ refund.payment_method || '—' }}</td>
+                                    <td class="px-4 py-3 text-right font-semibold text-rose-600">{{ formatMoney(refund.amount) }}</td>
+                                    <td class="px-4 py-3 max-w-xs truncate">{{ refund.notes || '—' }}</td>
+                                    <td class="px-4 py-3 text-gray-500">{{ refund.created_by || '—' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
             <!-- Tabs -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -343,10 +431,20 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    refunds: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const agent = props.agent;
 const clients = props.clients || [];
+const refunds = props.refunds || [];
 
 const activeTab = ref('overview');
+
+const formatMoney = (value) => {
+    const amount = Number(value) || 0;
+    return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+};
 </script>
