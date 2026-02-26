@@ -55,16 +55,12 @@
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Client Info</h2>
                 <div class="grid gap-4 md:grid-cols-2">
                     <FormGroup label="Client Name" :error="form.errors.client_id">
-                        <select
+                        <SearchableSelect
                             v-model="form.client_id"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                            :options="clients"
+                            placeholder="Select client"
                             @change="handleClientChange"
-                        >
-                            <option value="" disabled>Select client</option>
-                            <option v-for="client in clients" :key="client.id" :value="client.id">
-                                {{ client.name }}
-                            </option>
-                        </select>
+                        />
                     </FormGroup>
                     <FormGroup label="Organization Name" :error="form.errors.organization_name">
                         <input
@@ -358,6 +354,7 @@
 import { computed, defineComponent, h, onMounted, ref, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import SubcategorySelector from '@/Components/SubcategorySelector.vue';
+import SearchableSelect from '@/Components/SearchableSelect.vue';
 
 const props = defineProps({
     quotation: Object,
@@ -367,12 +364,14 @@ const props = defineProps({
     defaultTerms: String,
 });
 
+const initialClient = props.clients.find(item => item.id === props.quotation.client_id) || {};
+
 const form = useForm({
     client_id: props.quotation.client_id,
     organization_name: props.quotation.organization_name || '',
-    client_passport: '',
+    client_passport: initialClient.passport_number || '',
     client_mobile: props.quotation.client_mobile || '',
-    client_agent: '',
+    client_agent: initialClient.agent_name || '',
     client_email: props.quotation.client_email || '',
     service_category: props.quotation.service_category,
     service_type: props.quotation.service_type,

@@ -35,7 +35,7 @@ class IncomeController extends Controller
         // Get income entries for this category and period
         $entries = IncomeEntry::where('accounting_period_id', $period->id)
             ->where('category', $category)
-            ->with('client:id,name,mobile')
+            ->with('client:id,name,passport_number')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -56,7 +56,7 @@ class IncomeController extends Controller
         $periods = AccountingPeriod::latest()->get();
 
         // Get all clients for selection dropdown
-        $clients = Client::select('id', 'name', 'mobile')
+        $clients = Client::select('id', 'name', 'passport_number')
             ->orderBy('name')
             ->get();
 
@@ -95,7 +95,7 @@ class IncomeController extends Controller
                 'client' => $e->client ? [
                     'id' => $e->client->id,
                     'name' => $e->client->name,
-                    'phone_number' => $e->client->mobile,
+                    'phone_number' => $e->client->passport_number,
                 ] : null,
                 'subcategory' => $e->subcategory,
                 'description' => $e->description,
@@ -112,7 +112,7 @@ class IncomeController extends Controller
             'clients' => $clients->map(fn($c) => [
                 'id' => $c->id,
                 'name' => $c->name,
-                'phone_number' => $c->mobile,
+                'phone_number' => $c->passport_number,
             ]),
             'subcategories' => $subcategories->map(fn($s) => [
                 'id' => $s->id,
@@ -176,7 +176,7 @@ class IncomeController extends Controller
 
         $entries = IncomeEntry::where('accounting_period_id', $period->id)
             ->where('category', $category)
-            ->with('client:id,name,mobile')
+            ->with('client:id,name,passport_number')
             ->orderBy('created_at', 'desc')
             ->get();
 

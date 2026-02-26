@@ -123,9 +123,19 @@ class QuotationController extends Controller
 
     public function create()
     {
-        $clients = Client::select('id', 'name', 'organization_name', 'email', 'mobile')
+        $clients = Client::with('agent:id,name')
+            ->select('id', 'name', 'organization_name', 'email', 'mobile', 'passport_number', 'agent_id')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(fn($client) => [
+                'id' => $client->id,
+                'name' => $client->name,
+                'organization_name' => $client->organization_name,
+                'email' => $client->email,
+                'mobile' => $client->mobile,
+                'passport_number' => $client->passport_number,
+                'agent_name' => $client->agent?->name,
+            ]);
 
         $officeStaff = OfficeStaff::select('id', 'name')
             ->orderBy('name')
@@ -271,9 +281,19 @@ class QuotationController extends Controller
     {
         $quotation->load(['client', 'quotationMaker', 'items']);
 
-        $clients = Client::select('id', 'name', 'organization_name', 'email', 'mobile')
+        $clients = Client::with('agent:id,name')
+            ->select('id', 'name', 'organization_name', 'email', 'mobile', 'passport_number', 'agent_id')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(fn($client) => [
+                'id' => $client->id,
+                'name' => $client->name,
+                'organization_name' => $client->organization_name,
+                'email' => $client->email,
+                'mobile' => $client->mobile,
+                'passport_number' => $client->passport_number,
+                'agent_name' => $client->agent?->name,
+            ]);
 
         $officeStaff = OfficeStaff::select('id', 'name')
             ->orderBy('name')

@@ -34,7 +34,7 @@ class OperatingExpensesController extends Controller
         // Get operating expenses for this category and period
         $entries = OperatingExpense::where('accounting_period_id', $period->id)
             ->where('category', $category)
-            ->with('client:id,name,mobile', 'staff:id,name')
+            ->with('client:id,name,passport_number', 'staff:id,name')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -57,7 +57,7 @@ class OperatingExpensesController extends Controller
         $periods = AccountingPeriod::latest()->get();
 
         // Get all clients for selection dropdown
-        $clients = Client::select('id', 'name', 'mobile')
+        $clients = Client::select('id', 'name', 'passport_number')
             ->orderBy('name')
             ->get();
 
@@ -101,7 +101,7 @@ class OperatingExpensesController extends Controller
                 'client' => $e->client ? [
                     'id' => $e->client->id,
                     'name' => $e->client->name,
-                    'phone_number' => $e->client->mobile,
+                    'phone_number' => $e->client->passport_number,
                 ] : null,
                 'staff' => $e->staff ? [
                     'id' => $e->staff->id,
@@ -129,7 +129,7 @@ class OperatingExpensesController extends Controller
             'clients' => $clients->map(fn($c) => [
                 'id' => $c->id,
                 'name' => $c->name,
-                'phone_number' => $c->mobile,
+                'phone_number' => $c->passport_number,
             ]),
             'officeStaff' => $officeStaff->map(fn($s) => [
                 'id' => $s->id,
@@ -291,7 +291,7 @@ class OperatingExpensesController extends Controller
 
         $entries = OperatingExpense::where('accounting_period_id', $period->id)
             ->where('category', $category)
-            ->with('client:id,name,mobile', 'staff:id,name')
+            ->with('client:id,name,passport_number', 'staff:id,name')
             ->orderBy('created_at', 'desc')
             ->get();
 

@@ -35,7 +35,7 @@ class NonOperatingController extends Controller
         $periods = AccountingPeriod::latest()->get();
 
         // Get all clients for selection dropdown
-        $clients = Client::select('id', 'name', 'mobile')
+        $clients = Client::select('id', 'name', 'passport_number')
             ->orderBy('name')
             ->get();
 
@@ -86,7 +86,7 @@ class NonOperatingController extends Controller
                 'client' => $e->client ? [
                     'id' => $e->client->id,
                     'name' => $e->client->name,
-                    'phone_number' => $e->client->mobile,
+                    'phone_number' => $e->client->passport_number,
                 ] : null,
                 'category' => $e->category,
                 'description' => $e->description,
@@ -102,7 +102,7 @@ class NonOperatingController extends Controller
                 'client' => $e->client ? [
                     'id' => $e->client->id,
                     'name' => $e->client->name,
-                    'phone_number' => $e->client->mobile,
+                    'phone_number' => $e->client->passport_number,
                 ] : null,
                 'category' => $e->category,
                 'description' => $e->description,
@@ -121,7 +121,7 @@ class NonOperatingController extends Controller
             'clients' => $clients->map(fn($c) => [
                 'id' => $c->id,
                 'name' => $c->name,
-                'phone_number' => $c->mobile,
+                'phone_number' => $c->passport_number,
             ]),
             'subcategories' => $subcategories->map(fn($s) => [
                 'id' => $s->id,

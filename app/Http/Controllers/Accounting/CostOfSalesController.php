@@ -35,7 +35,7 @@ class CostOfSalesController extends Controller
         // Get cost of sales entries for this category and period
         $entries = CostOfSale::where('accounting_period_id', $period->id)
             ->where('category', $category)
-            ->with('client:id,name,mobile')
+            ->with('client:id,name,passport_number')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -50,7 +50,7 @@ class CostOfSalesController extends Controller
         $periods = AccountingPeriod::latest()->get();
 
         // Get all clients for selection dropdown
-        $clients = Client::select('id', 'name', 'mobile')
+        $clients = Client::select('id', 'name', 'passport_number')
             ->orderBy('name')
             ->get();
 
@@ -88,7 +88,7 @@ class CostOfSalesController extends Controller
                 'client' => $e->client ? [
                     'id' => $e->client->id,
                     'name' => $e->client->name,
-                    'phone_number' => $e->client->mobile,
+                    'phone_number' => $e->client->passport_number,
                 ] : null,
                 'subcategory' => $e->subcategory,
                 'description' => $e->description,
@@ -101,7 +101,7 @@ class CostOfSalesController extends Controller
             'clients' => $clients->map(fn($c) => [
                 'id' => $c->id,
                 'name' => $c->name,
-                'phone_number' => $c->mobile,
+                'phone_number' => $c->passport_number,
             ]),
             'subcategories' => $subcategories->map(fn($s) => [
                 'id' => $s->id,
@@ -159,7 +159,7 @@ class CostOfSalesController extends Controller
 
         $entries = CostOfSale::where('accounting_period_id', $period->id)
             ->where('category', $category)
-            ->with('client:id,name,mobile')
+            ->with('client:id,name,passport_number')
             ->orderBy('created_at', 'desc')
             ->get();
 

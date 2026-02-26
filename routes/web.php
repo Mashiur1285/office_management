@@ -57,6 +57,10 @@ Route::middleware('auth')->group(function () {
         Route::post('clients/{client}/refund', [ClientController::class, 'refund'])->name('clients.refund');
     });
 
+    Route::middleware('permission:client.delete')->group(function () {
+        Route::delete('clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+    });
+
     Route::middleware('permission:client.view')->group(function () {
         Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
         Route::get('clients/export/{type?}', [ClientController::class, 'export'])->name('clients.export');

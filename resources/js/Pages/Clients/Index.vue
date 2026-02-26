@@ -349,19 +349,13 @@
                                 Client Info
                             </th>
                             <th scope="col" class="px-6 py-4 font-semibold">
-                                Passport
-                            </th>
-                            <th scope="col" class="px-6 py-4 font-semibold">
-                                Job Sector
-                            </th>
-                            <th scope="col" class="px-6 py-4 font-semibold">
                                 Agent
                             </th>
                             <th scope="col" class="px-6 py-4 font-semibold">
                                 Status
                             </th>
                             <th scope="col" class="px-6 py-4 font-semibold">
-                                Companies
+                                Passport
                             </th>
                             <th scope="col" class="px-6 py-4 font-semibold">
                                 Due Amount
@@ -379,7 +373,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <tr
-                            v-for="client in filteredClients"
+                            v-for="client in paginatedClients"
                             :key="client.id"
                             class="transition hover:bg-blue-50/50 group"
                         >
@@ -415,18 +409,6 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="space-y-1">
-                                    <p class="font-semibold text-gray-900">
-                                        {{ client.passport_number }}
-                                    </p>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <p class="font-medium text-gray-900">
-                                    {{ client.job_sector || "—" }}
-                                </p>
-                            </td>
-                            <td class="px-6 py-4">
                                 <p class="font-medium text-gray-900">
                                     {{ client.agent_name || "—" }}
                                 </p>
@@ -443,20 +425,9 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="space-y-1 text-sm">
-                                    <p class="font-medium text-gray-900">
-                                        <span class="text-xs text-gray-500"
-                                            >BD:</span
-                                        >
-                                        {{ client.bd_company || "—" }}
-                                    </p>
-                                    <p class="font-medium text-gray-700">
-                                        <span class="text-xs text-gray-500"
-                                            >Foreign:</span
-                                        >
-                                        {{ client.foreign_company || "—" }}
-                                    </p>
-                                </div>
+                                <p class="font-medium text-gray-900">
+                                    {{ client.passport_number || "—" }}
+                                </p>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-1">
@@ -553,6 +524,12 @@
                                             )
                                         "
                                     />
+                                    <IconButton
+                                        icon="fa-solid fa-trash"
+                                        class="bg-red-100 text-red-600 hover:bg-red-200"
+                                        tooltip="Delete client"
+                                        @click="confirmDelete(client)"
+                                    />
                                 </div>
                             </td>
                         </tr>
@@ -564,7 +541,7 @@
                                 clients.length === 0
                             "
                         >
-                            <td colspan="8" class="px-4 py-16">
+                            <td colspan="7" class="px-4 py-16">
                                 <div
                                     class="flex flex-col items-center justify-center text-center"
                                 >
@@ -625,7 +602,7 @@
                                 clients.length > 0
                             "
                         >
-                            <td colspan="8" class="px-4 py-12">
+                            <td colspan="7" class="px-4 py-12">
                                 <div
                                     class="flex flex-col items-center justify-center text-center"
                                 >
@@ -667,12 +644,159 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Bar -->
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-gray-100 px-6 py-4">
+                <!-- Per page + info -->
+                <div class="flex items-center gap-3 text-sm text-gray-600">
+                    <span>Rows per page:</span>
+                    <div class="flex items-center gap-1">
+                        <button
+                            v-for="n in [25, 50, 75, 100]"
+                            :key="n"
+                            @click="perPage = n"
+                            :class="[
+                                'px-2.5 py-1 rounded-lg text-xs font-semibold transition',
+                                perPage === n
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                            ]"
+                        >
+                            {{ n }}
+                        </button>
+                    </div>
+                    <span class="text-gray-400">|</span>
+                    <span>
+                        {{ (currentPage - 1) * perPage + 1 }}–{{ Math.min(currentPage * perPage, filteredClients.length) }}
+                        of {{ filteredClients.length }}
+                    </span>
+                </div>
+
+                <!-- Page navigation -->
+                <div class="flex items-center gap-1">
+                    <button
+                        @click="currentPage = 1"
+                        :disabled="currentPage === 1"
+                        class="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                        title="First page"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7M18 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button
+                        @click="currentPage--"
+                        :disabled="currentPage === 1"
+                        class="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                        title="Previous page"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <span class="px-3 py-1 text-sm font-semibold text-gray-700">
+                        {{ currentPage }} / {{ totalPages }}
+                    </span>
+
+                    <button
+                        @click="currentPage++"
+                        :disabled="currentPage === totalPages"
+                        class="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                        title="Next page"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <button
+                        @click="currentPage = totalPages"
+                        :disabled="currentPage === totalPages"
+                        class="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                        title="Last page"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M6 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <Teleport to="body">
+        <div
+            v-if="deleteModal.show"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+            <!-- Backdrop -->
+            <div
+                class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                @click="deleteModal.show = false"
+            ></div>
+
+            <!-- Modal -->
+            <div
+                class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl"
+            >
+                <div class="p-6">
+                    <!-- Icon -->
+                    <div class="flex justify-center mb-4">
+                        <div class="rounded-full bg-red-100 p-4">
+                            <svg
+                                class="h-8 w-8 text-red-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Text -->
+                    <h3 class="text-center text-lg font-bold text-gray-900 mb-2">
+                        Are you sure?
+                    </h3>
+                    <p class="text-center text-sm text-gray-500 mb-1">
+                        You are about to delete
+                    </p>
+                    <p class="text-center text-base font-semibold text-gray-800 mb-4">
+                        "{{ deleteModal.clientName }}"
+                    </p>
+                    <p class="text-center text-xs text-red-500 mb-6">
+                        This action cannot be undone.
+                    </p>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3">
+                        <button
+                            @click="deleteModal.show = false"
+                            class="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            @click="doDelete"
+                            class="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition"
+                        >
+                            Yes, Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Teleport>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { Head, Link, router, usePage } from "@inertiajs/vue3";
 import IconButton from "@/Components/Buttons/IconButton.vue";
 
@@ -692,6 +816,12 @@ const flash = computed(() => usePage().props.flash || {});
 // Search and filter state
 const searchQuery = ref("");
 const selectedStage = ref("all");
+const perPage = ref(25);
+const currentPage = ref(1);
+
+watch([searchQuery, selectedStage, perPage], () => {
+    currentPage.value = 1;
+});
 
 const statusFilters = [
     { value: "pending", label: "Pending" },
@@ -728,6 +858,13 @@ const filteredClients = computed(() => {
     }
 
     return result;
+});
+
+const totalPages = computed(() => Math.ceil(filteredClients.value.length / perPage.value) || 1);
+
+const paginatedClients = computed(() => {
+    const start = (currentPage.value - 1) * perPage.value;
+    return filteredClients.value.slice(start, start + perPage.value);
 });
 
 // Statistics
@@ -767,6 +904,19 @@ const money = (value) => {
 const clearFilters = () => {
     searchQuery.value = "";
     selectedStage.value = "all";
+};
+
+const deleteModal = ref({ show: false, clientId: null, clientName: "" });
+
+const confirmDelete = (client) => {
+    deleteModal.value = { show: true, clientId: client.id, clientName: client.name };
+};
+
+const doDelete = () => {
+    router.delete(`/clients/${deleteModal.value.clientId}`, {
+        preserveScroll: true,
+        onFinish: () => { deleteModal.value.show = false; },
+    });
 };
 
 if (

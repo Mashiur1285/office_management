@@ -659,6 +659,14 @@ class ClientController extends Controller
             ->with('success', 'Refund of ৳' . number_format($validated['amount'], 2) . ' processed successfully.');
     }
 
+    public function destroy(Client $client)
+    {
+        $client->delete();
+
+        return redirect()->route('clients.index')
+            ->with('success', 'Client deleted successfully.');
+    }
+
     private function formData(): array
     {
         $jobSectors = JobSector::whereNull('parent_id')

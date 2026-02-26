@@ -9,9 +9,7 @@
         >
             <!-- Main Content Area -->
             <div class="flex-1 p-3 md:p-4 lg:p-5 print:p-0">
-                <div class="max-w-7xl mx-auto">
-                    <slot />
-                </div>
+                <slot />
             </div>
 
             <!-- Footer -->
