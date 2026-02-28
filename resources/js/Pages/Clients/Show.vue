@@ -1,10 +1,10 @@
 <template>
     <Head title="Client Details" />
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-8">
+    <div class="min-h-screen bg-gray-50 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header Section -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-8 text-white">
+                <div class="bg-[#1e5b43] px-6 py-8 text-white">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0">
@@ -45,7 +45,7 @@
                                 </svg>
                                 Back
                             </Link>
-                            <Link :href="`/clients/${client.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-blue-600 hover:bg-blue-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
+                            <Link :href="`/clients/${client.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1e5b43] hover:bg-emerald-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
@@ -154,12 +154,12 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <div class="h-8 w-1 bg-gradient-to-b from-blue-600 to-blue-400 rounded-full"></div>
+                            <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
                             Payment & Refund History
                         </h2>
                         <p class="text-sm text-gray-600">All payment and refund records for this client.</p>
                     </div>
-                    <span class="text-xs font-semibold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
                         {{ paymentHistory.length }} {{ paymentHistory.length === 1 ? 'record' : 'records' }}
                     </span>
                 </div>
@@ -215,7 +215,7 @@
                             :class="[
                                 'flex-1 py-4 px-6 text-center font-semibold text-sm transition-all',
                                 activeTab === 'overview'
-                                    ? 'border-b-2 border-blue-600 text-blue-600'
+                                    ? 'border-b-2 border-[#1e5b43] text-[#1e5b43]'
                                     : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             ]"
                         >
@@ -226,7 +226,7 @@
                             :class="[
                                 'flex-1 py-4 px-6 text-center font-semibold text-sm transition-all',
                                 activeTab === 'documents'
-                                    ? 'border-b-2 border-blue-600 text-blue-600'
+                                    ? 'border-b-2 border-[#1e5b43] text-[#1e5b43]'
                                     : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             ]"
                         >
@@ -243,7 +243,7 @@
                             <!-- Client Info Card -->
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                                 <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <div class="h-8 w-1 bg-gradient-to-b from-blue-600 to-blue-400 rounded-full"></div>
+                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
                                     Client Information
                                 </h2>
                                 <div class="space-y-3">
@@ -280,7 +280,7 @@
                             <!-- Status Badges -->
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                                 <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <div class="h-8 w-1 bg-gradient-to-b from-blue-600 to-blue-400 rounded-full"></div>
+                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
                                     Processing Status
                                 </h2>
                                 <div class="space-y-3">
@@ -361,7 +361,7 @@
                                             v-model="vatForm.vat_chalan_number"
                                             type="text"
                                             required
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-[#1e5b43]"
                                             placeholder="Enter chalan number"
                                         />
                                     </div>
@@ -377,7 +377,7 @@
                                     </div>
                                     <button
                                         type="submit"
-                                        class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                                        class="w-full px-4 py-2 bg-[#1e5b43] text-white rounded-lg hover:bg-[#154130] transition-colors font-semibold"
                                     >
                                         Mark as Paid
                                     </button>
@@ -408,9 +408,9 @@
                             </div>
 
                             <!-- Tracking Flow -->
-                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-4">
+                            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-100 p-4">
                                 <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 12h6"/>
                                     </svg>
                                     Document Flow
@@ -420,7 +420,7 @@
                                     <!-- Progress Line -->
                                     <div class="absolute top-5 left-0 right-0 h-1 bg-gray-300 rounded-full" style="z-index: 0;">
                                         <div
-                                            class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                                            class="h-full bg-gradient-to-r from-[#1e5b43] to-[#2d8262] rounded-full transition-all duration-500"
                                             :style="{ width: progressPercentage + '%' }"
                                         ></div>
                                     </div>
@@ -435,7 +435,7 @@
                                             <!-- Stage Circle -->
                                             <div
                                                 class="w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 shadow-md relative"
-                                                :class="index < currentStageIndex ? 'bg-green-500' : index === currentStageIndex ? 'bg-blue-600 ring-2 ring-blue-300' : 'bg-gray-300'"
+                                                :class="index < currentStageIndex ? 'bg-[#154130]' : index === currentStageIndex ? 'bg-[#1e5b43] ring-4 ring-emerald-100' : 'bg-gray-300'"
                                             >
                                                 <svg v-if="index < currentStageIndex" class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
@@ -488,22 +488,22 @@
                     <div v-show="activeTab === 'documents'">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             <!-- Client Photo -->
-                            <div v-if="client.photo_path" class="group relative bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-100 hover:border-blue-300 transition-all hover:shadow-lg">
+                            <div v-if="client.photo_path" class="group relative bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border-2 border-emerald-100 hover:border-emerald-300 transition-all hover:shadow-lg">
                                 <div class="flex items-center gap-3 mb-3">
-                                    <div class="p-2 bg-blue-100 rounded-lg">
-                                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="p-2 bg-emerald-100 rounded-lg">
+                                        <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-xs font-bold text-blue-700 uppercase">Photo</p>
+                                        <p class="text-xs font-bold text-emerald-700 uppercase">Photo</p>
                                         <p class="text-xs text-gray-600">Profile Image</p>
                                     </div>
                                 </div>
                                 <div class="aspect-video rounded-lg overflow-hidden mb-3">
                                     <img :src="`/storage/${client.photo_path}`" :alt="client.name" class="w-full h-full object-cover" />
                                 </div>
-                                <a :href="`/storage/${client.photo_path}`" target="_blank" class="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-700">
+                                <a :href="`/storage/${client.photo_path}`" target="_blank" class="inline-flex items-center gap-2 text-xs font-semibold text-[#1e5b43] hover:text-[#154130]">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>

@@ -1,10 +1,10 @@
 <template>
     <Head title="Foreign Company Details" />
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50/30 py-8">
+    <div class="min-h-screen bg-gray-50 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header Section -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="bg-gradient-to-r from-indigo-600 to-blue-700 px-6 py-8 text-white">
+                <div class="bg-[#1e5b43] px-6 py-8 text-white">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0">
@@ -40,7 +40,7 @@
                                 </svg>
                                 Back
                             </Link>
-                            <Link :href="`/foreign-companies/${company.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-indigo-600 hover:bg-indigo-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
+                            <Link :href="`/foreign-companies/${company.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1e5b43] hover:bg-emerald-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
@@ -99,7 +99,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <div class="h-8 w-1 bg-gradient-to-b from-indigo-600 to-indigo-400 rounded-full"></div>
+                            <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
                             Linked Clients
                         </h2>
                         <p class="text-sm text-gray-600 ml-3">Click a client to view their details</p>
@@ -142,7 +142,7 @@
                             </div>
                             <Link
                                 :href="`/clients/${client.id}`"
-                                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold shadow-md hover:bg-indigo-700 transition-all group-hover:scale-105"
+                                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-[#1e5b43] text-white rounded-lg text-xs font-semibold shadow-md hover:bg-[#154130] transition-all group-hover:scale-105"
                             >
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

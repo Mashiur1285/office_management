@@ -1,13 +1,13 @@
 <template>
     <Head title="Accounting Dashboard" />
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-8">
+    <div class="min-h-screen bg-[#f5f6f8] py-8 text-gray-800 font-sans">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header -->
-            <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl p-6">
-                <div class="flex items-center justify-between">
+            <div class="overflow-hidden rounded-[24px] bg-[#1e5b43] text-white shadow-[0_2px_12px_rgba(30,91,67,0.15)] p-6 md:p-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-white">Accounting Dashboard</h1>
-                        <p class="text-sm text-blue-100 mt-1">Profit & Loss Overview - {{ period.name }}</p>
+                        <h1 class="text-[32px] font-bold tracking-tight leading-none mb-2">Accounting Dashboard</h1>
+                        <p class="text-emerald-100/90 text-sm">Profit & Loss Overview - {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-900">
@@ -25,7 +25,7 @@
             <!-- Charts Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Income Breakdown Pie Chart -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Income Breakdown</h3>
                     <div class="h-64 flex items-center justify-center">
                         <Pie :data="incomeChartData" :options="pieChartOptions" />
@@ -33,7 +33,7 @@
                 </div>
 
                 <!-- Expense Breakdown Pie Chart -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Operating Expense Breakdown</h3>
                     <div class="h-64 flex items-center justify-center">
                         <Pie :data="expenseChartData" :options="pieChartOptions" />
@@ -41,7 +41,7 @@
                 </div>
 
                 <!-- P&L Flow Chart -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">P&L Flow</h3>
                     <div class="h-64">
                         <Doughnut :data="plOverviewChartData" :options="doughnutChartOptions" />
@@ -52,8 +52,9 @@
 
             <!-- Key Metrics Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200">
-                    <p class="text-sm text-green-700 font-medium mb-1">Total Revenue</p>
+                <div class="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 relative overflow-hidden group hover:border-[#1e5b43]/30 transition-colors">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 relative z-10">Total Revenue</p>
                     <p class="text-2xl font-bold text-green-900">{{ money(period.total_income) }}</p>
                     <div class="mt-2 flex items-center text-xs text-green-700">
                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -63,33 +64,36 @@
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200">
-                    <p class="text-sm text-blue-700 font-medium mb-1">Gross Profit</p>
-                    <p class="text-2xl font-bold text-blue-900">{{ money(period.gross_profit) }}</p>
-                    <div class="mt-2 text-xs text-blue-700">
+                <div class="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 relative overflow-hidden group hover:border-blue-200 transition-colors">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 relative z-10">Gross Profit</p>
+                    <p class="text-2xl font-bold text-gray-900 relative z-10">{{ money(period.gross_profit) }}</p>
+                    <div class="mt-2 text-xs font-medium text-blue-600 relative z-10">
                         {{ profitMargin(period.gross_profit, period.total_income) }}% margin
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-5 border border-indigo-200">
-                    <p class="text-sm text-indigo-700 font-medium mb-1">Operating Profit</p>
-                    <p class="text-2xl font-bold text-indigo-900">{{ money(period.operating_profit) }}</p>
-                    <div class="mt-2 text-xs text-indigo-700">
+                <div class="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 relative overflow-hidden group hover:border-indigo-200 transition-colors">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 relative z-10">Operating Profit</p>
+                    <p class="text-2xl font-bold text-gray-900 relative z-10">{{ money(period.operating_profit) }}</p>
+                    <div class="mt-2 text-xs font-medium text-indigo-600 relative z-10">
                         {{ profitMargin(period.operating_profit, period.total_income) }}% margin
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
-                    <p class="text-sm text-purple-700 font-medium mb-1">Net Profit</p>
-                    <p class="text-2xl font-bold text-purple-900">{{ money(period.net_profit_after_tax) }}</p>
-                    <div class="mt-2 text-xs text-purple-700">
+                <div class="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 relative overflow-hidden group hover:border-purple-200 transition-colors">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-purple-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 relative z-10">Net Profit</p>
+                    <p class="text-2xl font-bold text-gray-900 relative z-10">{{ money(period.net_profit_after_tax) }}</p>
+                    <div class="mt-2 text-xs font-medium text-purple-600 relative z-10">
                         {{ profitMargin(period.net_profit_after_tax, period.total_income) }}% margin
                     </div>
                 </div>
             </div>
 
             <!-- P&L Statement Summary -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">Financial Statement Summary</h2>
 
                 <div class="space-y-4">
@@ -144,16 +148,16 @@
                     </div>
 
                     <!-- Net Profit After Tax -->
-                    <div class="flex justify-between items-center py-4 bg-gradient-to-r from-purple-100 to-indigo-100 px-4 -mx-3 rounded-lg border-2 border-purple-300">
-                        <span class="text-xl font-bold text-gray-900">NET PROFIT AFTER TAX</span>
-                        <span class="text-3xl font-bold text-purple-700">{{ money(period.net_profit_after_tax) }}</span>
+                    <div class="flex justify-between items-center py-4 bg-[#1e5b43] text-white px-5 -mx-5 rounded-[16px] shadow-sm">
+                        <span class="text-lg font-bold">NET PROFIT AFTER TAX</span>
+                        <span class="text-3xl font-bold">{{ money(period.net_profit_after_tax) }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Links -->
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <Link href="/accounting/income/travel-tourism" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all hover:scale-105">
+                <Link href="/accounting/income/travel-tourism" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-4 hover:shadow-md transition-all hover:-translate-y-1">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-green-700" fill="currentColor" viewBox="0 0 20 20">
@@ -168,7 +172,7 @@
                     </div>
                 </Link>
 
-                <Link href="/accounting/operating-expenses" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all hover:scale-105">
+                <Link href="/accounting/operating-expenses" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-4 hover:shadow-md transition-all hover:-translate-y-1">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-orange-700" fill="currentColor" viewBox="0 0 20 20">
@@ -183,7 +187,7 @@
                     </div>
                 </Link>
 
-                <Link href="/accounting/tax" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all hover:scale-105">
+                <Link href="/accounting/tax" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-4 hover:shadow-md transition-all hover:-translate-y-1">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-yellow-700" fill="currentColor" viewBox="0 0 20 20">
@@ -197,7 +201,7 @@
                     </div>
                 </Link>
 
-                <Link href="/accounting/vat-summary" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all hover:scale-105">
+                <Link href="/accounting/vat-summary" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-4 hover:shadow-md transition-all hover:-translate-y-1">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-red-700" fill="currentColor" viewBox="0 0 20 20">
@@ -212,7 +216,7 @@
                     </div>
                 </Link>
 
-                <Link href="/accounting/net-profit-after-tax" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all hover:scale-105">
+                <Link href="/accounting/net-profit-after-tax" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-4 hover:shadow-md transition-all hover:-translate-y-1">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-purple-700" fill="currentColor" viewBox="0 0 20 20">

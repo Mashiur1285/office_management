@@ -14,13 +14,13 @@
             <div class="flex items-center gap-3">
                 <Link
                     :href="route('quotations.index')"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
                 >
                     Back
                 </Link>
                 <a
                     :href="route('quotations.download', quotation.id)"
-                    class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                    class="inline-flex items-center gap-2 rounded-full bg-[#1e5b43] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#154130] transition-colors shadow-sm"
                 >
                     <font-awesome-icon icon="file-pdf" />
                     Download PDF
@@ -43,14 +43,14 @@
             </InfoCard>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-gray-900 mb-3">Description</h2>
             <p class="whitespace-pre-line text-sm text-gray-700">
                 {{ quotation.description }}
             </p>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-gray-900 mb-3">Items</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Summary</h2>
             <div class="grid gap-4 md:grid-cols-3">
                 <InfoRow label="Subtotal" :value="money(quotation.subtotal)" />
@@ -92,7 +92,7 @@
             </div>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-gray-900 mb-3">Terms & Conditions</h2>
             <p class="whitespace-pre-line text-sm text-gray-700">
                 {{ quotation.terms_text }}
@@ -134,7 +134,7 @@ const formatQuantity = (value) => {
 const InfoCard = {
     props: ['title'],
     template: `
-        <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-gray-900 mb-3">{{ title }}</h2>
             <slot />
         </div>

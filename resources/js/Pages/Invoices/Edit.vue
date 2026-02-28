@@ -15,7 +15,7 @@
             </div>
             <Link
                 :href="route('invoices.index')"
-                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
             >
                 Back to list
             </Link>
@@ -26,13 +26,13 @@
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Invoice Info</h2>
                 <div class="grid gap-4 md:grid-cols-2">
                     <FormGroup label="Invoice Number">
-                    <input
-                        :value="props.invoice.invoice_no"
-                        readonly
-                        class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 font-semibold"
-                    />
-                </FormGroup>
-                <FormGroup label="Invoice Date">
+                        <input
+                            :value="props.invoice.invoice_no"
+                            readonly
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700 font-semibold"
+                        />
+                    </FormGroup>
+                    <FormGroup label="Invoice Date">
                     <input
                         :value="props.invoice.invoice_date"
                         readonly
@@ -42,7 +42,7 @@
                     <FormGroup label="Payment Method" :error="form.errors.payment_method">
                         <select
                             v-model="form.payment_method"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                         >
                             <option value="" disabled>Select method</option>
                             <option value="Cash">Cash</option>
@@ -67,7 +67,7 @@
                     <FormGroup label="Organization Name" :error="form.errors.organization_name">
                         <input
                             v-model="form.organization_name"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                             placeholder="Organization name"
                         />
                     </FormGroup>
@@ -75,28 +75,28 @@
                         <input
                             v-model="form.client_passport"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
                         />
                     </FormGroup>
                     <FormGroup label="Mobile Number">
                         <input
                             v-model="form.client_mobile"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
                         />
                     </FormGroup>
                     <FormGroup label="Agent Name">
                         <input
                             v-model="form.client_agent"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
                         />
                     </FormGroup>
                     <FormGroup label="Client Email" :error="form.errors.client_email">
                         <input
                             v-model="form.client_email"
                             type="email"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                             placeholder="Client email"
                         />
                     </FormGroup>
@@ -109,7 +109,7 @@
                     <FormGroup label="Select Service" :error="form.errors.service_category">
                         <select
                             v-model="form.service_category"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                             @change="handleServiceCategoryChange"
                         >
                             <option value="travel_tourism">Travel and Tourism</option>
@@ -133,7 +133,7 @@
                         <textarea
                             v-model="form.description"
                             rows="5"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                             placeholder="Service details or notes"
                         ></textarea>
                     </FormGroup>
@@ -174,7 +174,7 @@
                                 <td class="px-3 py-2">
                                     <input
                                         v-model="item.service_description"
-                                        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                                         placeholder="Service description"
                                     />
                                     <p v-if="form.errors[`items.${index}.service_description`]" class="mt-1 text-xs text-red-600">
@@ -188,7 +188,7 @@
                                         min="1"
                                         step="1"
                                         inputmode="numeric"
-                                        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                                         placeholder="1"
                                     />
                                     <p v-if="form.errors[`items.${index}.quantity`]" class="mt-1 text-xs text-red-600">
@@ -202,7 +202,7 @@
                                         min="0"
                                         step="1"
                                         inputmode="numeric"
-                                        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                                         placeholder="0.00"
                                     />
                                     <p v-if="form.errors[`items.${index}.unit_price`]" class="mt-1 text-xs text-red-600">
@@ -213,7 +213,7 @@
                                     <div class="flex items-center gap-2">
                                         <select
                                             v-model="item.discount_type"
-                                            class="w-24 rounded-lg border border-gray-200 px-2 py-2 text-sm"
+                                            class="w-24 rounded-xl border border-gray-200 px-2 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                                         >
                                             <option value="percent">%</option>
                                             <option value="amount">৳</option>
@@ -223,7 +223,7 @@
                                             type="number"
                                             min="0"
                                             step="0.01"
-                                            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                            class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                                             placeholder="0"
                                         />
                                     </div>
@@ -237,7 +237,7 @@
                                         type="number"
                                         min="0"
                                         step="0.01"
-                                        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                                         placeholder="0"
                                     />
                                 </td>
@@ -270,28 +270,28 @@
                         <input
                             :value="money(subtotal)"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
                         />
                     </FormGroup>
                     <FormGroup label="Discount Total">
                         <input
                             :value="money(discountTotal)"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
                         />
                     </FormGroup>
                     <FormGroup label="VAT Amount">
                         <input
                             :value="money(vatAmount)"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
                         />
                     </FormGroup>
                     <FormGroup label="Total Amount">
                         <input
                             :value="money(totalAmount)"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-900 font-semibold"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 font-semibold"
                         />
                     </FormGroup>
                     <FormGroup
@@ -304,7 +304,7 @@
                             type="number"
                             min="0"
                             step="0.01"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                             placeholder="0.00"
                         />
                     </FormGroup>
@@ -312,21 +312,21 @@
                         <input
                             :value="money(dueAmount)"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
                         />
                     </FormGroup>
                     <FormGroup label="Payment Date" :error="form.errors.payment_date">
                         <input
                             v-model="form.payment_date"
                             type="date"
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                         />
                     </FormGroup>
                     <FormGroup label="Status">
                         <input
                             :value="paymentStatusLabel"
                             readonly
-                            class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
                         />
                     </FormGroup>
                 </div>
@@ -347,7 +347,7 @@
                 <textarea
                     v-model="form.terms_text"
                     rows="6"
-                    class="mt-4 w-full rounded-lg border border-gray-200 px-4 py-2 text-sm"
+                    class="mt-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
                     :readonly="form.terms_type === 'default'"
                 ></textarea>
                 <p v-if="form.errors.terms_text" class="mt-2 text-sm text-red-600">
@@ -358,7 +358,7 @@
             <div class="flex items-center justify-end gap-3">
                 <button
                     type="submit"
-                    class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                    class="inline-flex items-center gap-2 rounded-full bg-[#1e5b43] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#154130] transition-colors shadow-sm"
                     :disabled="form.processing"
                 >
                     <span v-if="!form.processing">Update & Regenerate PDF</span>

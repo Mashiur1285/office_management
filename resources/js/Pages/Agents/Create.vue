@@ -3,7 +3,7 @@
     <div class="py-8 space-y-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">Agents</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1e5b43]">Agents</p>
                 <h1 class="text-2xl font-bold text-gray-900">
                     {{ isEdit ? "Edit agent" : "Add an agent" }}
                 </h1>
@@ -20,7 +20,7 @@
                 </Link>
                 <button
                     type="button"
-                    class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
+                    class="inline-flex items-center justify-center rounded-lg bg-[#1e5b43] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
                     :disabled="form.processing"
                     @click="submit"
                 >
@@ -96,7 +96,7 @@
                                 type="checkbox"
                                 :value="service"
                                 v-model="form.services"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                class="h-4 w-4 rounded border-gray-300 text-[#1e5b43] focus:ring-[#1e5b43]"
                             />
                             {{ service }}
                         </label>
@@ -114,7 +114,7 @@
                 </Link>
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
+                    class="inline-flex items-center justify-center rounded-lg bg-[#1e5b43] px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
                     :disabled="form.processing"
                 >
                     {{
@@ -167,11 +167,11 @@ const buildFormState = () => ({
 const form = useForm(buildFormState());
 
 const baseInput =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white";
+    "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43] outline-none text-gray-900 bg-white";
 const baseFile =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 bg-white file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500";
+    "w-full rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-900 bg-white file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43] outline-none transition-all";
 const baseTextarea =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white";
+    "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43] outline-none text-gray-900 bg-white";
 
 const inputClass = (field) =>
     [

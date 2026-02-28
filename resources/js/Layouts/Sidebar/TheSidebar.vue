@@ -1,19 +1,32 @@
 <template>
     <aside
         id="logo-sidebar"
-        class="fixed top-0 left-0 z-[60] w-64 h-screen transition-transform -translate-x-full bg-gray-900 border-r border-gray-800 sm:translate-x-0 shadow-xl"
+        class="fixed top-0 left-0 z-[60] w-64 h-screen transition-transform -translate-x-full bg-white border-r border-gray-100 sm:translate-x-0 shadow-sm"
         aria-label="Sidebar"
     >
-        <div class="h-full px-3 pt-4 pb-4 overflow-y-auto bg-gray-900">
-            <ul class="space-y-2 font-medium">
+        <!-- Logo Section -->
+        <div class="flex items-center gap-3 px-4 py-4 border-b border-gray-100">
+            <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-green-700 shadow-sm">
+                <font-awesome-icon icon="leaf" class="w-3.5 h-3.5 text-gray-500" />
+            </div>
+            <div>
+                <p class="text-gray-900 font-bold text-base leading-tight">{{ appName }}</p>
+                <p class="text-gray-400 text-[10px] leading-tight">Management</p>
+            </div>
+        </div>
+
+        <div class="h-[calc(100%-72px)] px-3 py-3 pb-4 overflow-y-auto bg-white">
+            <!-- MENU label -->
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Menu</p>
+            <ul class="space-y-0.5 font-medium">
                 <li v-if="hasPermission('dashboard.view')">
                     <Link href="/dashboard" :class="linkClass('/dashboard')">
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="house"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="ml-3">Home</span>
@@ -23,15 +36,15 @@
                 <li v-if="showOperations">
                     <button
                         type="button"
-                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         @click="toggleOperations"
                     >
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-500"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="cubes"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="flex-1 ml-3 text-left whitespace-nowrap"
@@ -61,11 +74,11 @@
                                 :class="linkClass('/quotations', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="file-invoice"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Quotation</span>
@@ -77,11 +90,11 @@
                                 :class="linkClass('/invoices', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="file-invoice"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Invoice</span>
@@ -93,15 +106,15 @@
                 <li v-if="showRegistrations">
                     <button
                         type="button"
-                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         @click="toggleRegistrations"
                     >
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="layer-group"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="flex-1 ml-3 text-left whitespace-nowrap"
@@ -131,11 +144,11 @@
                                 :class="linkClass('/clients', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-green-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="id-card"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Clients</span>
@@ -147,11 +160,11 @@
                                 :class="linkClass('/agents', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="address-card"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Agents</span>
@@ -163,11 +176,11 @@
                                 :class="linkClass('/office-staff', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-sky-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="users"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Office Staff</span>
@@ -179,11 +192,11 @@
                                 :class="linkClass('/bd-companies', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="building"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">BD Companies</span>
@@ -195,11 +208,11 @@
                                 :class="linkClass('/foreign-companies', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="globe"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Foreign Companies</span>
@@ -211,15 +224,15 @@
                 <li v-if="showAccounting">
                     <button
                         type="button"
-                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         @click="toggleAccounting"
                     >
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-pink-500"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="chart-line"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="flex-1 ml-3 text-left whitespace-nowrap"
@@ -249,11 +262,11 @@
                                 :class="linkClass('/accounting', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="gauge"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Dashboard</span>
@@ -262,15 +275,15 @@
                         <li>
                             <button
                                 type="button"
-                                class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800 text-base"
+                                class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-sm"
                                 @click="toggleIncome"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-green-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="money-bill-trend-up"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span
@@ -306,7 +319,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="plane"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Travel & Tourism</span
@@ -324,7 +337,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="user-tie"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Manpower Exporting</span
@@ -342,7 +355,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="graduation-cap"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Student Package</span
@@ -360,7 +373,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="hand-holding-dollar"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3">Other Income</span>
                                     </Link>
@@ -370,15 +383,15 @@
                         <li>
                             <button
                                 type="button"
-                                class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800 text-base"
+                                class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-sm"
                                 @click="toggleCostOfSales"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="box"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span
@@ -417,7 +430,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="plane"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Travel & Tourism</span
@@ -435,7 +448,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="user-tie"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Manpower Exporting</span
@@ -453,7 +466,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="graduation-cap"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Student Package</span
@@ -470,11 +483,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-teal-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="chart-line"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Gross Profit</span>
@@ -483,15 +496,15 @@
                         <li>
                             <button
                                 type="button"
-                                class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800 text-base"
+                                class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-sm"
                                 @click="toggleOperatingExpenses"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="wallet"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span
@@ -532,7 +545,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="users"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Employee & Manpower</span
@@ -550,7 +563,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="file-lines"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3">Administrative</span>
                                     </Link>
@@ -566,7 +579,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="bullhorn"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Selling & Marketing</span
@@ -584,7 +597,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="list"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3">General</span>
                                     </Link>
@@ -600,7 +613,7 @@
                                     >
                                         <font-awesome-icon
                                             icon="chart-line"
-                                            class="w-4 h-4"
+                                            class="w-3.5 h-3.5 text-gray-400"
                                         />
                                         <span class="ml-3"
                                             >Operating Profit</span
@@ -617,11 +630,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="coins"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Non-Operating</span>
@@ -638,11 +651,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="sack-dollar"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Net Profit Before Tax</span>
@@ -654,11 +667,11 @@
                                 :class="linkClass('/accounting/tax', true)"
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-red-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="file-invoice-dollar"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Tax Management</span>
@@ -675,11 +688,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="trophy"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Net Profit After Tax</span>
@@ -693,11 +706,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-amber-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="file-invoice-dollar"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Tax Summary</span>
@@ -711,11 +724,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="file-alt"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Tax Report</span>
@@ -729,11 +742,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-lime-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="percent"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">VAT Summary</span>
@@ -747,11 +760,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-fuchsia-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="file-alt"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">VAT Report</span>
@@ -763,15 +776,15 @@
                 <li v-if="showReports">
                     <button
                         type="button"
-                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         @click="toggleReports"
                     >
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-500"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="chart-bar"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="flex-1 ml-3 text-left whitespace-nowrap"
@@ -803,11 +816,11 @@
                                 "
                             >
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-rose-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="money-bill"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Refund Report</span>
@@ -819,15 +832,15 @@
                 <li v-if="showAccessManagement">
                     <button
                         type="button"
-                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         @click="toggleAccess"
                     >
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-rose-500"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="user-shield"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="flex-1 ml-3 text-left whitespace-nowrap"
@@ -854,11 +867,11 @@
                         <li v-if="hasPermission('user.view')">
                             <Link href="/users" :class="linkClass('/users')">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-violet-500"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="users-gear"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Users</span>
@@ -867,11 +880,11 @@
                         <li v-if="hasPermission('role.view')">
                             <Link href="/roles" :class="linkClass('/roles')">
                                 <div
-                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600"
+                                    class="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100"
                                 >
                                     <font-awesome-icon
                                         icon="users-gear"
-                                        class="w-4 h-4 text-white"
+                                        class="w-3.5 h-3.5 text-gray-500"
                                     />
                                 </div>
                                 <span class="ml-3">Roles</span>
@@ -882,11 +895,11 @@
                 <li v-if="hasPermission('settings.view')">
                     <Link href="/settings" :class="linkClass('/settings')">
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-500"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="gear"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="ml-3">Settings</span>
@@ -895,11 +908,11 @@
                 <li>
                     <Link href="/notepad" :class="linkClass('/notepad')">
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-amber-500"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="file-lines"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="ml-3">My Notepad</span>
@@ -909,14 +922,14 @@
                 <li>
                     <button
                         @click="showLogoutModal = true"
-                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-white hover:bg-gray-800"
+                        class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     >
                         <div
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-600"
+                            class="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100"
                         >
                             <font-awesome-icon
                                 icon="arrow-right-from-bracket"
-                                class="w-5 h-5 text-white"
+                                class="w-4 h-4 text-gray-500"
                             />
                         </div>
                         <span class="ml-3">Logout</span>
@@ -975,6 +988,7 @@ import Modal from "@/Components/Modal.vue";
 const $page = usePage();
 const userPermissions = computed(() => $page.props.userPermissions || []);
 const userRoles = computed(() => $page.props.userRoles || []);
+const appName = computed(() => $page.props.settings?.app_name || "MITT");
 
 const hasPermission = (permission) =>
     userPermissions.value.includes(permission) ||
@@ -1021,19 +1035,27 @@ const showReports = computed(
 
 const currentPath = computed(() => $page.url.split("?")[0]);
 
-const linkClass = (path, exact = false) => [
-    "flex items-center p-2 rounded-lg transition-colors duration-200",
-    (exact ? currentPath.value === path : currentPath.value.startsWith(path))
-        ? "bg-gray-800 text-white hover:bg-gray-700"
-        : "text-white hover:bg-gray-800",
-];
+const linkClass = (path, exact = false) => {
+    const isActive = exact
+        ? currentPath.value === path
+        : currentPath.value.startsWith(path);
+    return [
+        "flex items-center p-2 rounded-lg transition-all duration-200 relative",
+        isActive
+            ? "bg-green-50 text-green-800 font-semibold border-l-[3px] border-green-700 pl-[5px]"
+            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-[3px] border-transparent pl-[5px]",
+    ];
+};
 
-const subLinkClass = (path) => [
-    "flex items-center p-2 text-base font-medium rounded-lg transition-colors duration-200",
-    currentPath.value === path
-        ? "bg-gray-800 text-white"
-        : "text-gray-300 hover:bg-gray-800 hover:text-white",
-];
+const subLinkClass = (path) => {
+    const isActive = currentPath.value === path;
+    return [
+        "flex items-center p-2 text-sm font-medium rounded-lg transition-all duration-200 relative border-l-[3px] pl-[5px]",
+        isActive
+            ? "bg-green-50 text-green-800 border-green-600"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-800 border-transparent",
+    ];
+};
 
 const accessOpen = ref(false);
 const toggleAccess = () => {

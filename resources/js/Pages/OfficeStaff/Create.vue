@@ -3,7 +3,7 @@
     <div class="py-8 space-y-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">Office Staff</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1e5b43]">Office Staff</p>
                 <h1 class="text-2xl font-bold text-gray-900">
                     {{ isEdit ? "Edit Staff Member" : "Add Staff Member" }}
                 </h1>
@@ -24,7 +24,7 @@
                 </Link>
                 <button
                     type="button"
-                    class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
+                    class="inline-flex items-center justify-center rounded-lg bg-[#1e5b43] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
                     :disabled="form.processing"
                     @click="submit"
                 >
@@ -125,7 +125,7 @@
                 </Link>
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
+                    class="inline-flex items-center justify-center rounded-lg bg-[#1e5b43] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
                     :disabled="form.processing"
                 >
                     {{
@@ -193,17 +193,18 @@ const submit = () => {
 <style scoped>
 .input {
     width: 100%;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     border: 1px solid rgb(229, 231, 235);
-    padding: 0.5rem 0.75rem;
+    padding: 0.625rem 1rem;
     font-size: 0.875rem;
     color: rgb(17, 24, 39);
     background-color: #ffffff;
+    transition: all 0.2s;
 }
 
 .input:focus {
     outline: none;
-    border-color: rgb(59, 130, 246);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    border-color: #1e5b43;
+    box-shadow: 0 0 0 1px #1e5b43;
 }
 </style>

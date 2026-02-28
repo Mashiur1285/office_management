@@ -1,53 +1,50 @@
 <template>
     <Head title="Tax Summary" />
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50/30 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <!-- Header -->
-            <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold text-white">Tax Summary & Payments</h1>
-                        <p class="text-sm text-blue-100 mt-1">Period: {{ period.name }}</p>
+    <div class="px-4 py-8 md:px-6 lg:px-8 bg-[#f5f6f8] min-h-screen text-gray-800 font-sans">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">Tax Summary & Payments</h1>
+                <p class="text-sm text-gray-500">Period: {{ period.name }}</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-900">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1e5b43] outline-none">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
-                        <a :href="route('accounting.tax-summary.report')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-excel"></i>
-                            Export to Excel
+                        <a :href="route('accounting.tax-summary.report')" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-excel text-green-600"></i>
+                            Excel
                         </a>
-                        <a :href="route('accounting.tax-summary.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-pdf"></i>
-                            Export to PDF
+                        <a :href="route('accounting.tax-summary.report', { type: 'pdf' })" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf text-red-600"></i>
+                            PDF
                         </a>
                     </div>
                 </div>
-            </div>
 
             <!-- Total Tax Summary with Payments -->
-            <div class="bg-white rounded-xl shadow-sm border-4 border-amber-500 p-6">
-                <h2 class="text-xl font-bold text-amber-700 mb-6">Tax Payment Summary</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-amber-50 rounded-lg p-4 border-2 border-amber-300">
-                        <div class="text-sm text-gray-600 mb-1">Total Tax</div>
-                        <div class="text-2xl font-bold text-amber-700">
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-8 mb-6">
+                <h2 class="text-[20px] font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Tax Payment Summary</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50/50 rounded-[20px] p-6 border border-gray-100 flex flex-col justify-center transition-all hover:bg-gray-50 hover:shadow-sm">
+                        <div class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Total Tax</div>
+                        <div class="text-[32px] font-bold text-amber-600">
                             {{ money(totalTax) }}
                         </div>
                     </div>
 
-                    <div class="bg-blue-50 rounded-lg p-4 border-2 border-blue-300">
-                        <div class="text-sm text-gray-600 mb-1">Total Payments Made</div>
-                        <div class="text-2xl font-bold text-blue-700">
+                    <div class="bg-gray-50/50 rounded-[20px] p-6 border border-gray-100 flex flex-col justify-center transition-all hover:bg-gray-50 hover:shadow-sm">
+                        <div class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Total Payments Made</div>
+                        <div class="text-[32px] font-bold text-[#1e5b43]">
                             {{ money(totalTaxPayments) }}
                         </div>
                     </div>
 
-                    <div :class="['rounded-lg p-4 border-2', taxBalance > 0 ? 'bg-orange-50 border-orange-300' : 'bg-green-50 border-green-300']">
-                        <div class="text-sm text-gray-600 mb-1">Remaining Balance</div>
-                        <div :class="['text-2xl font-bold', taxBalance > 0 ? 'text-orange-700' : 'text-green-700']">
+                    <div :class="['rounded-[20px] p-6 border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transform scale-105 flex flex-col justify-center', taxBalance > 0 ? 'bg-orange-50 border-orange-200' : 'bg-[#1e5b43] text-white']">
+                        <div :class="['text-[12px] uppercase tracking-wider font-bold mb-2', taxBalance > 0 ? 'text-gray-500' : 'text-emerald-100/90']">Remaining Balance</div>
+                        <div :class="['text-[36px] font-bold leading-none', taxBalance > 0 ? 'text-orange-600' : 'text-white']">
                             {{ money(taxBalance) }}
                         </div>
                     </div>
@@ -55,18 +52,18 @@
             </div>
 
             <!-- Tax Breakdown -->
-            <div class="bg-white rounded-xl shadow-sm border-4 border-yellow-400 p-6">
-                <h2 class="text-xl font-bold text-yellow-700 mb-4">Tax Breakdown</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                        <div class="text-sm text-gray-600 mb-1">Current Tax</div>
-                        <div class="text-2xl font-bold text-yellow-700">
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-8 mb-6">
+                <h2 class="text-[20px] font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Tax Breakdown</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50/50 rounded-[20px] p-6 border border-gray-100 transition-all hover:bg-gray-50 hover:shadow-sm">
+                        <div class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Current Tax</div>
+                        <div class="text-[28px] font-bold text-gray-800">
                             {{ money(taxByType.current) }}
                         </div>
                     </div>
-                    <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                        <div class="text-sm text-gray-600 mb-1">Deferred Tax</div>
-                        <div class="text-2xl font-bold text-yellow-700">
+                    <div class="bg-gray-50/50 rounded-[20px] p-6 border border-gray-100 transition-all hover:bg-gray-50 hover:shadow-sm">
+                        <div class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Deferred Tax</div>
+                        <div class="text-[28px] font-bold text-gray-800">
                             {{ money(taxByType.deferred) }}
                         </div>
                     </div>
@@ -74,15 +71,15 @@
             </div>
 
             <!-- Tax Payment Form -->
-            <div class="bg-white rounded-xl shadow-sm border-4 border-green-500 p-6">
-                <h2 class="text-xl font-bold text-green-700 mb-4">Record Tax Payment</h2>
-                <form @submit.prevent="submitPayment" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-8 mb-6">
+                <h2 class="text-[20px] font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Record Tax Payment</h2>
+                <form @submit.prevent="submitPayment" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Payment Type *</label>
+                            <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Payment Type *</label>
                             <select
                                 v-model="paymentForm.payment_type"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none cursor-pointer"
                                 required
                             >
                                 <option value="bulk">Bulk Payment (All Clients)</option>
@@ -91,10 +88,10 @@
                         </div>
 
                         <div v-if="paymentForm.payment_type === 'individual'">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Select Client *</label>
+                            <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Select Client *</label>
                             <select
                                 v-model="paymentForm.client_id"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none cursor-pointer"
                                 required
                             >
                                 <option :value="null">-- Select Client --</option>
@@ -105,141 +102,139 @@
                         </div>
 
                         <div v-if="paymentForm.payment_type === 'individual'">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Payment Amount *</label>
+                            <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Payment Amount *</label>
                             <input
                                 v-model="paymentForm.payment_amount"
                                 type="number"
                                 step="0.01"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none"
                                 placeholder="0.00"
                             />
                         </div>
 
-                        <div v-else class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div v-else class="p-5 bg-gray-50 border border-gray-200 rounded-[16px]">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-medium text-gray-700">Total Payment Amount:</span>
-                                <span class="text-lg font-bold text-blue-700">{{ money(taxBalance) }}</span>
+                                <span class="text-[12px] uppercase tracking-wider font-bold text-gray-500">Total Payment Amount:</span>
+                                <span class="text-[24px] font-bold text-[#1e5b43]">{{ money(taxBalance) }}</span>
                             </div>
-                            <p class="text-xs text-gray-600">This amount will be distributed across all clients with unpaid tax</p>
+                            <p class="text-xs text-gray-500 font-medium">This amount will be distributed across all clients with unpaid tax</p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Payment Date *</label>
-                            <VueDatePicker
-                                v-model="paymentForm.payment_date"
-                                :enable-time-picker="false"
-                                model-type="yyyy-MM-dd"
-                                required
-                                class="w-full"
-                            />
+                            <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Payment Date *</label>
+                            <div class="theme-datepicker">
+                                <VueDatePicker
+                                    v-model="paymentForm.payment_date"
+                                    :enable-time-picker="false"
+                                    model-type="yyyy-MM-dd"
+                                    required
+                                    class="w-full"
+                                />
+                            </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Chalan Number *</label>
+                            <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Chalan Number *</label>
                             <input
                                 v-model="paymentForm.chalan_number"
                                 type="text"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none"
                                 placeholder="Enter chalan number"
                             />
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Chalan Slip</label>
+                            <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Chalan Slip (Optional)</label>
                             <input
                                 ref="chalanSlipInput"
                                 type="file"
                                 @change="handleChalanSlipChange"
                                 accept=".pdf,.jpg,.jpeg,.png"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-[12px] text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1e5b43] file:text-white hover:file:bg-[#164230]"
                             />
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                            <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Notes</label>
                             <textarea
                                 v-model="paymentForm.notes"
-                                rows="2"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                rows="3"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none resize-none"
                                 placeholder="Any additional notes..."
                             ></textarea>
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        :disabled="isSubmitting"
-                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {{ isSubmitting ? 'Saving...' : 'Record Payment' }}
-                    </button>
+                    <div class="flex justify-end pt-4">
+                        <button
+                            type="submit"
+                            :disabled="isSubmitting"
+                            class="px-8 py-3 bg-[#1e5b43] text-white rounded-full hover:bg-[#164230] transition-colors font-bold text-sm shadow-[0_4px_12px_rgba(30,91,67,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {{ isSubmitting ? 'Saving...' : 'Record Payment' }}
+                        </button>
+                    </div>
                 </form>
             </div>
 
             <!-- Clients with Tax Due -->
-            <div v-if="clientsWithTax && clientsWithTax.length > 0" class="bg-white rounded-xl shadow-sm border-4 border-blue-500 overflow-hidden">
+            <div v-if="clientsWithTax && clientsWithTax.length > 0" class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 overflow-hidden mb-6">
                 <button
                     @click="showClientsWithTax = !showClientsWithTax"
-                    class="w-full bg-blue-600 text-white p-4 flex items-center justify-between hover:bg-blue-700 transition-colors"
+                    class="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors border-b border-gray-100"
                 >
-                    <div>
-                        <h2 class="text-xl font-bold">Clients with Tax Due</h2>
-                        <p class="text-sm text-blue-100 mt-1">{{ clientsWithTax.length }} client(s) with tax due</p>
+                    <div class="text-left">
+                        <h2 class="text-[20px] font-bold text-gray-900">Clients with Tax Due</h2>
+                        <p class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mt-1">{{ clientsWithTax.length }} client(s) with tax due</p>
                     </div>
-                    <svg
-                        class="w-6 h-6 transition-transform duration-200"
-                        :class="{ 'rotate-180': showClientsWithTax }"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 transition-transform duration-300" :class="{ 'rotate-180': showClientsWithTax }">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
                 </button>
 
                 <div v-show="showClientsWithTax" class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-blue-50 border-b-2 border-blue-200">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-[11px] text-gray-500 uppercase font-bold tracking-wider bg-gray-50/50 border-b border-gray-100">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider">Client Name</th>
-                                <th class="px-6 py-3 text-right text-xs font-bold text-blue-900 uppercase tracking-wider">Total Tax</th>
-                                <th class="px-6 py-3 text-right text-xs font-bold text-blue-900 uppercase tracking-wider">Paid</th>
-                                <th class="px-6 py-3 text-right text-xs font-bold text-blue-900 uppercase tracking-wider">Unpaid</th>
-                                <th class="px-6 py-3 text-center text-xs font-bold text-blue-900 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider">Payment Info</th>
+                                <th class="px-6 py-4">Client Name</th>
+                                <th class="px-6 py-4 text-right">Total Tax</th>
+                                <th class="px-6 py-4 text-right">Paid</th>
+                                <th class="px-6 py-4 text-right">Unpaid</th>
+                                <th class="px-6 py-4 text-center">Status</th>
+                                <th class="px-6 py-4">Payment Info</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr v-for="client in clientsWithTax" :key="client.id" :class="client.tax_paid ? 'bg-green-50' : 'hover:bg-gray-50'">
-                                <td class="px-6 py-3 text-sm font-medium text-gray-900">
+                        <tbody class="divide-y divide-gray-100">
+                            <tr v-for="client in clientsWithTax" :key="client.id" :class="client.tax_paid ? 'bg-emerald-50/30' : 'hover:bg-gray-50/50 transition-colors'">
+                                <td class="px-6 py-4 font-bold text-gray-900 border-x-0">
                                     {{ client.name }}
                                 </td>
-                                <td class="px-6 py-3 text-sm font-semibold text-right text-gray-900">
+                                <td class="px-6 py-4 font-bold text-gray-900 text-right">
                                     {{ money(client.total_tax_receivable) }}
                                 </td>
-                                <td class="px-6 py-3 text-sm text-right text-green-700">
+                                <td class="px-6 py-4 text-[#1e5b43] font-semibold text-right">
                                     {{ money(client.tax_paid_amount) }}
                                 </td>
-                                <td class="px-6 py-3 text-sm font-bold text-right" :class="client.tax_paid ? 'text-gray-400' : 'text-orange-700'">
+                                <td class="px-6 py-4 font-bold text-right" :class="client.tax_paid ? 'text-gray-400' : 'text-orange-600'">
                                     {{ money(client.tax_unpaid_amount) }}
                                 </td>
-                                <td class="px-6 py-3 text-center">
-                                    <span v-if="client.tax_paid" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                <td class="px-6 py-4 text-center">
+                                    <span v-if="client.tax_paid" class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-md text-[11px] font-bold uppercase tracking-wider">
                                         Fully Paid
                                     </span>
-                                    <span v-else-if="client.tax_paid_amount > 0" class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+                                    <span v-else-if="client.tax_paid_amount > 0" class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md text-[11px] font-bold uppercase tracking-wider">
                                         Partially Paid
                                     </span>
-                                    <span v-else class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-semibold">
+                                    <span v-else class="px-3 py-1 bg-orange-100 text-orange-800 rounded-md text-[11px] font-bold uppercase tracking-wider">
                                         Pending
                                     </span>
                                 </td>
-                                <td class="px-6 py-3 text-sm text-gray-600">
+                                <td class="px-6 py-4 text-gray-500">
                                     <div v-if="client.tax_paid_amount > 0">
-                                        <div v-if="client.tax_chalan_number" class="text-xs">Chalan: {{ client.tax_chalan_number }}</div>
-                                        <div v-if="client.tax_payment_date" class="text-xs">Date: {{ formatDate(client.tax_payment_date) }}</div>
+                                        <div v-if="client.tax_chalan_number" class="text-xs mb-0.5"><span class="font-semibold text-gray-700">Chalan:</span> {{ client.tax_chalan_number }}</div>
+                                        <div v-if="client.tax_payment_date" class="text-xs"><span class="font-semibold text-gray-700">Date:</span> {{ formatDate(client.tax_payment_date) }}</div>
                                     </div>
                                     <div v-else class="text-gray-400">—</div>
                                 </td>
@@ -250,101 +245,96 @@
             </div>
 
             <!-- Tax Payment History -->
-            <div v-if="taxPayments && taxPayments.length > 0" class="bg-white rounded-xl shadow-sm border-4 border-purple-500 overflow-hidden">
-                <div class="bg-purple-600 text-white p-4">
-                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        <div>
-                            <h2 class="text-xl font-bold">Tax Payment History</h2>
-                            <p class="text-sm text-purple-100 mt-1">All recorded payments for this period</p>
-                        </div>
-                        <div class="flex-1 max-w-md">
-                            <div class="relative">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <svg class="h-5 w-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </div>
-                                <input
-                                    v-model="searchPayments"
-                                    type="text"
-                                    class="block w-full rounded-lg border border-purple-400 bg-purple-500 pl-10 pr-4 py-2 text-sm text-white placeholder-purple-200 focus:border-white focus:ring-2 focus:ring-white focus:bg-purple-600 transition"
-                                    placeholder="Search by challan number, client, date..."
-                                />
-                                <button
-                                    v-if="searchPayments"
-                                    @click="searchPayments = ''"
-                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-purple-200 hover:text-white"
-                                >
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+            <div v-if="taxPayments && taxPayments.length > 0" class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 overflow-hidden mb-8">
+                <div class="p-6 border-b border-gray-100 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between bg-gray-50/50">
+                    <div>
+                        <h2 class="text-[20px] font-bold text-gray-900">Tax Payment History</h2>
+                        <p class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mt-1">All recorded payments for this period</p>
                     </div>
-                    <div v-if="searchPayments" class="mt-2 text-sm text-purple-100">
-                        Showing <span class="font-semibold text-white">{{ filteredTaxPayments.length }}</span> of {{ taxPayments.length }} payments
+                    <div class="flex-1 max-w-md relative">
+                        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input
+                            v-model="searchPayments"
+                            type="text"
+                            class="w-full bg-white border border-gray-200 rounded-full pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-all shadow-sm"
+                            placeholder="Search by challan number, client, date..."
+                        />
+                        <button
+                            v-if="searchPayments"
+                            @click="searchPayments = ''"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                        >
+                            <i class="fa-solid fa-times text-xs"></i>
+                        </button>
                     </div>
+                </div>
+                <div v-if="searchPayments" class="bg-blue-50 px-6 py-2 border-b border-blue-100 text-sm text-blue-800">
+                    Showing <span class="font-bold">{{ filteredTaxPayments.length }}</span> of {{ taxPayments.length }} payments
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-purple-50 border-b-2 border-purple-200">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-[11px] text-gray-500 uppercase font-bold tracking-wider bg-gray-50/50 border-b border-gray-100">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-purple-900 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-purple-900 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-purple-900 uppercase tracking-wider">Client</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-purple-900 uppercase tracking-wider">Amount</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-purple-900 uppercase tracking-wider">Chalan Number</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-purple-900 uppercase tracking-wider">Notes</th>
-                                <th class="px-6 py-3 text-center text-xs font-bold text-purple-900 uppercase tracking-wider">Chalan Slip</th>
-                                <th class="px-6 py-3 text-center text-xs font-bold text-purple-900 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-4">Date</th>
+                                <th class="px-6 py-4">Type</th>
+                                <th class="px-6 py-4">Client</th>
+                                <th class="px-6 py-4">Amount</th>
+                                <th class="px-6 py-4">Chalan Number</th>
+                                <th class="px-6 py-4">Notes</th>
+                                <th class="px-6 py-4 text-center">Chalan Slip</th>
+                                <th class="px-6 py-4 text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr v-for="payment in filteredTaxPayments" :key="payment.id" class="hover:bg-gray-50">
-                                <td class="px-6 py-3 text-sm text-gray-900">
+                        <tbody class="divide-y divide-gray-100">
+                            <tr v-for="payment in filteredTaxPayments" :key="payment.id" class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-gray-900 border-x-0">
                                     {{ formatDate(payment.payment_date) }}
                                 </td>
-                                <td class="px-6 py-3 text-sm text-gray-700 capitalize">
-                                    {{ payment.payment_type }}
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-[11px] font-bold uppercase tracking-wider">
+                                        {{ payment.payment_type }}
+                                    </span>
                                 </td>
-                                <td class="px-6 py-3 text-sm text-gray-700">
+                                <td class="px-6 py-4 text-gray-600 font-medium">
                                     {{ payment.client_name || 'Organization-wide' }}
                                 </td>
-                                <td class="px-6 py-3 text-sm font-semibold text-green-700">
+                                <td class="px-6 py-4 font-bold text-[#1e5b43]">
                                     {{ money(payment.payment_amount) }}
                                 </td>
-                                <td class="px-6 py-3 text-sm text-gray-700">
+                                <td class="px-6 py-4 font-mono text-xs text-gray-600 font-semibold bg-gray-50 rounded select-all inline-block mt-2 px-1">
                                     {{ payment.chalan_number || '—' }}
                                 </td>
-                                <td class="px-6 py-3 text-sm text-gray-700">
+                                <td class="px-6 py-4 text-gray-500">
                                     {{ payment.notes || '—' }}
                                 </td>
-                                <td class="px-6 py-3 text-center">
+                                <td class="px-6 py-4 text-center">
                                     <a
                                         v-if="payment.chalan_slip"
                                         :href="`/storage/${payment.chalan_slip}`"
                                         target="_blank"
-                                        class="text-blue-600 hover:text-blue-800 text-sm underline"
+                                        class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center mx-auto transition-colors"
+                                        title="View Chalan Slip"
                                     >
-                                        View
+                                        <i class="fa-solid fa-file-pdf"></i>
                                     </a>
-                                    <span v-else class="text-sm text-gray-400">—</span>
+                                    <span v-else class="text-sm text-gray-300">—</span>
                                 </td>
-                                <td class="px-6 py-3 text-center">
+                                <td class="px-6 py-4 text-center">
                                     <button
                                         @click="deletePaymentRecord(payment.id)"
-                                        class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs"
+                                        class="w-8 h-8 rounded-full bg-gray-50 text-red-500 hover:bg-red-50 flex items-center justify-center mx-auto transition-colors"
+                                        title="Delete Payment"
                                     >
-                                        Delete
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </td>
                             </tr>
                             <tr v-if="filteredTaxPayments.length === 0 && taxPayments.length > 0">
-                                <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
+                                <td colspan="8" class="px-6 py-12 text-center text-sm text-gray-500">
+                                    <i class="fa-solid fa-search text-gray-300 text-2xl mb-3 block"></i>
                                     No payments found matching your search.
-                                    <button @click="searchPayments = ''" class="text-purple-600 font-semibold hover:underline ml-1">Clear search</button>
+                                    <button @click="searchPayments = ''" class="text-[#1e5b43] font-bold hover:underline ml-1">Clear search</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -353,21 +343,27 @@
             </div>
 
             <!-- Navigation Links -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Link href="/accounting/tax" class="bg-amber-50 hover:bg-amber-100 rounded-lg p-4 border border-amber-200 transition-colors">
-                    <div class="text-sm text-amber-700 font-medium mb-1">Tax Management</div>
-                    <div class="font-semibold text-gray-900">Add & Edit Tax Entries</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-8">
+                <Link href="/accounting/tax" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1e5b43]/20 p-6 flex items-center justify-between group hover:border-[#1e5b43]/40 transition-colors">
+                    <div>
+                        <div class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Previous</div>
+                        <div class="font-bold text-gray-900 group-hover:text-[#1e5b43] transition-colors">Tax Management</div>
+                    </div>
+                    <i class="fa-solid fa-arrow-left text-gray-300 group-hover:-translate-x-1 group-hover:text-[#1e5b43] transition-all"></i>
                 </Link>
-                <Link href="/accounting/net-profit-after-tax" class="bg-purple-50 hover:bg-purple-100 rounded-lg p-4 border border-purple-200 transition-colors">
-                    <div class="text-sm text-purple-700 font-medium mb-1">P&L Summary</div>
-                    <div class="font-semibold text-gray-900">Net Profit After Tax</div>
+                <Link href="/accounting/net-profit-after-tax" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1e5b43]/20 p-6 flex flex-col justify-center text-center group hover:border-[#1e5b43]/40 transition-colors relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#1e5b43]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <div class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">P&L Summary</div>
+                    <div class="font-bold text-gray-900 group-hover:text-[#1e5b43] transition-colors">Net Profit After Tax</div>
                 </Link>
-                <Link href="/accounting" class="bg-amber-50 hover:bg-amber-100 rounded-lg p-4 border border-amber-200 transition-colors">
-                    <div class="text-sm text-amber-700 font-medium mb-1">Dashboard</div>
-                    <div class="font-semibold text-gray-900">Accounting Home</div>
+                <Link href="/accounting" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1e5b43]/20 p-6 flex items-center justify-between group hover:border-[#1e5b43]/40 transition-colors">
+                    <div>
+                        <div class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Dashboard</div>
+                        <div class="font-bold text-gray-900 group-hover:text-[#1e5b43] transition-colors">Accounting Home</div>
+                    </div>
+                    <i class="fa-solid fa-house text-gray-300 group-hover:text-[#1e5b43] transition-colors"></i>
                 </Link>
             </div>
-        </div>
     </div>
 </template>
 

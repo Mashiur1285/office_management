@@ -105,7 +105,25 @@ import {
     faGraduationCap,
     faHandHoldingDollar,
     faBullhorn,
-    faList
+    faList,
+    faLeaf,
+    faBell,
+    faArrowTrendUp,
+    faCaretUp,
+    faFolderOpen,
+    faPause,
+    faSquare,
+    faMoneyBillWave,
+    faGift,
+    faCircleExclamation,
+    faSpinner,
+    faAngleLeft,
+    faAngleRight,
+    faTriangleExclamation,
+    faAnglesLeft,
+    faAnglesRight,
+    faAngleDoubleLeft,
+    faAngleDoubleRight
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -215,7 +233,25 @@ library.add(
     faGraduationCap,
     faHandHoldingDollar,
     faBullhorn,
-    faList
+    faList,
+    faLeaf,
+    faBell,
+    faArrowTrendUp,
+    faCaretUp,
+    faFolderOpen,
+    faPause,
+    faSquare,
+    faMoneyBillWave,
+    faGift,
+    faCircleExclamation,
+    faSpinner,
+    faAngleLeft,
+    faAngleRight,
+    faTriangleExclamation,
+    faAnglesLeft,
+    faAnglesRight,
+    faAngleDoubleLeft,
+    faAngleDoubleRight
 );
 
 export default {

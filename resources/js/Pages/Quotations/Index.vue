@@ -2,62 +2,61 @@
     <Head title="Quotations" />
 
     <div class="space-y-6">
-        <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl">
-            <div class="px-6 py-8">
-                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                        <h1 class="text-2xl font-bold text-white">Quotations</h1>
-                        <p class="text-sm text-blue-100">
-                            Create and manage client quotations.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="relative">
-                            <input
-                                v-model="searchQuery"
-                                type="text"
-                                placeholder="Search quotations..."
-                                class="w-full sm:w-80 rounded-xl border border-white/30 bg-white px-4 py-2.5 pl-10 text-sm text-gray-900 shadow-sm focus:border-white focus:outline-none focus:ring-2 focus:ring-white/40"
-                            />
-                            <svg
-                                class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                />
-                            </svg>
-                        </div>
-                        <a
-                            :href="route('quotations.export', { type: 'excel', search: searchQuery })"
-                            class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-green-700 whitespace-nowrap"
-                        >
-                            Export to Excel
-                        </a>
-                        <a
-                            :href="route('quotations.export', { type: 'pdf', search: searchQuery })"
-                            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-red-700 whitespace-nowrap"
-                        >
-                            Export to PDF
-                        </a>
-                        <Link
-                            :href="route('quotations.create')"
-                            class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 shadow-lg transition hover:shadow-xl hover:scale-105 whitespace-nowrap"
-                        >
-                            <font-awesome-icon icon="file-invoice" />
-                            New Quotation
-                        </Link>
-                    </div>
+        <!-- Header -->
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Quotations</h1>
+                <p class="text-sm text-gray-500 mt-1">Create and manage client quotations.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="relative w-full sm:w-80">
+                    <input
+                        v-model="searchQuery"
+                        type="text"
+                        placeholder="Search quotations..."
+                        class="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-900 transition-colors focus:border-[#1e5b43] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e5b43]/20"
+                    />
+                    <svg
+                        class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                    </svg>
                 </div>
+                <!-- Export Excel -->
+                <a
+                    :href="route('quotations.export', { type: 'excel', search: searchQuery })"
+                    class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap"
+                >
+                    <font-awesome-icon icon="file-excel" class="text-green-600" />
+                    Excel
+                </a>
+                <!-- Export PDF -->
+                <a
+                    :href="route('quotations.export', { type: 'pdf', search: searchQuery })"
+                    class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap"
+                >
+                    <font-awesome-icon icon="file-pdf" class="text-red-500" />
+                    PDF
+                </a>
+                <Link
+                    :href="route('quotations.create')"
+                    class="bg-[#1e5b43] hover:bg-[#154130] text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
+                >
+                    <font-awesome-icon icon="plus" />
+                    New Quotation
+                </Link>
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
@@ -96,22 +95,22 @@
                                     <IconButton
                                         v-if="canEdit"
                                         icon="fa-solid fa-pen-to-square"
-                                        class="bg-blue-600 text-white hover:bg-blue-700"
+                                        class="bg-blue-50 text-blue-600 hover:bg-blue-100"
                                         tooltip="Edit quotation"
                                         @click="router.visit(route('quotations.edit', quotation.id))"
                                     />
                                     <IconButton
                                         icon="fa-solid fa-eye"
-                                        class="bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        class="bg-gray-100 text-gray-600 hover:bg-gray-200"
                                         tooltip="View quotation"
                                         @click="router.visit(route('quotations.show', quotation.id))"
                                     />
                                     <a
                                         :href="route('quotations.download', quotation.id)"
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg transition duration-200 bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg transition duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200"
                                         title="Download PDF"
                                     >
-                                        <FontAwesomeIcon icon="fa-solid fa-download" />
+                                        <font-awesome-icon icon="download" class="text-sm" />
                                     </a>
                                 </div>
                             </td>

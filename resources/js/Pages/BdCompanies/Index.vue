@@ -1,87 +1,77 @@
 <template>
     <Head title="BD Companies" />
-    <div class="py-6 space-y-6">
-        <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl">
-            <div class="px-6 py-8">
-                <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-100">Bangladeshi Companies</p>
-                        <h1 class="text-2xl font-bold text-white">Processing Partners</h1>
-                        <p class="text-sm text-blue-100">List of local companies receiving client documents.</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <a
-                            :href="route('bd-companies.export', { type: 'excel' })"
-                            class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-green-700"
-                        >
-                            Export to Excel
-                        </a>
-                        <a
-                            :href="route('bd-companies.export', { type: 'pdf' })"
-                            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-red-700"
-                        >
-                            Export to PDF
-                        </a>
-                        <Link
-                            href="/bd-companies/create"
-                            class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 shadow-lg transition hover:shadow-xl hover:scale-105"
-                        >
-                            <span class="text-lg leading-none">+</span>
-                            Add Company
-                        </Link>
-                    </div>
-                </div>
+    <div class="px-4 py-8 md:px-6 lg:px-8 bg-[#f5f6f8] min-h-screen text-gray-800 font-sans">
+        
+        <!-- Main Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">Processing Partners</h1>
+                <p class="text-sm text-gray-500">List of local companies receiving client documents.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a
+                    :href="route('bd-companies.export', { type: 'excel' })"
+                    class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
+                >
+                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-green-600" />
+                    Excel
+                </a>
+                <a
+                    :href="route('bd-companies.export', { type: 'pdf' })"
+                    class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
+                >
+                    <font-awesome-icon icon="file-pdf" class="w-3.5 h-3.5 text-red-600" />
+                    PDF
+                </a>
+                <Link
+                    href="/bd-companies/create"
+                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition flex items-center gap-2 shadow-sm"
+                >
+                    <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
+                    Add Company
+                </Link>
             </div>
         </div>
 
-        <!-- Search Section -->
-        <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div class="flex-1 max-w-md">
-                    <div class="relative">
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <input
-                            v-model="searchQuery"
-                            type="text"
-                            class="block w-full rounded-lg border border-gray-300 bg-gray-50 pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
-                            placeholder="Search by name, owner, contact person, or job category..."
-                        />
-                        <button
-                            v-if="searchQuery"
-                            @click="searchQuery = ''"
-                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
-                        >
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div v-if="searchQuery" class="text-sm text-gray-600">
-                    Showing <span class="font-semibold text-gray-900">{{ filteredCompanies.length }}</span> of {{ companies.length }} companies
-                </div>
+        <!-- Search and Filter Section -->
+        <div class="bg-white rounded-[24px] border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-5 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-gray-400 bg-gray-50/80 rounded-full px-4 py-2.5 w-full md:w-96 border border-gray-100">
+                <font-awesome-icon icon="magnifying-glass" class="w-4 h-4" />
+                <input
+                    v-model="searchQuery"
+                    type="text"
+                    class="border-none bg-transparent focus:ring-0 text-sm w-full text-gray-700 placeholder-gray-400 outline-none"
+                    placeholder="Search by name, owner, contact person, or job category..."
+                />
+                <button
+                    v-if="searchQuery"
+                    @click="searchQuery = ''"
+                    class="text-gray-400 hover:text-gray-600 outline-none"
+                >
+                    <font-awesome-icon icon="times" class="w-4 h-4" />
+                </button>
+            </div>
+            <div v-if="searchQuery" class="text-sm text-gray-600">
+                Showing <span class="font-semibold text-gray-900">{{ filteredCompanies.length }}</span> of {{ companies.length }} companies
             </div>
         </div>
 
-        <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <!-- Table Card -->
+        <div class="bg-white rounded-[24px] border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-gray-700">
-                    <thead class="bg-gray-50 text-xs uppercase text-gray-600">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead class="bg-gray-50/50 text-[11px] uppercase text-gray-400 font-bold tracking-wider border-b border-gray-100">
                         <tr>
-                            <th class="px-6 py-3 font-semibold">Name</th>
-                            <th class="px-6 py-3 font-semibold">Job Categories</th>
-                            <th class="px-6 py-3 font-semibold">Owner</th>
-                            <th class="px-6 py-3 font-semibold">Contact Person</th>
-                            <th class="px-6 py-3 font-semibold">Per Client Fee</th>
-                            <th class="px-6 py-3 font-semibold text-right">Actions</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Name</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Job Categories</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Owner</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Contact Person</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Per Client Fee</th>
+                            <th class="px-6 py-4 whitespace-nowrap text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        <tr v-for="company in filteredCompanies" :key="company.id" class="transition hover:bg-gray-50">
+                    <tbody class="divide-y divide-gray-50">
+                        <tr v-for="company in filteredCompanies" :key="company.id" class="transition-colors hover:bg-gray-50/50 group">
                             <td class="px-6 py-4">
                                 <div class="font-semibold text-gray-900">{{ company.name }}</div>
                                 <p class="text-xs text-gray-500">{{ company.office_address || "—" }}</p>
@@ -102,32 +92,47 @@
                                     {{ money(company.per_client_fee) }}
                                 </p>
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <IconButton
-                                        icon="fa-solid fa-eye"
-                                        class="bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                        tooltip="View company"
-                                        @click="router.visit(`/bd-companies/${company.id}`)"
-                                    />
-                                    <IconButton
-                                        icon="fa-solid fa-pen-to-square"
-                                        class="bg-blue-600 text-white hover:bg-blue-700"
-                                        tooltip="Edit company"
-                                        @click="router.visit(`/bd-companies/${company.id}/edit`)"
-                                    />
+                            <td class="px-6 py-4 text-right border-l border-transparent group-hover:border-gray-100">
+                                <div class="flex items-center justify-end gap-1.5 transition-opacity">
+                                    <button @click="router.visit(`/bd-companies/${company.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1e5b43] hover:bg-emerald-50 transition" title="View">
+                                        <font-awesome-icon icon="eye" class="w-3.5 h-3.5" />
+                                    </button>
+                                    <button @click="router.visit(`/bd-companies/${company.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
+                                        <font-awesome-icon icon="edit" class="w-3.5 h-3.5" />
+                                    </button>
                                 </div>
                             </td>
                         </tr>
+                        <!-- Empty States -->
                         <tr v-if="filteredCompanies.length === 0 && companies.length === 0">
-                            <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
-                                No companies yet. <Link href="/bd-companies/create" class="text-blue-600 font-semibold hover:underline">Add the first one</Link>
+                            <td colspan="6" class="px-6 py-16 text-center">
+                                <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                                    <font-awesome-icon icon="building" class="w-6 h-6 text-gray-300" />
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-1">No companies yet</h3>
+                                <p class="text-sm text-gray-500 mb-5">Get started by adding your first company</p>
+                                <Link
+                                    href="/bd-companies/create"
+                                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition inline-flex items-center gap-2"
+                                >
+                                    <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
+                                    Add First Company
+                                </Link>
                             </td>
                         </tr>
                         <tr v-if="filteredCompanies.length === 0 && companies.length > 0">
-                            <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
-                                No companies found matching your search.
-                                <button @click="searchQuery = ''" class="text-blue-600 font-semibold hover:underline ml-1">Clear search</button>
+                            <td colspan="6" class="px-6 py-16 text-center">
+                                <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                                    <font-awesome-icon icon="search" class="w-6 h-6 text-gray-300" />
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-1">No results found</h3>
+                                <p class="text-sm text-gray-500 mb-5">Try adjusting your search to find what you're looking for</p>
+                                <button
+                                    @click="searchQuery = ''"
+                                    class="border border-gray-200 text-gray-700 bg-white px-5 py-2 hover:bg-gray-50 rounded-full font-semibold text-sm transition"
+                                >
+                                    Clear search
+                                </button>
                             </td>
                         </tr>
                     </tbody>

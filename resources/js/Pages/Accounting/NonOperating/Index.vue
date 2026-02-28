@@ -1,49 +1,48 @@
 <template>
     <Head title="Non-Operating" />
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-cyan-50/30 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <!-- Header -->
-            <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold text-white">Non-Operating Income & Expenses</h1>
-                        <p class="text-sm text-blue-100 mt-1">Period: {{ period.name }}</p>
+    <div class="px-4 py-8 md:px-6 lg:px-8 bg-[#f5f6f8] min-h-screen text-gray-800 font-sans">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">Non-Operating Income & Expenses</h1>
+                <p class="text-sm text-gray-500">Period: {{ period.name }}</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-900">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1e5b43] outline-none">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
-                        <a :href="route('accounting.non-operating.report')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-excel"></i>
-                            Export to Excel
+                        <a :href="route('accounting.non-operating.report')" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-excel text-green-600"></i>
+                            Excel
                         </a>
-                        <a :href="route('accounting.non-operating.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-pdf"></i>
-                            Export to PDF
+                        <a :href="route('accounting.non-operating.report', { type: 'pdf' })" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf text-red-600"></i>
+                            PDF
                         </a>
                     </div>
                 </div>
-            </div>
 
             <!-- Net Non-Operating Display -->
-            <div class="bg-white rounded-xl shadow-sm border-4 border-cyan-500 p-6">
-                <h2 class="text-xl font-bold text-cyan-700 mb-4">Net Non-Operating Profit/Loss</h2>
-                <div class="bg-cyan-50 rounded-lg p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="rounded-xl border border-green-200 bg-white/80 p-5 text-center">
-                            <div class="text-sm text-gray-600 mb-1">Non-Operating Income</div>
-                            <div class="text-2xl font-bold text-green-700">{{ money(totalIncome) }}</div>
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(30,91,67,0.1)] border-2 border-[#1e5b43]/20 overflow-hidden mb-6">
+                <div class="bg-[#1e5b43]/5 border-b border-[#1e5b43]/10 px-6 py-4">
+                    <h2 class="text-xl font-bold text-[#1e5b43]">Net Non-Operating Profit/Loss</h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-gray-100 p-5 text-center transition-transform hover:-translate-y-1">
+                            <div class="text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-2">Non-Operating Income</div>
+                            <div class="text-2xl font-bold text-[#1e5b43]">{{ money(totalIncome) }}</div>
                         </div>
-                        <div class="rounded-xl border border-red-200 bg-white/80 p-5 text-center">
-                            <div class="text-sm text-gray-600 mb-1">Non-Operating Expenses</div>
-                            <div class="text-2xl font-bold text-red-700">{{ money(totalExpenses) }}</div>
-                            <div class="text-xs text-gray-500 mt-1">Tax: {{ money(totalExpenseTax) }}</div>
+                        <div class="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-gray-100 p-5 text-center transition-transform hover:-translate-y-1">
+                            <div class="text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-2">Non-Operating Expenses</div>
+                            <div class="text-2xl font-bold text-red-600">{{ money(totalExpenses) }}</div>
+                            <div class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mt-2">Tax: {{ money(totalExpenseTax) }}</div>
                         </div>
-                        <div class="rounded-xl border-2 border-cyan-500 bg-cyan-100 p-5 text-center shadow-sm">
-                            <div class="text-sm text-gray-700 mb-1 font-semibold">Net Result</div>
-                            <div class="text-3xl font-bold" :class="netNonOperating >= 0 ? 'text-cyan-700' : 'text-red-700'">
+                        <div class="bg-[#1e5b43] rounded-[20px] shadow-[0_4px_12px_rgba(30,91,67,0.2)] p-5 text-center transform scale-105">
+                            <div class="text-[11px] uppercase tracking-wider font-bold text-emerald-100/90 mb-2">Net Result</div>
+                            <div class="text-3xl font-bold" :class="netNonOperating >= 0 ? 'text-white' : 'text-red-300'">
                                 {{ money(netNonOperating) }}
                             </div>
                         </div>
@@ -51,39 +50,37 @@
                 </div>
 
                 <!-- Alert for loss -->
-                <div v-if="netNonOperating < 0" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="text-sm font-medium text-red-800">Net Non-Operating Loss: Review financing and forex exposure</span>
+                <div v-if="netNonOperating < 0" class="mx-6 mb-6 mt-0 bg-red-50 border border-red-100 rounded-[16px] p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
+                    <span class="text-sm font-bold text-red-800">Net Non-Operating Loss: Review financing and forex exposure</span>
                 </div>
             </div>
 
             <!-- Split View: Income & Expenses -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <!-- Non-Operating Income -->
-                <div class="bg-white rounded-xl shadow-sm border-4 border-cyan-400 p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-cyan-700">Non-Operating Income</h3>
-                        <button @click="showAddModal('income')" class="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-xs">
-                            + Add Income
+                <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                        <h3 class="text-[18px] font-bold text-gray-900">Non-Operating Income</h3>
+                        <button @click="showAddModal('income')" class="bg-[#1e5b43]/10 text-[#1e5b43] px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-[#1e5b43]/20 transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus w-3 h-3"></i> Add Income
                         </button>
                     </div>
 
                     <!-- Income Breakdown -->
-                    <div class="space-y-2 mb-4">
-                        <div v-for="(category, index) in incomeCategories" :key="category" class="group hover:bg-cyan-50 rounded-lg p-2 transition-colors">
+                    <div class="space-y-1 mb-6 flex-1">
+                        <div v-for="(category, index) in incomeCategories" :key="category" class="group hover:bg-gray-50 rounded-xl p-2.5 transition-colors border border-transparent hover:border-gray-100">
                             <div class="flex justify-between items-center">
-                                <button @click="filterByCategory('income', category)" class="text-sm text-gray-700 hover:text-cyan-800 font-medium text-left flex items-center gap-2 flex-1">
-                                    <span class="font-bold text-cyan-700">{{ String.fromCharCode(65 + index) }}.</span>
+                                <button @click="filterByCategory('income', category)" class="text-sm text-gray-700 hover:text-[#1e5b43] font-medium text-left flex items-center gap-3 flex-1">
+                                    <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[10px] font-bold">{{ String.fromCharCode(65 + index) }}</span>
                                     <span>{{ category }}</span>
                                 </button>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-semibold text-green-700">{{ money(incomeBreakdown[category] || 0) }}</span>
-                                    <button @click="quickAdd('income', category)" class="opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-green-800 text-xl font-bold" title="Quick Add">
-                                        +
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-[#1e5b43]">{{ money(incomeBreakdown[category] || 0) }}</span>
+                                    <button @click="quickAdd('income', category)" class="w-7 h-7 rounded-full flex items-center justify-center text-[#1e5b43] bg-[#1e5b43]/5 hover:bg-[#1e5b43]/10 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100" title="Quick Add">
+                                        <i class="fa-solid fa-plus text-xs"></i>
                                     </button>
                                 </div>
                             </div>
@@ -91,35 +88,35 @@
                     </div>
 
                     <!-- Total Income -->
-                    <div class="pt-4 border-t-2 border-cyan-300">
+                    <div class="pt-5 border-t border-gray-200 mt-auto">
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-gray-900">Total Income:</span>
-                            <span class="text-xl font-bold text-green-700">{{ money(totalIncome) }}</span>
+                            <span class="text-[11px] uppercase tracking-wider font-bold text-gray-500">Total Income:</span>
+                            <span class="text-[20px] font-bold text-[#1e5b43]">{{ money(totalIncome) }}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Non-Operating Expenses -->
-                <div class="bg-white rounded-xl shadow-sm border-4 border-cyan-400 p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-cyan-700">Non-Operating Expenses</h3>
-                        <button @click="showAddModal('expense')" class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-xs">
-                            + Add Expense
+                <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                        <h3 class="text-[18px] font-bold text-gray-900">Non-Operating Expenses</h3>
+                        <button @click="showAddModal('expense')" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-red-100 transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus w-3 h-3"></i> Add Expense
                         </button>
                     </div>
 
                     <!-- Expense Breakdown -->
-                    <div class="space-y-2 mb-4">
-                        <div v-for="(category, index) in expenseCategories" :key="category" class="group hover:bg-cyan-50 rounded-lg p-2 transition-colors">
+                    <div class="space-y-1 mb-6 flex-1">
+                        <div v-for="(category, index) in expenseCategories" :key="category" class="group hover:bg-gray-50 rounded-xl p-2.5 transition-colors border border-transparent hover:border-gray-100">
                             <div class="flex justify-between items-center">
-                                <button @click="filterByCategory('expense', category)" class="text-sm text-gray-700 hover:text-cyan-800 font-medium text-left flex items-center gap-2 flex-1">
-                                    <span class="font-bold text-cyan-700">{{ String.fromCharCode(65 + index) }}.</span>
+                                <button @click="filterByCategory('expense', category)" class="text-sm text-gray-700 hover:text-red-700 font-medium text-left flex items-center gap-3 flex-1">
+                                    <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[10px] font-bold">{{ String.fromCharCode(65 + index) }}</span>
                                     <span>{{ category }}</span>
                                 </button>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-semibold text-red-700">{{ money(expenseBreakdown[category] || 0) }}</span>
-                                    <button @click="quickAdd('expense', category)" class="opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-800 text-xl font-bold" title="Quick Add">
-                                        +
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-red-600">{{ money(expenseBreakdown[category] || 0) }}</span>
+                                    <button @click="quickAdd('expense', category)" class="w-7 h-7 rounded-full flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100" title="Quick Add">
+                                        <i class="fa-solid fa-plus text-xs"></i>
                                     </button>
                                 </div>
                             </div>
@@ -127,94 +124,92 @@
                     </div>
 
                     <!-- Total Expenses -->
-                    <div class="pt-4 border-t-2 border-cyan-300">
+                    <div class="pt-5 border-t border-gray-200 mt-auto">
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-gray-900">Total Expenses:</span>
-                            <span class="text-xl font-bold text-red-700">{{ money(totalExpenses) }}</span>
+                            <span class="text-[11px] uppercase tracking-wider font-bold text-gray-500">Total Expenses:</span>
+                            <span class="text-[20px] font-bold text-red-600">{{ money(totalExpenses) }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Detailed Entries Table (Expandable) -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-4 bg-gray-50 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <button @click="showDetails = !showDetails" class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                            <svg :class="['w-4 h-4 transition-transform', showDetails ? 'rotate-90' : '']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                            {{ showDetails ? 'Hide' : 'Show' }} Detailed Entries ({{ filteredEntries.length }} {{ filterActive ? 'filtered' : 'total' }})
-                        </button>
-                        <button v-if="filterActive" @click="clearFilter" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 overflow-hidden mb-6 transition-all duration-300 ease-in-out">
+                <div class="p-5 border-b border-gray-100 bg-white cursor-pointer hover:bg-gray-50/50 transition-colors" @click="showDetails = !showDetails">
+                    <div class="flex items-center justify-between pointer-events-none">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                <i :class="['fa-solid fa-chevron-right transition-transform duration-300 text-xs', showDetails ? 'rotate-90' : '']"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-sm tracking-wide">{{ showDetails ? 'Hide' : 'Show' }} Detailed Entries</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ filteredEntries.length }} {{ filterActive ? 'filtered' : 'total' }} entries</p>
+                            </div>
+                        </div>
+                        <button v-if="filterActive" @click.stop="clearFilter" class="pointer-events-auto bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors">
                             Clear Filter
                         </button>
                     </div>
                 </div>
-                <div v-show="showDetails" class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50 border-b border-gray-200">
+                
+                <div v-show="showDetails" class="overflow-x-auto border-t border-gray-100">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-gray-50/50 text-[11px] uppercase text-gray-400 font-bold tracking-wider border-b border-gray-100">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost Head</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Rate</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Amount</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Type</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Cost Head</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Client</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Description</th>
+                                <th class="px-6 py-4 whitespace-nowrap text-right">Amount</th>
+                                <th class="px-6 py-4 whitespace-nowrap text-right">Tax Rate</th>
+                                <th class="px-6 py-4 whitespace-nowrap text-right">Tax Amount</th>
+                                <th class="px-6 py-4 whitespace-nowrap text-right">Total</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Date</th>
+                                <th class="px-6 py-4 whitespace-nowrap text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="divide-y divide-gray-50">
                             <tr v-if="filteredEntries.length === 0">
                                 <td colspan="10" class="px-6 py-12 text-center text-gray-500">
                                     {{ filterActive ? 'No entries found for this subcategory.' : 'No non-operating entries yet. Click "Add Income" or "Add Expense" to create one.' }}
                                 </td>
                             </tr>
-                            <tr v-for="entry in filteredEntries" :key="entry.id" class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 text-sm">
-                                    <span :class="['px-2 py-1 rounded-full text-xs font-medium', entry.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                            <tr v-for="entry in filteredEntries" :key="entry.id" class="transition-colors hover:bg-gray-50/50 group">
+                                <td class="px-6 py-4">
+                                    <span :class="['px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider', entry.type === 'income' ? 'bg-emerald-50 text-[#1e5b43] border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100']">
                                         {{ entry.type === 'income' ? 'Income' : 'Expense' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ entry.category }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-900">
+                                <td class="px-6 py-4 font-semibold text-gray-900">{{ entry.category }}</td>
+                                <td class="px-6 py-4">
                                     <template v-if="entry.client">
-                                        <div>{{ entry.client.name }}</div>
-                                        <div class="text-xs text-gray-500">{{ entry.client.phone_number }}</div>
+                                        <div class="font-medium text-gray-900">{{ entry.client.name }}</div>
+                                        <div class="text-[11px] text-gray-500 mt-0.5">{{ entry.client.phone_number }}</div>
                                     </template>
-                                    <span v-else class="text-gray-400 italic">Organization-wide</span>
+                                    <span v-else class="inline-flex px-2 py-1 rounded bg-gray-100 text-gray-500 text-[10px] uppercase font-bold tracking-wider">Org Wide</span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-700">{{ entry.description }}</td>
-                                <td class="px-6 py-4 text-sm text-right font-bold" :class="entry.type === 'income' ? 'text-green-700' : 'text-red-700'">
+                                <td class="px-6 py-4 text-gray-600 max-w-[200px] truncate" :title="entry.description">{{ entry.description || "—" }}</td>
+                                <td class="px-6 py-4 text-right font-medium" :class="entry.type === 'income' ? 'text-[#1e5b43]' : 'text-red-600'">
                                     {{ money(entry.amount) }}
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right text-gray-700">
+                                <td class="px-6 py-4 text-right text-gray-500">
                                     {{ entry.type === 'expense' ? `${entry.tax_rate}%` : '—' }}
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right font-medium text-amber-700">
+                                <td class="px-6 py-4 text-right font-medium" :class="entry.type === 'expense' ? 'text-orange-600' : 'text-gray-400'">
                                     {{ entry.type === 'expense' ? money(entry.tax_amount) : '—' }}
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right font-bold text-purple-700">
+                                <td class="px-6 py-4 text-right font-bold text-gray-900">
                                     {{ money(entry.type === 'expense' ? (entry.amount + entry.tax_amount) : entry.amount) }}
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ entry.created_at }}</td>
-                                <td class="px-6 py-4 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <IconButton
-                                            icon="fa-solid fa-pen-to-square"
-                                            class="bg-blue-600 text-white hover:bg-blue-700"
-                                            tooltip="Edit entry"
-                                            @click="editEntry(entry)"
-                                        />
-                                        <IconButton
-                                            icon="fa-solid fa-trash"
-                                            class="bg-red-600 text-white hover:bg-red-700"
-                                            tooltip="Delete entry"
-                                            @click="deleteEntry(entry)"
-                                        />
+                                <td class="px-6 py-4 text-gray-500">{{ entry.created_at }}</td>
+                                <td class="px-6 py-4 text-right border-l border-transparent group-hover:border-gray-100">
+                                    <div class="flex items-center justify-end gap-1.5 transition-opacity">
+                                        <button @click="editEntry(entry)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit entry">
+                                            <i class="fa-solid fa-pen-to-square w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button @click="deleteEntry(entry)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition" title="Delete entry">
+                                            <i class="fa-solid fa-trash w-3.5 h-3.5"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -222,134 +217,136 @@
                     </table>
                 </div>
             </div>
-        </div>
 
         <!-- Add/Edit Modal -->
-        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-                <div class="p-6 border-b border-gray-200 flex-shrink-0">
-                    <h2 class="text-2xl font-bold text-gray-900">
+        <div v-if="showModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-6">
+            <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all">
+                <div class="p-6 border-b border-gray-100 flex-shrink-0 flex items-center justify-between bg-gray-50/50">
+                    <h2 class="text-xl font-bold text-gray-900">
                         {{ editingEntry ? 'Edit Entry' : `Add ${form.type === 'income' ? 'Income' : 'Expense'} Entry` }}
                     </h2>
+                    <button @click="closeModal" class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-times w-3.5 h-3.5"></i>
+                    </button>
                 </div>
-                <form @submit.prevent="submitForm" class="flex-1 overflow-y-auto">
-                    <div class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Client *</label>
-                        <div class="relative" ref="clientDropdownRef">
-                            <input
-                                v-model="clientSearch"
-                                @input="filterClients"
-                                @focus="showClientDropdown = true"
-                                type="text"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                                placeholder="Search by name or phone number..."
-                            />
-                            <div
-                                v-if="showClientDropdown"
-                                class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
-                            >
+                <div class="overflow-y-auto flex-1 p-6">
+                    <form @submit.prevent="submitForm" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wider text-[11px]">Client *</label>
+                            <div class="relative" ref="clientDropdownRef">
+                                <input
+                                    v-model="clientSearch"
+                                    @input="filterClients"
+                                    @focus="showClientDropdown = true"
+                                    type="text"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                    placeholder="Search by name or phone number..."
+                                />
                                 <div
-                                    v-for="client in filteredClients"
-                                    :key="client.id"
-                                    @click="selectClient(client)"
-                                    class="px-4 py-2 hover:bg-cyan-50 cursor-pointer text-sm border-t border-gray-100"
+                                    v-if="showClientDropdown"
+                                    class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto py-1"
                                 >
-                                    <div class="font-medium">{{ client.name }}</div>
-                                    <div class="text-xs text-gray-500">{{ client.phone_number }}</div>
-                                </div>
-                                <div v-if="filteredClients.length === 0 && clientSearch" class="px-4 py-2 text-sm text-gray-500 italic">
-                                    No clients found
+                                    <div
+                                        v-for="client in filteredClients"
+                                        :key="client.id"
+                                        @click="selectClient(client)"
+                                        class="px-4 py-2 cursor-pointer hover:bg-gray-50 border-b border-gray-50 last:border-0"
+                                    >
+                                        <div class="font-bold text-sm text-gray-900">{{ client.name }}</div>
+                                        <div class="text-[11px] text-gray-500 mt-0.5">{{ client.phone_number }}</div>
+                                    </div>
+                                    <div v-if="filteredClients.length === 0 && clientSearch" class="px-4 py-3 text-sm text-gray-500 italic text-center">
+                                        No clients found
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Cost Head *</label>
-                        <SubcategorySelector
-                            v-model="form.category"
-                            :subcategories="form.type === 'income' ? incomeSubcategoryObjects : expenseSubcategoryObjects"
-                            type="non_operating"
-                            :category="form.type"
-                            label="Cost Head"
-                        />
-                    </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wider text-[11px]">Cost Head *</label>
+                            <SubcategorySelector
+                                v-model="form.category"
+                                :subcategories="form.type === 'income' ? incomeSubcategoryObjects : expenseSubcategoryObjects"
+                                type="non_operating"
+                                :category="form.type"
+                                label="Cost Head"
+                            />
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea
-                            v-model="form.description"
-                            rows="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                            placeholder="Enter detailed description"
-                        ></textarea>
-                    </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wider text-[11px]">Description</label>
+                            <textarea
+                                v-model="form.description"
+                                rows="3"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                placeholder="Enter detailed description"
+                            ></textarea>
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Amount (৳) *</label>
-                        <input
-                            v-model.number="form.amount"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                            placeholder="0.00"
-                        />
-                    </div>
-                    <div v-if="form.type === 'expense'">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tax Rate (%)</label>
-                        <input
-                            v-model.number="form.tax_rate"
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="0.01"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                            placeholder="0"
-                        />
-                        <div v-if="form.tax_rate > 0" class="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-700">Calculated Tax Amount:</span>
-                                <span class="text-sm font-bold text-amber-700">{{ money(calculatedTax) }}</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wider text-[11px]">Amount (৳) *</label>
+                                <input
+                                    v-model.number="form.amount"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    required
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                    placeholder="0.00"
+                                />
                             </div>
-                            <div class="flex justify-between items-center mt-2">
-                                <span class="text-sm font-medium text-gray-900">Total with Tax:</span>
-                                <span class="text-sm font-bold text-purple-700">{{ money(totalWithTaxPreview) }}</span>
+                            <div v-if="form.type === 'expense'">
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wider text-[11px]">Tax Rate (%)</label>
+                                <input
+                                    v-model.number="form.tax_rate"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.01"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm transition-shadow"
+                                    placeholder="0"
+                                />
                             </div>
                         </div>
-                    </div>
+                        
+                        <div v-if="form.type === 'expense' && form.tax_rate > 0" class="mt-4 rounded-[16px] border border-orange-100 bg-orange-50/50 p-4">
+                            <div class="flex justify-between items-center pb-2 border-b border-orange-100">
+                                <span class="text-sm font-medium text-orange-900">Calculated Tax Amount:</span>
+                                <span class="text-sm font-bold text-orange-600">{{ money(calculatedTax) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-3">
+                                <span class="text-sm font-bold text-gray-900 uppercase tracking-wider text-[11px]">Total with Tax:</span>
+                                <span class="text-lg font-bold text-gray-900">{{ money(totalWithTaxPreview) }}</span>
+                            </div>
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea
-                            v-model="form.notes"
-                            rows="2"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                            placeholder="Additional notes (optional)"
-                        ></textarea>
-                    </div>
-
-                    </div>
-                </form>
-                <div class="p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-                    <div class="flex justify-end gap-3">
-                        <button
-                            type="button"
-                            @click="closeModal"
-                            class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 bg-white transition-colors font-medium text-sm"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            @click="submitForm"
-                            class="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors font-medium text-sm"
-                        >
-                            {{ editingEntry ? 'Update Entry' : 'Add Entry' }}
-                        </button>
-                    </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wider text-[11px]">Notes</label>
+                            <textarea
+                                v-model="form.notes"
+                                rows="2"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                placeholder="Additional notes (optional)"
+                            ></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="p-5 border-t border-gray-100 bg-gray-50 flex-shrink-0 flex justify-end gap-3 rounded-b-[24px]">
+                    <button
+                        type="button"
+                        @click="closeModal"
+                        class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        @click="submitForm"
+                        class="bg-[#1e5b43] text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-[#164230] transition-colors shadow-sm"
+                    >
+                        {{ editingEntry ? 'Update Entry' : 'Add Entry' }}
+                    </button>
                 </div>
             </div>
         </div>

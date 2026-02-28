@@ -10,21 +10,21 @@
             <div class="flex items-center gap-3">
                 <Link
                     :href="route('invoices.index')"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
                 >
                     Back to list
                 </Link>
                 <a
                     v-if="invoice.pdf_path"
                     :href="route('invoices.download', invoice.id)"
-                    class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+                    class="inline-flex items-center gap-2 rounded-full bg-[#1e5b43] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#154130] transition-colors shadow-sm"
                 >
                     Download PDF
                 </a>
             </div>
         </div>
 
-        <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <div class="grid gap-4 md:grid-cols-2">
                 <InfoRow label="Invoice Date" :value="invoice.invoice_date" />
                 <InfoRow label="Payment Status" :value="capitalize(invoice.payment_status)" />
@@ -41,7 +41,7 @@
             </div>
         </section>
 
-        <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Invoice Items</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
@@ -73,7 +73,7 @@
             </div>
         </section>
 
-        <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Summary</h2>
             <div class="grid gap-4 md:grid-cols-3">
                 <InfoRow label="Subtotal" :value="money(invoice.subtotal)" />
@@ -87,7 +87,7 @@
             </div>
         </section>
 
-        <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h2 class="text-lg font-semibold text-gray-900 mb-3">Terms & Conditions</h2>
             <p class="whitespace-pre-line text-sm text-gray-700">
                 {{ invoice.terms_text }}

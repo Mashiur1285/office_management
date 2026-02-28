@@ -1,157 +1,152 @@
 <template>
     <Head title="Net Profit Before Tax" />
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-green-50/30 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <!-- Header -->
-            <div class="overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 text-white shadow-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold text-white">Net Profit Before Tax</h1>
-                        <p class="text-sm text-blue-100 mt-1">Period: {{ period.name }}</p>
+    <div class="px-4 py-8 md:px-6 lg:px-8 bg-[#f5f6f8] min-h-screen text-gray-800 font-sans">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">Net Profit Before Tax</h1>
+                <p class="text-sm text-gray-500">Period: {{ period.name }}</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-900">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1e5b43] outline-none">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
-                        <a :href="route('accounting.net-profit-before-tax.report')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-excel"></i>
-                            Export to Excel
+                        <a :href="route('accounting.net-profit-before-tax.report')" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-excel text-green-600"></i>
+                            Excel
                         </a>
-                        <a :href="route('accounting.net-profit-before-tax.report', { type: 'pdf' })" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-pdf"></i>
-                            Export to PDF
+                        <a :href="route('accounting.net-profit-before-tax.report', { type: 'pdf' })" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf text-red-600"></i>
+                            PDF
                         </a>
                     </div>
                 </div>
-            </div>
 
             <!-- Net Profit Before Tax Calculation -->
-            <div class="bg-white rounded-xl shadow-sm border-4 border-green-500 p-6">
-                <h2 class="text-xl font-bold text-green-700 mb-6">Pre-Tax Profit Calculation</h2>
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-8 mb-6">
+                <h2 class="text-[20px] font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Pre-Tax Profit Calculation</h2>
 
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <!-- Formula Display -->
-                    <div class="bg-green-50 rounded-lg p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="rounded-xl border border-blue-200 bg-white/80 p-5 text-center">
-                                <div class="text-sm text-gray-600 mb-1">Operating Profit</div>
-                                <Link href="/accounting/operating-profit" class="text-2xl font-bold text-blue-700 hover:text-blue-800 hover:underline">
-                                    {{ money(operatingProfit) }}
-                                </Link>
-                            </div>
-                            <div class="rounded-xl border border-cyan-200 bg-white/80 p-5 text-center">
-                                <div class="text-sm text-gray-600 mb-1">Net Non-Operating</div>
-                                <Link href="/accounting/non-operating" class="text-2xl font-bold hover:underline" :class="netNonOperating >= 0 ? 'text-cyan-700 hover:text-cyan-800' : 'text-red-700 hover:text-red-800'">
-                                    {{ money(netNonOperating) }}
-                                </Link>
-                            </div>
-                            <div class="rounded-xl border-2 border-green-500 bg-green-100 p-5 text-center shadow-sm">
-                                <div class="text-sm text-gray-700 mb-1 font-semibold">Net Profit Before Tax</div>
-                                <div class="text-3xl font-bold" :class="netProfitBeforeTax >= 0 ? 'text-green-700' : 'text-red-700'">
-                                    {{ money(netProfitBeforeTax) }}
-                                </div>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-50/50 rounded-[20px] p-6 border border-gray-100 flex flex-col justify-center transition-all hover:bg-gray-50 hover:shadow-sm">
+                            <p class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Operating Profit</p>
+                            <Link href="/accounting/operating-profit" class="text-[32px] font-bold text-[#1e5b43] leading-none hover:text-[#164230] transition-colors">
+                                {{ money(operatingProfit) }}
+                            </Link>
+                        </div>
+                        <div class="bg-gray-50/50 rounded-[20px] p-6 border border-gray-100 flex flex-col justify-center transition-all hover:bg-gray-50 hover:shadow-sm">
+                            <p class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Net Non-Operating</p>
+                            <Link href="/accounting/non-operating" class="text-[32px] font-bold leading-none hover:opacity-80 transition-colors" :class="netNonOperating >= 0 ? 'text-[#1e5b43]' : 'text-red-600'">
+                                {{ money(netNonOperating) }}
+                            </Link>
+                        </div>
+                        <div class="bg-white rounded-[24px] shadow-[0_4px_12px_rgba(0,0,0,0.05)] border-2 border-[#1e5b43] p-6 flex flex-col justify-center transform scale-105">
+                            <p class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Net Profit Before Tax</p>
+                            <p class="text-[36px] font-bold leading-none" :class="netProfitBeforeTax >= 0 ? 'text-[#1e5b43]' : 'text-red-600'">
+                                {{ money(netProfitBeforeTax) }}
+                            </p>
                         </div>
                     </div>
 
                     <!-- Profitability Indicator -->
-                    <div v-if="netProfitBeforeTax >= 0" class="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-sm font-medium text-green-800">Profitable before tax - Ready for tax planning</span>
+                    <div v-if="netProfitBeforeTax >= 0" class="bg-emerald-50 rounded-[20px] border border-emerald-100 p-6 flex items-center gap-4 mt-6">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <span class="block font-bold text-emerald-900 mb-1">Profitable before tax</span>
+                            <span class="text-sm text-emerald-700">Ready for tax planning.</span>
                         </div>
                     </div>
-                    <div v-else class="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-sm font-medium text-red-800">Loss before tax - Review operations and non-operating activities</span>
+                    <div v-else class="bg-red-50 rounded-[20px] border border-red-100 p-6 flex items-center gap-4 mt-6">
+                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <span class="block font-bold text-red-900 mb-1">Loss before tax</span>
+                            <span class="text-sm text-red-700">Review operations and non-operating activities.</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Detailed Breakdown -->
-            <div class="bg-white rounded-xl shadow-sm border-4 border-green-500 p-6">
-                <h3 class="text-lg font-bold text-green-700 mb-4">Detailed Breakdown</h3>
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-8 mb-6">
+                <h3 class="text-[20px] font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Detailed Breakdown</h3>
 
-                <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Operating Performance Section -->
-                    <div class="bg-blue-50 rounded-lg p-4">
-                        <h4 class="font-semibold text-blue-900 mb-3">Operating Performance</h4>
-                        <div class="space-y-2">
+                    <div class="border border-gray-100 rounded-[20px] p-6 hover:shadow-sm transition-all">
+                        <h4 class="font-bold text-gray-800 mb-4 border-b border-gray-50 pb-2">Operating Performance</h4>
+                        <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
-                                <span class="text-gray-700">Gross Profit</span>
-                                <Link href="/accounting/gross-profit" class="font-semibold text-green-700 hover:text-green-800 hover:underline">
+                                <span class="text-gray-500 font-medium">Gross Profit</span>
+                                <Link href="/accounting/gross-profit" class="font-bold text-[#1e5b43] hover:text-[#164230] transition-colors">
                                     {{ money(grossProfit) }}
                                 </Link>
                             </div>
                             <div class="flex justify-between items-center text-sm">
-                                <span class="text-gray-700">Less: Operating Expenses (with VAT &amp; Tax)</span>
-                                <Link href="/accounting/operating-profit" class="font-semibold text-pink-700 hover:text-pink-800 hover:underline">
+                                <span class="text-gray-500 font-medium">Less: Operating Expenses</span>
+                                <Link href="/accounting/operating-profit" class="font-bold text-red-500 hover:text-red-700 transition-colors">
                                     {{ money(totalOperatingExpensesWithVatTax) }}
                                 </Link>
                             </div>
-                            <div class="pt-2 border-t border-blue-200 flex justify-between items-center">
-                                <span class="font-bold text-gray-900">Operating Profit</span>
-                                <span class="text-xl font-bold text-blue-700">{{ money(operatingProfit) }}</span>
+                            <div class="pt-3 border-t border-gray-100 flex justify-between items-center mt-2">
+                                <span class="font-bold text-gray-800 uppercase tracking-wider text-[11px]">Operating Profit</span>
+                                <span class="text-[18px] font-bold text-[#1e5b43]">{{ money(operatingProfit) }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Non-Operating Section -->
-                    <div class="bg-cyan-50 rounded-lg p-4">
-                        <h4 class="font-semibold text-cyan-900 mb-3">Non-Operating Activities</h4>
-                        <div class="space-y-2">
+                    <div class="border border-gray-100 rounded-[20px] p-6 hover:shadow-sm transition-all">
+                        <h4 class="font-bold text-gray-800 mb-4 border-b border-gray-50 pb-2">Non-Operating Activities</h4>
+                        <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
-                                <span class="text-gray-700">Non-Operating Income</span>
-                                <Link href="/accounting/non-operating" class="font-semibold text-green-700 hover:text-green-800 hover:underline">
+                                <span class="text-gray-500 font-medium">Non-Operating Income</span>
+                                <Link href="/accounting/non-operating" class="font-bold text-[#1e5b43] hover:text-[#164230] transition-colors">
                                     {{ money(nonOperatingIncome) }}
                                 </Link>
                             </div>
                             <div class="flex justify-between items-center text-sm">
-                                <span class="text-gray-700">Less: Non-Operating Expenses</span>
-                                <Link href="/accounting/non-operating" class="font-semibold text-red-700 hover:text-red-800 hover:underline">
+                                <span class="text-gray-500 font-medium">Less: Non-Operating Expenses</span>
+                                <Link href="/accounting/non-operating" class="font-bold text-red-500 hover:text-red-700 transition-colors">
                                     {{ money(nonOperatingExpenses) }}
                                 </Link>
                             </div>
-                            <div class="pt-2 border-t border-cyan-200 flex justify-between items-center">
-                                <span class="font-bold text-gray-900">Net Non-Operating</span>
-                                <span class="text-xl font-bold" :class="netNonOperating >= 0 ? 'text-cyan-700' : 'text-red-700'">
+                            <div class="pt-3 border-t border-gray-100 flex justify-between items-center mt-2">
+                                <span class="font-bold text-gray-800 uppercase tracking-wider text-[11px]">Net Non-Operating</span>
+                                <span class="text-[18px] font-bold" :class="netNonOperating >= 0 ? 'text-[#1e5b43]' : 'text-red-500'">
                                     {{ money(netNonOperating) }}
                                 </span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Final Calculation -->
-                    <div class="bg-green-100 rounded-lg p-4 border-2 border-green-400">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <div class="text-sm text-gray-600 mb-1">Combined Result</div>
-                                <div class="font-bold text-gray-900">Net Profit Before Tax</div>
-                            </div>
-                            <div class="text-3xl font-bold" :class="netProfitBeforeTax >= 0 ? 'text-green-700' : 'text-red-700'">
-                                {{ money(netProfitBeforeTax) }}
-                            </div>
-                        </div>
+                <!-- Final Calculation -->
+                <div class="mt-6 bg-[#1e5b43] rounded-[20px] p-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-white shadow-[0_8px_24px_rgba(30,91,67,0.3)]">
+                    <div>
+                        <div class="text-[11px] font-bold uppercase tracking-widest mb-1 opacity-80">Combined Result</div>
+                        <div class="text-[20px] font-bold">Net Profit Before Tax</div>
+                    </div>
+                    <div class="text-[40px] font-black tracking-tight leading-none bg-white text-[#1e5b43] px-6 py-2 rounded-[16px]">
+                        {{ money(netProfitBeforeTax) }}
                     </div>
                 </div>
             </div>
 
             <!-- Tax Planning Note -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div class="flex items-start gap-3">
-                    <svg class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                    </svg>
+            <div class="bg-gray-50/80 rounded-[20px] shadow-sm border border-gray-100 p-6 mb-8">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 flex-shrink-0">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
                     <div>
-                        <h4 class="font-semibold text-gray-900 mb-1">Tax Planning Ready</h4>
+                        <h4 class="font-bold text-gray-900 mb-1">Tax Planning Ready</h4>
                         <p class="text-sm text-gray-600">
                             This is your pre-tax profit figure. Proceed to Tax Management to record current and deferred tax expenses, then view your final Net Profit After Tax.
                         </p>
@@ -160,20 +155,22 @@
             </div>
 
             <!-- Navigation Links -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Link href="/accounting/operating-profit" class="bg-blue-50 hover:bg-blue-100 rounded-lg p-4 border border-blue-200 transition-colors">
-                    <div class="text-sm text-blue-700 font-medium mb-1">← Previous</div>
-                    <div class="font-semibold text-gray-900">Operating Profit</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-8">
+                <Link href="/accounting/operating-profit" class="bg-white hover:bg-gray-50 rounded-[20px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all flex flex-col justify-center items-center text-center group">
+                    <i class="fa-solid fa-arrow-left text-gray-400 mb-2 group-hover:-translate-x-1 transition-transform"></i>
+                    <div class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Previous</div>
+                    <div class="font-bold text-gray-900 group-hover:text-[#1e5b43] transition-colors">Operating Profit</div>
                 </Link>
-                <Link href="/accounting/tax" class="bg-green-50 hover:bg-green-100 rounded-lg p-4 border border-green-200 transition-colors">
-                    <div class="text-sm text-green-700 font-medium mb-1">Next Step →</div>
-                    <div class="font-semibold text-gray-900">Tax Management</div>
+                <Link href="/accounting/tax" class="bg-white hover:bg-gray-50 rounded-[20px] p-6 border border-[#1e5b43]/20 shadow-[0_2px_12px_rgba(30,91,67,0.05)] transition-all flex flex-col justify-center items-center text-center group">
+                    <i class="fa-solid fa-arrow-right text-[#1e5b43] mb-2 group-hover:translate-x-1 transition-transform"></i>
+                    <div class="text-[11px] text-[#1e5b43] font-bold uppercase tracking-wider mb-1">Next Step</div>
+                    <div class="font-bold text-[#1e5b43]">Tax Management</div>
                 </Link>
-                <Link href="/accounting/non-operating" class="bg-cyan-50 hover:bg-cyan-100 rounded-lg p-4 border border-cyan-200 transition-colors">
-                    <div class="text-sm text-cyan-700 font-medium mb-1">Related</div>
-                    <div class="font-semibold text-gray-900">Non-Operating</div>
+                <Link href="/accounting/non-operating" class="bg-white hover:bg-gray-50 rounded-[20px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all flex flex-col justify-center items-center text-center group">
+                    <i class="fa-solid fa-link text-gray-400 mb-2"></i>
+                    <div class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Related</div>
+                    <div class="font-bold text-gray-900 group-hover:text-[#1e5b43] transition-colors">Non-Operating</div>
                 </Link>
-            </div>
         </div>
     </div>
 </template>

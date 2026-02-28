@@ -1,49 +1,60 @@
 <template>
     <Head title="Create Expense" />
-    <div class="py-8 space-y-6">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="px-4 py-8 md:px-6 lg:px-8 bg-[#f5f6f8] min-h-screen text-gray-800 font-sans">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">Accounting</p>
-                <h1 class="text-2xl font-bold text-gray-900">
+                <p class="text-[12px] font-bold uppercase tracking-wider text-[#1e5b43] mb-1">Accounting</p>
+                <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">
                     {{ isEdit ? "Edit expense" : "Add expense" }}
                 </h1>
-                <p class="text-sm text-gray-600">
+                <p class="text-sm text-gray-500">
                     {{ isEdit ? "Update expense details." : "Record a new expense." }}
                 </p>
             </div>
-            <div class="flex gap-3">
+            <div class="flex flex-wrap gap-3">
                 <Link
                     href="/expenses"
-                    class="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center justify-center"
                 >
-                    ← Back to list
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Back to list
                 </Link>
                 <button
                     type="button"
-                    class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
+                    class="bg-[#1e5b43] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition shadow-sm border border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
                     :disabled="form.processing"
                     @click="submit"
                 >
-                    {{ form.processing ? (isEdit ? "Updating..." : "Saving...") : isEdit ? "Update Expense" : "Save Expense" }}
+                    <span v-if="form.processing">
+                         <i class="fa-solid fa-spinner fa-spin mr-2"></i> {{ isEdit ? "Updating..." : "Saving..." }}
+                    </span>
+                    <span v-else>
+                         <i class="fa-solid fa-check mr-2"></i> {{ isEdit ? "Update Expense" : "Save Expense" }}
+                    </span>
                 </button>
             </div>
         </div>
 
-        <form @submit.prevent="submit" class="space-y-6">
-            <section class="rounded-xl border border-gray-100 bg-white shadow-sm">
-                <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-900">Expense Details</h2>
-                        <p class="text-sm text-gray-600">Title, amount, and optional metadata.</p>
+        <form @submit.prevent="submit" class="space-y-6 max-w-4xl">
+            <section class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 overflow-hidden mb-8">
+                <div class="p-6 border-b border-gray-100 flex flex-col justify-center bg-gray-50/50">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-[20px] font-bold text-gray-900 tracking-tight">Expense Details</h2>
+                            <p class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mt-1">Title, amount, and optional metadata.</p>
+                        </div>
+                        <p class="text-xs font-bold text-[#1e5b43] bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">Fields with * are required.</p>
                     </div>
-                    <p class="text-xs text-gray-500">Fields with * are required.</p>
                 </div>
-                <div class="grid gap-4 p-6 md:grid-cols-2">
+                <div class="grid gap-6 p-6 md:p-8 md:grid-cols-2">
                     <FormGroup label="Title *" :error="form.errors.title">
                         <input v-model="form.title" :class="inputClass('title')" required placeholder="Ex: Visa processing fee" />
                     </FormGroup>
                     <FormGroup label="Amount *" :error="form.errors.amount">
-                        <input v-model="form.amount" type="number" step="0.01" :class="inputClass('amount')" required />
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-500">৳</span>
+                            <input v-model="form.amount" type="number" step="0.01" :class="[inputClass('amount'), 'pl-8']" required />
+                        </div>
                     </FormGroup>
                     <FormGroup label="Category" :error="form.errors.category">
                         <input v-model="form.category" :class="inputClass('category')" placeholder="Ex: Operations" />
@@ -53,7 +64,7 @@
                             v-model="form.paid_on"
                             :enable-time-picker="false"
                             model-type="yyyy-MM-dd"
-                            :class="inputClass('paid_on')"
+                            input-class-name="dp-custom-input"
                         />
                     </FormGroup>
                     <FormGroup label="Vendor" :error="form.errors.vendor">
@@ -73,19 +84,24 @@
                 </div>
             </section>
 
-            <div class="flex items-center justify-end gap-3">
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
                 <Link
                     href="/expenses"
-                    class="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    class="border border-gray-200 text-gray-700 bg-white px-6 py-2.5 rounded-full text-sm font-bold tracking-tight hover:bg-gray-50 transition shadow-sm"
                 >
                     Cancel
                 </Link>
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 disabled:opacity-60"
+                    class="bg-[#1e5b43] text-white px-8 py-2.5 rounded-full text-sm font-bold tracking-tight hover:bg-[#164230] transition shadow-sm border border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
                     :disabled="form.processing"
                 >
-                    {{ form.processing ? (isEdit ? "Updating..." : "Saving...") : isEdit ? "Update Expense" : "Save Expense" }}
+                    <span v-if="form.processing">
+                         <i class="fa-solid fa-spinner fa-spin mr-2"></i> {{ isEdit ? "Updating..." : "Saving..." }}
+                    </span>
+                    <span v-else>
+                         <i class="fa-solid fa-check mr-2"></i> {{ isEdit ? "Update Expense" : "Save Expense" }}
+                    </span>
                 </button>
             </div>
         </form>
@@ -124,11 +140,11 @@ const buildFormState = () => ({
 const form = useForm(buildFormState());
 
 const baseInput =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white";
+    "w-full rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-900 focus:border-transparent focus:ring-2 focus:ring-[#1e5b43] bg-gray-50 focus:bg-white transition-all";
 const baseFile =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 bg-white file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500";
+    "w-full rounded-full border border-gray-200 px-5 py-2 text-sm font-medium text-gray-900 bg-gray-50 file:mr-4 file:rounded-full file:border-0 file:bg-[#1e5b43] file:text-white file:px-4 file:py-1 file:text-xs file:font-bold hover:file:bg-[#164230] file:transition-colors focus:border-transparent focus:ring-2 focus:ring-[#1e5b43] transition-all file:cursor-pointer";
 const baseTextarea =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white";
+    "w-full rounded-2xl border border-gray-200 px-5 py-3 text-sm font-medium text-gray-900 focus:border-transparent focus:ring-2 focus:ring-[#1e5b43] bg-gray-50 focus:bg-white transition-all";
 
 const inputClass = (field) =>
     [
@@ -172,14 +188,36 @@ const FormGroup = defineComponent({
         return () =>
             h(
                 "div",
-                { class: "space-y-2", role: "group" },
+                { class: "space-y-1.5", role: "group" },
                 [
-                    h("label", { class: "text-sm font-medium text-gray-700" }, props.label),
+                    h("label", { class: "text-[13px] font-bold text-gray-700 tracking-wide ml-1 uppercase" }, props.label),
                     slots.default ? slots.default() : null,
-                    props.hint ? h("p", { class: "text-xs text-gray-500" }, props.hint) : null,
-                    props.error ? h("p", { class: "text-xs text-red-600" }, props.error) : null,
+                    props.hint ? h("p", { class: "text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1" }, props.hint) : null,
+                    props.error ? h("p", { class: "text-xs font-bold text-red-500 ml-1" }, props.error) : null,
                 ].filter(Boolean)
             );
     },
 });
 </script>
+
+<style>
+/* Dashboard styles for vue-datepicker */
+.dp-custom-input {
+    width: 100%;
+    border-radius: 9999px !important; /* rounded-full */
+    border: 1px solid #e5e7eb !important; /* border-gray-200 */
+    padding: 0.625rem 1.25rem 0.625rem 2.5rem !important; /* py-2.5 px-5 pl-10 */
+    font-size: 0.875rem !important; /* text-sm */
+    font-weight: 500 !important; /* font-medium */
+    color: #111827 !important; /* text-gray-900 */
+    background-color: #f9fafb !important; /* bg-gray-50 */
+    transition: all 0.2s !important;
+}
+
+.dp-custom-input:focus {
+    background-color: #ffffff !important;
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px #1e5b43 !important; /* focus:ring-[#1e5b43] */
+}
+</style>
