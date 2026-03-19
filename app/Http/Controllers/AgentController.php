@@ -221,4 +221,11 @@ class AgentController extends Controller
 
         return redirect()->route('agents.index')->with('success', 'Agent updated successfully.');
     }
+
+    public function destroy(Agent $agent)
+    {
+        $agent->delete();
+
+        return redirect()->route('agents.index')->with('success', 'Agent deleted successfully.');
+    }
 }

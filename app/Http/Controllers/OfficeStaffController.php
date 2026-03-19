@@ -236,4 +236,11 @@ class OfficeStaffController extends Controller
 
         return redirect()->route('office-staff.index')->with('success', 'Office staff member updated successfully.');
     }
+
+    public function destroy(OfficeStaff $officeStaff)
+    {
+        $officeStaff->delete();
+
+        return redirect()->route('office-staff.index')->with('success', 'Staff member deleted successfully.');
+    }
 }

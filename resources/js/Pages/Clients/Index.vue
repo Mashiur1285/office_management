@@ -526,7 +526,7 @@
                                     />
                                     <IconButton
                                         icon="fa-solid fa-trash"
-                                        class="bg-red-100 text-red-600 hover:bg-red-200"
+                                        extraClass="bg-red-100 text-red-600 hover:bg-red-200"
                                         tooltip="Delete client"
                                         @click="confirmDelete(client)"
                                     />

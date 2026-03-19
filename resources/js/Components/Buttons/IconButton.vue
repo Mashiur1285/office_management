@@ -3,12 +3,13 @@
         v-if="tooltip"
         :data-tooltip-target="icon"
         :disabled="disabled"
+        :class="[btnClass, disabledClass]"
         @click="$emit('click')"
     >
-        <FontAwesomeIcon :class="[defaultIconClass, extraClass, disabledClass]" :icon="icon" />
+        <FontAwesomeIcon :icon="icon" />
     </button>
-    <button v-else :disabled="disabled" @click="$emit('click')">
-        <FontAwesomeIcon :class="[defaultIconClass, extraClass, disabledClass]" :icon="icon" />
+    <button v-else :disabled="disabled" :class="[btnClass, disabledClass]" @click="$emit('click')">
+        <FontAwesomeIcon :icon="icon" />
     </button>
     <div
         v-if="tooltip"
@@ -32,8 +33,12 @@ const props = defineProps({
     tooltip: { type: String, default: null },
 });
 
-const defaultIconClass = 'p-2 rounded-full bg-blue-600 text-white cursor-pointer hover:opacity-80';
-const disabledClass = computed(() => (props.disabled ? 'bg-gray-300 cursor-not-allowed' : ''));
+const btnClass = computed(() =>
+    props.extraClass
+        ? `p-2 rounded-full cursor-pointer ${props.extraClass}`
+        : 'p-2 rounded-full bg-blue-600 text-white cursor-pointer hover:opacity-80'
+);
+const disabledClass = computed(() => (props.disabled ? '!bg-gray-300 cursor-not-allowed' : ''));
 
 defineEmits(['click']);
 </script>

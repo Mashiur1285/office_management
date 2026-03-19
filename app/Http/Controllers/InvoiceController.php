@@ -605,4 +605,11 @@ class InvoiceController extends Controller
 
         return $path;
     }
+
+    public function destroy(Invoice $invoice)
+    {
+        $invoice->delete();
+
+        return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully.');
+    }
 }

@@ -581,4 +581,11 @@ class QuotationController extends Controller
             'total_amount' => $totalAmount,
         ];
     }
+
+    public function destroy(Quotation $quotation)
+    {
+        $quotation->delete();
+
+        return redirect()->route('quotations.index')->with('success', 'Quotation deleted successfully.');
+    }
 }

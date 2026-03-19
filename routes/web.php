@@ -77,6 +77,10 @@ Route::middleware('auth')->group(function () {
         Route::put('quotations/{quotation}', [QuotationController::class, 'update'])->name('quotations.update');
     });
 
+    Route::middleware('permission:quotation.delete')->group(function () {
+        Route::delete('quotations/{quotation}', [QuotationController::class, 'destroy'])->name('quotations.destroy');
+    });
+
     Route::middleware('permission:quotation.view')->group(function () {
         Route::get('quotations', [QuotationController::class, 'index'])->name('quotations.index');
         Route::get('quotations/export/{type?}', [QuotationController::class, 'export'])->name('quotations.export');
@@ -92,6 +96,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:invoice.update')->group(function () {
         Route::get('invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
         Route::put('invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
+    });
+
+    Route::middleware('permission:invoice.delete')->group(function () {
+        Route::delete('invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
     });
 
     Route::middleware('permission:invoice.view')->group(function () {
@@ -111,6 +119,10 @@ Route::middleware('auth')->group(function () {
         Route::put('agents/{agent}', [AgentController::class, 'update'])->name('agents.update');
     });
 
+    Route::middleware('permission:agent.delete')->group(function () {
+        Route::delete('agents/{agent}', [AgentController::class, 'destroy'])->name('agents.destroy');
+    });
+
     Route::middleware('permission:agent.view')->group(function () {
         Route::get('agents', [AgentController::class, 'index'])->name('agents.index');
         Route::get('agents/export/{type?}', [AgentController::class, 'export'])->name('agents.export');
@@ -125,6 +137,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:bd-company.update')->group(function () {
         Route::get('bd-companies/{bdCompany}/edit', [BdCompanyController::class, 'edit'])->name('bd-companies.edit');
         Route::put('bd-companies/{bdCompany}', [BdCompanyController::class, 'update'])->name('bd-companies.update');
+    });
+
+    Route::middleware('permission:bd-company.delete')->group(function () {
+        Route::delete('bd-companies/{bdCompany}', [BdCompanyController::class, 'destroy'])->name('bd-companies.destroy');
     });
 
     Route::middleware('permission:bd-company.view')->group(function () {
@@ -143,6 +159,10 @@ Route::middleware('auth')->group(function () {
         Route::put('foreign-companies/{foreignCompany}', [ForeignCompanyController::class, 'update'])->name('foreign-companies.update');
     });
 
+    Route::middleware('permission:foreign-company.delete')->group(function () {
+        Route::delete('foreign-companies/{foreignCompany}', [ForeignCompanyController::class, 'destroy'])->name('foreign-companies.destroy');
+    });
+
     Route::middleware('permission:foreign-company.view')->group(function () {
         Route::get('foreign-companies', [ForeignCompanyController::class, 'index'])->name('foreign-companies.index');
         Route::get('foreign-companies/export/{type?}', [ForeignCompanyController::class, 'export'])->name('foreign-companies.export');
@@ -158,6 +178,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:office-staff.update')->group(function () {
         Route::get('office-staff/{officeStaff}/edit', [OfficeStaffController::class, 'edit'])->name('office-staff.edit');
         Route::put('office-staff/{officeStaff}', [OfficeStaffController::class, 'update'])->name('office-staff.update');
+    });
+
+    Route::middleware('permission:office-staff.delete')->group(function () {
+        Route::delete('office-staff/{officeStaff}', [OfficeStaffController::class, 'destroy'])->name('office-staff.destroy');
     });
 
     Route::middleware('permission:office-staff.view')->group(function () {

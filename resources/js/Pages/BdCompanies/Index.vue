@@ -116,6 +116,12 @@
                                         tooltip="Edit company"
                                         @click="router.visit(`/bd-companies/${company.id}/edit`)"
                                     />
+                                    <IconButton
+                                        icon="fa-solid fa-trash"
+                                        extraClass="bg-red-100 text-red-600 hover:bg-red-200"
+                                        tooltip="Delete company"
+                                        @click="confirmDelete(company)"
+                                    />
                                 </div>
                             </td>
                         </tr>
@@ -135,6 +141,44 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <Teleport to="body">
+        <div
+            v-if="deleteModal.show"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+            <div
+                class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                @click="deleteModal.show = false"
+            ></div>
+            <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl">
+                <div class="p-6">
+                    <div class="flex justify-center mb-4">
+                        <div class="rounded-full bg-red-100 p-4">
+                            <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-center text-lg font-bold text-gray-900 mb-2">Are you sure?</h3>
+                    <p class="text-center text-sm text-gray-500 mb-1">You are about to delete</p>
+                    <p class="text-center text-base font-semibold text-gray-800 mb-4">"{{ deleteModal.name }}"</p>
+                    <p class="text-center text-xs text-red-500 mb-6">This action cannot be undone.</p>
+                    <div class="flex gap-3">
+                        <button
+                            @click="deleteModal.show = false"
+                            class="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+                        >Cancel</button>
+                        <button
+                            @click="doDelete"
+                            class="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition"
+                        >Yes, Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Teleport>
 </template>
 
 <script setup>
@@ -149,14 +193,14 @@ const props = defineProps({
     },
 });
 
-const companies = props.companies || [];
+const companies = computed(() => props.companies || []);
 const searchQuery = ref("");
 
 const filteredCompanies = computed(() => {
-    if (!searchQuery.value) return companies;
+    if (!searchQuery.value) return companies.value;
 
     const query = searchQuery.value.toLowerCase();
-    return companies.filter((company) => {
+    return companies.value.filter((company) => {
         return (
             company.name?.toLowerCase().includes(query) ||
             company.owner_name?.toLowerCase().includes(query) ||
@@ -172,5 +216,18 @@ const filteredCompanies = computed(() => {
 const money = (value) => {
     if (value === null || value === undefined || value === "") return "—";
     return '৳' + new Intl.NumberFormat('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(value || 0));
+};
+
+const deleteModal = ref({ show: false, id: null, name: '' });
+
+const confirmDelete = (company) => {
+    deleteModal.value = { show: true, id: company.id, name: company.name };
+};
+
+const doDelete = () => {
+    router.delete(`/bd-companies/${deleteModal.value.id}`, {
+        preserveScroll: true,
+        onFinish: () => { deleteModal.value.show = false; },
+    });
 };
 </script>

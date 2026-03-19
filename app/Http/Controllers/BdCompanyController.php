@@ -153,4 +153,11 @@ class BdCompanyController extends Controller
             'clients' => $clients,
         ]);
     }
+
+    public function destroy(BdCompany $bdCompany)
+    {
+        $bdCompany->delete();
+
+        return redirect()->route('bd-companies.index')->with('success', 'Company deleted successfully.');
+    }
 }

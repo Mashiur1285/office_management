@@ -211,4 +211,11 @@ class ForeignCompanyController extends Controller
             'clients' => $clients,
         ]);
     }
+
+    public function destroy(ForeignCompany $foreignCompany)
+    {
+        $foreignCompany->delete();
+
+        return redirect()->route('foreign-companies.index')->with('success', 'Company deleted successfully.');
+    }
 }
