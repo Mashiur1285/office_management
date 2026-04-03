@@ -26,7 +26,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
 
             <!-- Total Summary -->
             <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(30,91,67,0.1)] border-2 border-gray-100 p-6 flex items-center justify-between mb-6 transform transition-all hover:-translate-y-1 hover:shadow-lg">
@@ -50,7 +49,7 @@
                             </button>
                             <div class="flex items-center gap-4">
                                 <span class="font-bold text-gray-900">{{ money(costBreakdown[subcategory.name] || 0) }}</span>
-                                <button @click="quickAdd(subcategory.name)" class="w-7 h-7 rounded-full flex items-center justify-center text-[#1e5b43] bg-[#1e5b43]/5 hover:bg-[#1e5b43]/10 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100" title="Quick Add">
+                                <button @click="quickAdd(subcategory.name)" class="w-7 h-7 rounded-full flex items-center justify-center text-[#1e5b43] bg-[#1e5b43]/5 hover:bg-[#1e5b43]/10 transition-all" title="Quick Add">
                                     <i class="fa-solid fa-plus text-xs"></i>
                                 </button>
                             </div>
@@ -142,7 +141,7 @@
                         {{ editingEntry ? 'Edit Cost Entry' : 'Add Cost Entry' }}
                     </h2>
                     <button @click="closeModal" class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 flex items-center justify-center transition-colors">
-                        <i class="fa-solid fa-times w-3.5 h-3.5"></i>
+                        <font-awesome-icon icon="xmark" />
                     </button>
                 </div>
                 <div class="overflow-y-auto flex-1 p-6">
@@ -242,6 +241,7 @@
                 </div>
             </div>
         </div>
+    </div>
 </template>
 
 <script setup>

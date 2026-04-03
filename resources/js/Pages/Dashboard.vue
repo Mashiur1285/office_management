@@ -141,7 +141,7 @@ const barChartOptions = {
 };
 
 const salesExpensesTrendData = computed(() => {
-    const labels = state.salesMonthly.map((m) => m.label?.substring(0, 1) || '');
+    const labels = state.salesMonthly.map((m) => m.label?.substring(0, 3) || '');
     const salesData = state.salesMonthly.map((m) => m.amount || 0);
     const expensesData = state.expensesMonthly.map((m) => m.amount || 0);
 
@@ -338,52 +338,12 @@ const bdCompanyFilesOptions = {
             <span class="block sm:inline">{{ state.errorLog }}</span>
         </div>
 
-        <!-- Top header Area -->
-        <div class="bg-white rounded-[24px] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between p-3 mb-8 border border-gray-100 gap-4">
-            <!-- Search -->
-            <div class="flex items-center gap-2 pl-4 text-gray-400 bg-gray-50 rounded-full px-4 py-2 flex-grow sm:flex-grow-0 sm:w-80 border border-gray-100">
-                <font-awesome-icon icon="magnifying-glass" class="w-4 h-4" />
-                <input type="text" placeholder="Search task" class="border-none bg-transparent focus:ring-0 text-sm w-full text-gray-700 placeholder-gray-400 outline-none" />
-                <span class="bg-gray-200 text-gray-600 text-[10px] px-1.5 py-0.5 rounded ml-2 font-semibold tracking-widest hidden sm:inline-block">⌘F</span>
-            </div>
-            
-            <!-- Profile/icons -->
-            <div class="flex items-center justify-end gap-3 pr-1 w-full sm:w-auto">
-                <button class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition">
-                    <font-awesome-icon icon="envelope" class="w-4 h-4" />
-                </button>
-                <div class="relative">
-                    <button class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition">
-                        <font-awesome-icon icon="bell" class="w-4 h-4" />
-                    </button>
-                </div>
-                <div class="flex items-center gap-2 pr-1 py-1 ml-2 cursor-pointer">
-                    <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 font-bold text-lg overflow-hidden shrink-0 border border-gray-200">
-                        <img v-if="page.props.auth?.user?.profile_photo_url" :src="page.props.auth?.user?.profile_photo_url" class="w-full h-full object-cover">
-                        <span v-else>{{ page.props.auth?.user?.name?.charAt(0) || 'U' }}</span>
-                    </div>
-                    <div class="flex flex-col hidden sm:flex">
-                        <span class="text-sm font-semibold text-gray-800 leading-tight">{{ page.props.auth?.user?.name || 'User Name' }}</span>
-                        <span class="text-[11px] text-gray-500">{{ page.props.auth?.user?.email?.length > 20 ? page.props.auth.user.email.substring(0, 18) + '...' : (page.props.auth?.user?.email || 'user@example.com') }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Main Dashboard Header -->
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
                 <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">Dashboard</h1>
                 <p class="text-sm text-gray-500">Plan, prioritize, and accomplish your tasks with ease.</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <button class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition flex items-center gap-2 shadow-sm">
-                    <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
-                    Add Project
-                </button>
-                <button class="border border-[#1e5b43] text-[#1e5b43] bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-emerald-50 transition shadow-sm">
-                    Import Data
-                </button>
             </div>
         </div>
 
@@ -593,14 +553,6 @@ const bdCompanyFilesOptions = {
                          <div class="text-[44px] font-light tracking-wider text-white mb-6 drop-shadow-md">
                               {{ formatBytes(state.appUsage.total).replace(' GB', '') }}
                          </div>
-                         <div class="flex justify-center gap-3">
-                             <button class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-gray-100 transition shadow-lg">
-                                 <font-awesome-icon icon="pause" class="w-3.5 h-3.5" />
-                             </button>
-                             <button class="w-10 h-10 bg-[#ef4444] text-white rounded-full flex items-center justify-center hover:bg-red-600 transition shadow-lg">
-                                 <font-awesome-icon icon="square" class="w-3 h-3" />
-                             </button>
-                         </div>
                      </div>
                  </div>
              </div>
@@ -614,11 +566,11 @@ const bdCompanyFilesOptions = {
                     <h3 class="font-bold text-gray-900 text-lg">Tracking Graph</h3>
                     <span class="text-[11px] font-semibold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">Live</span>
                 </div>
-                <div class="flex-1 mt-4 relative z-10 flex items-center justify-between w-full">
-                    <div class="w-48 h-auto ml-2">
+                <div class="flex-1 mt-4 relative z-10 flex flex-col items-center justify-center gap-6 w-full lg:flex-row lg:items-center lg:justify-between">
+                    <div class="w-40 h-40 shrink-0 sm:w-44 sm:h-44 lg:w-48 lg:h-48">
                       <Doughnut :data="fileTrackingDonutData" :options="fileTrackingDonutOptions" />
                     </div>
-                    <div class="space-y-3 text-[12px] font-semibold text-gray-600 mr-2 flex-1 pl-8">
+                    <div class="w-full space-y-3 text-[12px] font-semibold text-gray-600 lg:mr-2 lg:flex-1 lg:pl-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> MITT Total</div>
                             <span class="text-gray-900">{{ mittPipelineTotal }}</span>

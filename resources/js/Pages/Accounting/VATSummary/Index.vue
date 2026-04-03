@@ -248,7 +248,7 @@
                         @click="searchPayments = ''"
                         class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
                     >
-                        <i class="fa-solid fa-times text-xs"></i>
+                        <font-awesome-icon icon="xmark" class="text-xs" />
                     </button>
                 </div>
             </div>

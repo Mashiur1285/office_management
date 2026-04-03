@@ -188,7 +188,7 @@
                         {{ editingEntry ? 'Edit Tax Entry' : `Add ${form.tax_type === 'current' ? 'Current' : 'Deferred'} Tax Entry` }}
                     </h2>
                     <button @click="closeModal" class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 flex items-center justify-center transition-colors">
-                        <i class="fa-solid fa-times w-3.5 h-3.5"></i>
+                        <font-awesome-icon icon="xmark" />
                     </button>
                 </div>
                 <form @submit.prevent="submitForm" class="flex-1 overflow-y-auto">

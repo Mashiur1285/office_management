@@ -60,7 +60,7 @@
                         @click="searchQuery = ''"
                         class="text-gray-400 hover:text-gray-600 outline-none"
                     >
-                        <i class="fa-solid fa-times w-4 h-4"></i>
+                        <font-awesome-icon icon="xmark" />
                     </button>
                 </div>
                 <div v-if="searchQuery" class="text-sm text-gray-600">
@@ -138,7 +138,7 @@
                         {{ editingEntry ? 'Edit Income Entry' : 'Add Income Entry' }}
                     </h2>
                     <button @click="closeModal" class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 flex items-center justify-center transition-colors">
-                        <i class="fa-solid fa-times w-3.5 h-3.5"></i>
+                        <font-awesome-icon icon="xmark" />
                     </button>
                 </div>
                 <div class="overflow-y-auto flex-1 p-6">
