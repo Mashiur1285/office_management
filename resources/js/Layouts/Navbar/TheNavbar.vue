@@ -182,7 +182,7 @@ const visibleNotifications = computed(() =>
 const page = usePage();
 const userName = computed(() => page.props.auth?.user?.name || "User");
 const appName = computed(() => page.props.settings?.app_name || "MITT");
-const logoUrl = computed(() => page.props.settings?.logo_url || "/images/mtt-logo.png");
+const logoUrl = computed(() => page.props.settings?.logo_url || "/images/aurora.jpeg");
 
 const handleClickOutside = (event) => {
     if (!dropdownOpen.value) return;

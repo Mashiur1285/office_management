@@ -34,6 +34,6 @@ class Setting extends Model
             return asset('storage/' . $this->logo_path);
         }
 
-        return asset('images/mtt-logo.png'); // Fallback to default
+        return asset('images/aurora.jpeg');
     }
 }
