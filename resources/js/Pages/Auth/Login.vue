@@ -65,13 +65,13 @@ const submit = () => {
                 <div class="text-center">
                     <div class="flex flex-col items-center gap-3">
                         <img
-                            src="/images/mtt-logo.png"
-                            alt="Mefway International Travel & Tours"
+                            src="/images/aurora.jpeg"
+                            alt="Aurora Digital Labs"
                             class="h-16 w-16 object-contain"
                         />
                         <div>
                             <h2 class="text-2xl font-semibold text-gray-900">
-                                Mefway International Travel & Tours
+                                Aurora Digital Labs
                             </h2>
                             <p class="text-sm text-gray-600">
                                 Sign in to continue
