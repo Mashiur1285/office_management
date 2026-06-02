@@ -4,7 +4,7 @@
         <button
             type="button"
             @click="toggleDropdown"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-left flex items-center justify-between"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-left flex items-center justify-between"
         >
             <span v-if="selectedSubcategory" class="text-gray-900">
                 {{ selectedSubcategory.name }} (VAT: {{ selectedSubcategory.vat_rate }}%)
@@ -22,7 +22,7 @@
             <div
                 v-for="sub in subcategories"
                 :key="sub.id"
-                class="group flex items-center justify-between px-4 py-2 hover:bg-green-50 cursor-pointer border-b border-gray-100"
+                class="group flex items-center justify-between px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100"
             >
                 <div
                     @click="selectSubcategory(sub)"
@@ -54,7 +54,7 @@
             <!-- Add New Option -->
             <div
                 @click="openAddModal"
-                class="flex items-center gap-2 px-4 py-2 hover:bg-green-50 cursor-pointer text-green-600 font-medium"
+                class="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 cursor-pointer text-blue-600 font-medium"
             >
                 <i class="fa-solid fa-plus"></i>
                 <span>Add New {{ label }}</span>
@@ -76,7 +76,7 @@
                             v-model="form.name"
                             type="text"
                             required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="e.g., Medical Fee"
                         />
                     </div>
@@ -89,7 +89,7 @@
                             min="0"
                             max="100"
                             required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="0"
                         />
                     </div>
@@ -103,7 +103,7 @@
                         </button>
                         <button
                             type="submit"
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         >
                             {{ editingSubcategory ? 'Update' : 'Add' }}
                         </button>

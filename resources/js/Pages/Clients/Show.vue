@@ -4,7 +4,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header Section -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="bg-[#1e5b43] px-6 py-8 text-white">
+                <div class="bg-[#1d4ed8] px-6 py-8 text-white">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0">
@@ -39,13 +39,13 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <Link href="/clients" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm">
+                            <Link :href="props.readOnly ? '/database/clients' : '/clients'" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                                 </svg>
                                 Back
                             </Link>
-                            <Link :href="`/clients/${client.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1e5b43] hover:bg-emerald-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
+                            <Link v-if="!props.readOnly" :href="`/clients/${client.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1d4ed8] hover:bg-blue-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
@@ -60,8 +60,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
-                        <div class="p-3 bg-emerald-50 rounded-xl">
-                            <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-3 bg-blue-50 rounded-xl">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
@@ -110,10 +110,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow" :class="client.vat_paid ? 'ring-2 ring-green-200' : ''">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow" :class="client.vat_paid ? 'ring-2 ring-blue-200' : ''">
                     <div class="flex items-center gap-3">
-                        <div class="p-3 rounded-xl" :class="client.vat_paid ? 'bg-green-50' : 'bg-orange-50'">
-                            <svg class="h-6 w-6" :class="client.vat_paid ? 'text-green-600' : 'text-orange-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-3 rounded-xl" :class="client.vat_paid ? 'bg-blue-50' : 'bg-orange-50'">
+                            <svg class="h-6 w-6" :class="client.vat_paid ? 'text-blue-600' : 'text-orange-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
                             </svg>
                         </div>
@@ -121,7 +121,7 @@
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wider leading-tight">VAT Unpaid</p>
                             <div class="flex items-center gap-2">
                                 <p class="text-xl font-bold text-gray-900 break-words leading-tight">{{ money(client.vat_unpaid) }}</p>
-                                <svg v-if="client.vat_paid" class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <svg v-if="client.vat_paid" class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                             </div>
@@ -138,9 +138,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Total Received</p>
-                        <p class="mt-2 text-2xl font-bold text-emerald-700">{{ money(client.total_received) }}</p>
+                    <div class="rounded-xl border border-blue-100 bg-blue-50/40 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Total Received</p>
+                        <p class="mt-2 text-2xl font-bold text-blue-700">{{ money(client.total_received) }}</p>
                     </div>
                     <div class="rounded-xl border border-rose-100 bg-rose-50/40 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Total Refunded</p>
@@ -154,12 +154,12 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                            <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                             Payment & Refund History
                         </h2>
                         <p class="text-sm text-gray-600">All payment and refund records for this client.</p>
                     </div>
-                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+                    <span class="text-xs font-semibold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
                         {{ paymentHistory.length }} {{ paymentHistory.length === 1 ? 'record' : 'records' }}
                     </span>
                 </div>
@@ -185,7 +185,7 @@
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
                                             :class="record.type === 'payment'
-                                                ? 'bg-emerald-100 text-emerald-700'
+                                                ? 'bg-blue-100 text-blue-700'
                                                 : 'bg-rose-100 text-rose-700'"
                                         >
                                             {{ record.type === 'payment' ? 'Payment' : 'Refund' }}
@@ -193,7 +193,7 @@
                                     </td>
                                     <td class="px-4 py-3 capitalize">{{ record.source || '—' }}</td>
                                     <td class="px-4 py-3">{{ record.agent_name || '—' }}</td>
-                                    <td class="px-4 py-3 text-right font-semibold" :class="record.type === 'refund' ? 'text-rose-600' : 'text-emerald-700'">
+                                    <td class="px-4 py-3 text-right font-semibold" :class="record.type === 'refund' ? 'text-rose-600' : 'text-blue-700'">
                                         {{ money(record.amount) }}
                                     </td>
                                     <td class="px-4 py-3">{{ record.payment_method || '—' }}</td>
@@ -211,14 +211,15 @@
                 <div class="flex items-center justify-between mb-5">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                            <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                             Airline Tickets
                         </h2>
                         <p class="text-sm text-gray-500 mt-0.5">Flight bookings linked to this client</p>
                     </div>
                     <Link
+                        v-if="!props.readOnly"
                         :href="`/airline-tickets/create?client_id=${client.id}`"
-                        class="flex items-center gap-2 bg-[#1e5b43] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#164230] transition"
+                        class="flex items-center gap-2 bg-[#1d4ed8] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition"
                     >
                         <font-awesome-icon icon="plus" class="w-3 h-3" />
                         Add Ticket
@@ -266,7 +267,7 @@
                                     </span>
                                 </td>
                                 <td class="py-3 px-3 text-right">
-                                    <Link :href="`/airline-tickets/${ticket.id}`" class="text-emerald-700 hover:text-emerald-900 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition">
+                                    <Link :href="`/airline-tickets/${ticket.id}`" class="text-blue-700 hover:text-blue-900 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition">
                                         View
                                     </Link>
                                 </td>
@@ -285,7 +286,7 @@
                             :class="[
                                 'flex-1 py-4 px-6 text-center font-semibold text-sm transition-all',
                                 activeTab === 'overview'
-                                    ? 'border-b-2 border-[#1e5b43] text-[#1e5b43]'
+                                    ? 'border-b-2 border-[#1d4ed8] text-[#1d4ed8]'
                                     : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             ]"
                         >
@@ -296,7 +297,7 @@
                             :class="[
                                 'flex-1 py-4 px-6 text-center font-semibold text-sm transition-all',
                                 activeTab === 'documents'
-                                    ? 'border-b-2 border-[#1e5b43] text-[#1e5b43]'
+                                    ? 'border-b-2 border-[#1d4ed8] text-[#1d4ed8]'
                                     : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             ]"
                         >
@@ -313,7 +314,7 @@
                             <!-- Client Info Card -->
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                                 <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                                     Client Information
                                 </h2>
                                 <div class="space-y-3">
@@ -331,7 +332,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                         </svg>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-xs font-semibold text-gray-500 uppercase">BD Company</p>
+                                            <p class="text-xs font-semibold text-gray-500 uppercase">Vendor</p>
                                             <p class="text-sm font-medium text-gray-900 truncate">{{ client.bd_company || "—" }}</p>
                                         </div>
                                     </div>
@@ -350,7 +351,7 @@
                             <!-- Status Badges -->
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                                 <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                                     Processing Status
                                 </h2>
                                 <div class="space-y-3">
@@ -376,7 +377,7 @@
                             </div>
 
                             <!-- VAT Payment -->
-                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6" :class="client.vat_paid ? 'ring-2 ring-green-200' : ''">
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6" :class="client.vat_paid ? 'ring-2 ring-blue-200' : ''">
                                 <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                                     <div class="h-8 w-1 bg-gradient-to-b from-orange-600 to-orange-400 rounded-full"></div>
                                     VAT Payment
@@ -384,11 +385,11 @@
 
                                 <!-- VAT Paid Status -->
                                 <div v-if="client.vat_paid" class="space-y-3">
-                                    <div class="flex items-center gap-2 p-3 bg-green-50 rounded-xl">
-                                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <div class="flex items-center gap-2 p-3 bg-blue-50 rounded-xl">
+                                        <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                         </svg>
-                                        <span class="text-sm font-semibold text-green-700">VAT Paid</span>
+                                        <span class="text-sm font-semibold text-blue-700">VAT Paid</span>
                                     </div>
                                     <div class="space-y-2">
                                         <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
@@ -411,6 +412,7 @@
                                         </div>
                                     </div>
                                     <button
+                                        v-if="!props.readOnly"
                                         @click="showUnpayConfirm = true"
                                         class="w-full px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
                                     >
@@ -419,7 +421,7 @@
                                 </div>
 
                                 <!-- VAT Payment Form -->
-                                <form v-else @submit.prevent="submitVatPayment" class="space-y-4">
+                                <form v-else-if="!props.readOnly" @submit.prevent="submitVatPayment" class="space-y-4">
                                     <div class="p-3 bg-orange-50 rounded-xl space-y-1">
                                         <p class="text-sm font-medium text-orange-800">Total VAT: <span class="font-bold">{{ money(client.vat_receivable) }}</span></p>
                                         <p v-if="client.vat_paid_amount > 0" class="text-sm font-medium text-gray-600">Already Paid: <span class="font-bold">{{ money(client.vat_paid_amount) }}</span></p>
@@ -431,7 +433,7 @@
                                             v-model="vatForm.vat_chalan_number"
                                             type="text"
                                             required
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-[#1e5b43]"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-[#1d4ed8]"
                                             placeholder="Enter chalan number"
                                         />
                                     </div>
@@ -447,26 +449,31 @@
                                     </div>
                                     <button
                                         type="submit"
-                                        class="w-full px-4 py-2 bg-[#1e5b43] text-white rounded-lg hover:bg-[#154130] transition-colors font-semibold"
+                                        class="w-full px-4 py-2 bg-[#1d4ed8] text-white rounded-lg hover:bg-[#154130] transition-colors font-semibold"
                                     >
                                         Mark as Paid
                                     </button>
                                 </form>
+                                <div v-else class="p-3 bg-orange-50 rounded-xl space-y-1">
+                                    <p class="text-sm font-medium text-orange-800">Total VAT: <span class="font-bold">{{ money(client.vat_receivable) }}</span></p>
+                                    <p v-if="client.vat_paid_amount > 0" class="text-sm font-medium text-gray-600">Already Paid: <span class="font-bold">{{ money(client.vat_paid_amount) }}</span></p>
+                                    <p class="text-sm font-medium text-orange-800">Unpaid VAT: <span class="font-bold">{{ money(client.vat_unpaid) }}</span></p>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Right Column -->
                         <div class="lg:col-span-2 space-y-6">
                             <!-- Current Holder -->
-                            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl shadow-sm border border-emerald-100 p-6">
+                            <div class="bg-gradient-to-br from-blue-50 to-teal-50 rounded-2xl shadow-sm border border-blue-100 p-6">
                                 <div class="flex items-start gap-4">
                                     <div class="p-3 bg-white rounded-xl shadow-sm">
-                                        <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     </div>
                                     <div class="flex-1">
-                                        <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1">Current Document Holder</p>
+                                        <p class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">Current Document Holder</p>
                                         <p class="text-xl font-bold text-gray-900 mb-2">{{ client.current_holder_name || client.current_holder_label || "Not Assigned" }}</p>
                                         <p v-if="client.processing_status" class="text-sm text-gray-600">Processing: <span class="font-semibold capitalize">{{ statusLabel(client.processing_status) }}</span></p>
                                         <div v-if="client.notes" class="mt-3 p-3 bg-white/60 rounded-lg">
@@ -478,9 +485,9 @@
                             </div>
 
                             <!-- Tracking Flow -->
-                            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-100 p-4">
+                            <div class="bg-gradient-to-br from-blue-50 to-teal-50 rounded-xl border border-blue-100 p-4">
                                 <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 12h6"/>
                                     </svg>
                                     Document Flow
@@ -490,7 +497,7 @@
                                     <!-- Progress Line -->
                                     <div class="absolute top-5 left-0 right-0 h-1 bg-gray-300 rounded-full" style="z-index: 0;">
                                         <div
-                                            class="h-full bg-gradient-to-r from-[#1e5b43] to-[#2d8262] rounded-full transition-all duration-500"
+                                            class="h-full bg-gradient-to-r from-[#1d4ed8] to-[#2d8262] rounded-full transition-all duration-500"
                                             :style="{ width: progressPercentage + '%' }"
                                         ></div>
                                     </div>
@@ -505,7 +512,7 @@
                                             <!-- Stage Circle -->
                                             <div
                                                 class="w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 shadow-md relative"
-                                                :class="index < currentStageIndex ? 'bg-[#154130]' : index === currentStageIndex ? 'bg-[#1e5b43] ring-4 ring-emerald-100' : 'bg-gray-300'"
+                                                :class="index < currentStageIndex ? 'bg-[#154130]' : index === currentStageIndex ? 'bg-[#1d4ed8] ring-4 ring-blue-100' : 'bg-gray-300'"
                                             >
                                                 <svg v-if="index < currentStageIndex" class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
@@ -530,7 +537,7 @@
                                                 <div v-if="index === stages.length - 1 && index === currentStageIndex" class="mt-1">
                                                     <span
                                                         v-if="client.status_value === 'completed'"
-                                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700"
+                                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700"
                                                     >
                                                         ✓ Completed
                                                     </span>
@@ -558,22 +565,22 @@
                     <div v-show="activeTab === 'documents'">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             <!-- Client Photo -->
-                            <div v-if="client.photo_path" class="group relative bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border-2 border-emerald-100 hover:border-emerald-300 transition-all hover:shadow-lg">
+                            <div v-if="client.photo_path" class="group relative bg-gradient-to-br from-blue-50 to-teal-50 rounded-xl p-4 border-2 border-blue-100 hover:border-blue-300 transition-all hover:shadow-lg">
                                 <div class="flex items-center gap-3 mb-3">
-                                    <div class="p-2 bg-emerald-100 rounded-lg">
-                                        <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="p-2 bg-blue-100 rounded-lg">
+                                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-xs font-bold text-emerald-700 uppercase">Photo</p>
+                                        <p class="text-xs font-bold text-blue-700 uppercase">Photo</p>
                                         <p class="text-xs text-gray-600">Profile Image</p>
                                     </div>
                                 </div>
                                 <div class="aspect-video rounded-lg overflow-hidden mb-3">
                                     <img :src="`/storage/${client.photo_path}`" :alt="client.name" class="w-full h-full object-cover" />
                                 </div>
-                                <a :href="`/storage/${client.photo_path}`" target="_blank" class="inline-flex items-center gap-2 text-xs font-semibold text-[#1e5b43] hover:text-[#154130]">
+                                <a :href="`/storage/${client.photo_path}`" target="_blank" class="inline-flex items-center gap-2 text-xs font-semibold text-[#1d4ed8] hover:text-[#154130]">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -605,20 +612,20 @@
                             </div>
 
                             <!-- Passport File -->
-                            <div v-if="client.passport_file_path" class="group bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-100 hover:border-green-300 transition-all hover:shadow-lg">
+                            <div v-if="client.passport_file_path" class="group bg-gradient-to-br from-blue-50 to-blue-50 rounded-xl p-4 border-2 border-blue-100 hover:border-blue-300 transition-all hover:shadow-lg">
                                 <div class="flex items-center gap-3 mb-3">
-                                    <div class="p-2 bg-green-100 rounded-lg">
-                                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="p-2 bg-blue-100 rounded-lg">
+                                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="text-xs font-bold text-green-700 uppercase">Passport</p>
+                                        <p class="text-xs font-bold text-blue-700 uppercase">Passport</p>
                                         <p class="text-xs text-gray-600">{{ client.passport_number }}</p>
                                     </div>
                                 </div>
                                 <p class="text-sm font-medium text-gray-900 mb-3 truncate">{{ getFileName(client.passport_file_path) }}</p>
-                                <a :href="`/storage/${client.passport_file_path}`" target="_blank" class="inline-flex items-center gap-2 text-xs font-semibold text-green-600 hover:text-green-700">
+                                <a :href="`/storage/${client.passport_file_path}`" target="_blank" class="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-700">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
@@ -746,6 +753,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 // Use computed to maintain reactivity
@@ -819,7 +830,7 @@ const statusLabel = (value) => {
 const statusBadgeClass = (value) => {
     const map = {
         pending: "bg-amber-50 text-amber-700 ring-amber-200",
-        ok: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+        ok: "bg-blue-50 text-blue-700 ring-blue-200",
         rejected: "bg-red-50 text-red-700 ring-red-200",
     };
     return map[value] || "bg-gray-50 text-gray-600 ring-gray-200";

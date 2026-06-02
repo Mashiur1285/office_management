@@ -20,7 +20,7 @@
             </Link>
         </div>
 
-        <div v-if="flash.success" class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        <div v-if="flash.success" class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
             {{ flash.success }}
         </div>
 
@@ -35,7 +35,7 @@
                             <span
                                 v-if="current.days_with_holder !== null"
                                 class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold ring-1 ring-inset"
-                                :class="current.overdue ? 'bg-red-50 text-red-700 ring-red-200' : 'bg-emerald-50 text-emerald-700 ring-emerald-200'"
+                                :class="current.overdue ? 'bg-red-50 text-red-700 ring-red-200' : 'bg-blue-50 text-blue-700 ring-blue-200'"
                             >
                                 {{ formatDays(current.days_with_holder) }} days
                             </span>
@@ -548,7 +548,7 @@ const getHolderTypeLabel = (value) => {
     const map = {
         agency: "MITT (General)",
         agency_user: "MITT Staff",
-        bd_company: "BD Company",
+        bd_company: "Vendor",
         foreign_company: "Foreign Company",
         agent: "Agent",
         other: "Other",
@@ -559,7 +559,7 @@ const getHolderTypeLabel = (value) => {
 const getStatusClass = (status) => {
     const classes = {
         pending: "bg-yellow-50 border-yellow-200",
-        accepted: "bg-green-50 border-green-200",
+        accepted: "bg-blue-50 border-blue-200",
         rejected: "bg-red-50 border-red-200",
         completed: "bg-blue-50 border-blue-200",
     };

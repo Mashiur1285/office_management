@@ -3,11 +3,11 @@
     <div class="min-h-screen bg-[#f5f6f8] py-8 text-gray-800 font-sans">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header -->
-            <div class="overflow-hidden rounded-[24px] bg-[#1e5b43] text-white shadow-[0_2px_12px_rgba(30,91,67,0.15)] p-6 md:p-8">
+            <div class="overflow-hidden rounded-[24px] bg-[#1d4ed8] text-white shadow-[0_2px_12px_rgba(30,91,67,0.15)] p-6 md:p-8">
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <h1 class="text-[32px] font-bold tracking-tight leading-none mb-2">Accounting Dashboard</h1>
-                        <p class="text-emerald-100/90 text-sm">Profit & Loss Overview - {{ period.name }}</p>
+                        <p class="text-blue-100/90 text-sm">Profit & Loss Overview - {{ period.name }}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <select class="px-4 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-medium bg-white text-gray-900">
@@ -52,11 +52,11 @@
 
             <!-- Key Metrics Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 relative overflow-hidden group hover:border-[#1e5b43]/30 transition-colors">
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 relative overflow-hidden group hover:border-[#1d4ed8]/30 transition-colors">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 relative z-10">Total Revenue</p>
-                    <p class="text-2xl font-bold text-green-900">{{ money(period.total_income) }}</p>
-                    <div class="mt-2 flex items-center text-xs text-green-700">
+                    <p class="text-2xl font-bold text-blue-900">{{ money(period.total_income) }}</p>
+                    <div class="mt-2 flex items-center text-xs text-blue-700">
                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
                         </svg>
@@ -100,7 +100,7 @@
                     <!-- Revenue -->
                     <div class="flex justify-between items-center py-3 border-b border-gray-200">
                         <span class="text-gray-700 font-medium">Total Revenue</span>
-                        <span class="text-xl font-bold text-green-700">{{ money(period.total_income) }}</span>
+                        <span class="text-xl font-bold text-blue-700">{{ money(period.total_income) }}</span>
                     </div>
 
                     <!-- Cost of Sales -->
@@ -136,9 +136,9 @@
                     </div>
 
                     <!-- Net Profit Before Tax -->
-                    <div class="flex justify-between items-center py-3 border-b border-gray-200 bg-green-50 px-3 -mx-3 rounded">
+                    <div class="flex justify-between items-center py-3 border-b border-gray-200 bg-blue-50 px-3 -mx-3 rounded">
                         <span class="text-gray-900 font-bold">Net Profit Before Tax</span>
-                        <span class="text-2xl font-bold text-green-700">{{ money(period.net_profit_before_tax) }}</span>
+                        <span class="text-2xl font-bold text-blue-700">{{ money(period.net_profit_before_tax) }}</span>
                     </div>
 
                     <!-- Tax -->
@@ -148,7 +148,7 @@
                     </div>
 
                     <!-- Net Profit After Tax -->
-                    <div class="flex justify-between items-center py-4 bg-[#1e5b43] text-white px-5 -mx-5 rounded-[16px] shadow-sm">
+                    <div class="flex justify-between items-center py-4 bg-[#1d4ed8] text-white px-5 -mx-5 rounded-[16px] shadow-sm">
                         <span class="text-lg font-bold">NET PROFIT AFTER TAX</span>
                         <span class="text-3xl font-bold">{{ money(period.net_profit_after_tax) }}</span>
                     </div>
@@ -159,8 +159,8 @@
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <Link href="/accounting/income/travel-tourism" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-4 hover:shadow-md transition-all hover:-translate-y-1">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-green-700" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-700" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
                             </svg>
@@ -283,7 +283,7 @@ const profitMargin = (profit, revenue) => {
 const statusClass = (status) => {
     const classes = {
         draft: 'bg-gray-100 text-gray-700',
-        active: 'bg-green-100 text-green-700',
+        active: 'bg-blue-100 text-blue-700',
         closed: 'bg-blue-100 text-blue-700',
     };
     return classes[status] || 'bg-gray-100 text-gray-700';

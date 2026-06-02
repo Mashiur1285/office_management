@@ -22,8 +22,9 @@ createInertiaApp({
             const component = module.default;
             const isAuthPage = name.startsWith('Auth/');
             const isWelcomePage = name === 'Welcome';
+            const isLauncherPage = name === 'Launcher';
 
-            if (!component.layout && !isAuthPage && !isWelcomePage) {
+            if (!component.layout && !isAuthPage && !isWelcomePage && !isLauncherPage) {
                 component.layout = BaseLayout;
             }
         });

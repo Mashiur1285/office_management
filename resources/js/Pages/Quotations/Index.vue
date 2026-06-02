@@ -14,7 +14,7 @@
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search quotations..."
-                        class="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-900 transition-colors focus:border-[#1e5b43] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e5b43]/20"
+                        class="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-900 transition-colors focus:border-[#1d4ed8] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1d4ed8]/20"
                     />
                     <svg
                         class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
@@ -35,7 +35,7 @@
                     :href="route('quotations.export', { type: 'excel', search: searchQuery })"
                     class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap"
                 >
-                    <font-awesome-icon icon="file-excel" class="text-green-600" />
+                    <font-awesome-icon icon="file-excel" class="text-blue-600" />
                     Excel
                 </a>
                 <!-- Export PDF -->
@@ -48,7 +48,7 @@
                 </a>
                 <Link
                     :href="route('quotations.create')"
-                    class="bg-[#1e5b43] hover:bg-[#154130] text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
+                    class="bg-[#1d4ed8] hover:bg-[#154130] text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
                 >
                     <font-awesome-icon icon="plus" />
                     New Quotation

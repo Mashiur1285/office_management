@@ -8,13 +8,13 @@
                 <p class="text-sm text-gray-500">Period: {{ period.name }}</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
-                        <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1e5b43] outline-none">
+                        <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1d4ed8] outline-none">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
                         <a :href="route('accounting.tax.report')" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-excel text-green-600"></i>
+                            <i class="fa-solid fa-file-excel text-blue-600"></i>
                             Excel
                         </a>
                         <a :href="route('accounting.tax.report', { type: 'pdf' })" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
@@ -49,7 +49,7 @@
                     <div class="bg-gray-50/80 rounded-[20px] p-6 border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-6 mt-4">
                         <div class="flex-1 text-center sm:text-left">
                             <div class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-1">Net Profit Before Tax</div>
-                            <Link href="/accounting/net-profit-before-tax" class="text-[24px] font-bold text-[#1e5b43] hover:text-[#164230] transition-colors">
+                            <Link href="/accounting/net-profit-before-tax" class="text-[24px] font-bold text-[#1d4ed8] hover:text-[#1e40af] transition-colors">
                                 {{ money(netProfitBeforeTax) }}
                             </Link>
                         </div>
@@ -58,7 +58,7 @@
                         </div>
                         <div class="flex-1 text-center sm:text-right">
                             <div class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-1">Net Profit After Tax</div>
-                            <div class="text-[28px] font-bold leading-none" :class="netProfitAfterTax >= 0 ? 'text-[#1e5b43]' : 'text-red-500'">
+                            <div class="text-[28px] font-bold leading-none" :class="netProfitAfterTax >= 0 ? 'text-[#1d4ed8]' : 'text-red-500'">
                                 {{ money(netProfitAfterTax) }}
                             </div>
                         </div>
@@ -72,7 +72,7 @@
                 <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-[16px] font-bold text-gray-900 border-b-2 border-amber-500 pb-1 inline-block">Current Tax</h3>
-                        <button @click="showAddModal('current')" class="px-4 py-2 bg-[#1e5b43] text-white rounded-full hover:bg-[#164230] transition-colors font-semibold text-xs shadow-sm flex items-center gap-1.5">
+                        <button @click="showAddModal('current')" class="px-4 py-2 bg-[#1d4ed8] text-white rounded-full hover:bg-[#1e40af] transition-colors font-semibold text-xs shadow-sm flex items-center gap-1.5">
                             <i class="fa-solid fa-plus w-3 h-3"></i> Add
                         </button>
                     </div>
@@ -85,7 +85,7 @@
                             <div class="flex justify-between items-start">
                                 <div class="flex-1 pr-4">
                                     <div class="font-bold text-gray-900 text-sm">{{ entry.description }}</div>
-                                    <div v-if="entry.client" class="text-[11px] text-emerald-700 font-medium mt-1 bg-emerald-50 inline-block px-2 py-0.5 rounded-md border border-emerald-100">
+                                    <div v-if="entry.client" class="text-[11px] text-blue-700 font-medium mt-1 bg-blue-50 inline-block px-2 py-0.5 rounded-md border border-blue-100">
                                         Client: {{ entry.client.name }} ({{ entry.client.phone_number }})
                                     </div>
                                     <div v-else-if="entry.staff" class="text-[11px] text-blue-700 font-medium mt-1 bg-blue-50 inline-block px-2 py-0.5 rounded-md border border-blue-100">
@@ -119,7 +119,7 @@
                 <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-[16px] font-bold text-gray-900 border-b-2 border-orange-500 pb-1 inline-block">Deferred Tax</h3>
-                        <button @click="showAddModal('deferred')" class="px-4 py-2 bg-[#1e5b43] text-white rounded-full hover:bg-[#164230] transition-colors font-semibold text-xs shadow-sm flex items-center gap-1.5">
+                        <button @click="showAddModal('deferred')" class="px-4 py-2 bg-[#1d4ed8] text-white rounded-full hover:bg-[#1e40af] transition-colors font-semibold text-xs shadow-sm flex items-center gap-1.5">
                             <i class="fa-solid fa-plus w-3 h-3"></i> Add
                         </button>
                     </div>
@@ -132,7 +132,7 @@
                             <div class="flex justify-between items-start">
                                 <div class="flex-1 pr-4">
                                     <div class="font-bold text-gray-900 text-sm">{{ entry.description }}</div>
-                                    <div v-if="entry.client" class="text-[11px] text-emerald-700 font-medium mt-1 bg-emerald-50 inline-block px-2 py-0.5 rounded-md border border-emerald-100">
+                                    <div v-if="entry.client" class="text-[11px] text-blue-700 font-medium mt-1 bg-blue-50 inline-block px-2 py-0.5 rounded-md border border-blue-100">
                                         Client: {{ entry.client.name }} ({{ entry.client.phone_number }})
                                     </div>
                                     <div v-else-if="entry.staff" class="text-[11px] text-blue-700 font-medium mt-1 bg-blue-50 inline-block px-2 py-0.5 rounded-md border border-blue-100">
@@ -200,7 +200,7 @@
                                     <button
                                         type="button"
                                         @click="setTargetType('client')"
-                                        :class="targetType === 'client' ? 'bg-[#1e5b43] border-[#1e5b43] text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'"
+                                        :class="targetType === 'client' ? 'bg-[#1d4ed8] border-[#1d4ed8] text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'"
                                         class="px-5 py-2 text-sm font-bold rounded-full border transition-colors shadow-sm"
                                     >
                                         Client
@@ -208,7 +208,7 @@
                                     <button
                                         type="button"
                                         @click="setTargetType('staff')"
-                                        :class="targetType === 'staff' ? 'bg-[#1e5b43] border-[#1e5b43] text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'"
+                                        :class="targetType === 'staff' ? 'bg-[#1d4ed8] border-[#1d4ed8] text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'"
                                         class="px-5 py-2 text-sm font-bold rounded-full border transition-colors shadow-sm"
                                     >
                                         Staff
@@ -216,7 +216,7 @@
                                     <button
                                         type="button"
                                         @click="setTargetType('other')"
-                                        :class="targetType === 'other' ? 'bg-[#1e5b43] border-[#1e5b43] text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'"
+                                        :class="targetType === 'other' ? 'bg-[#1d4ed8] border-[#1d4ed8] text-white' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'"
                                         class="px-5 py-2 text-sm font-bold rounded-full border transition-colors shadow-sm"
                                     >
                                         Other (Organization-wide)
@@ -231,7 +231,7 @@
                                         @input="filterClients"
                                         @focus="showClientDropdown = true"
                                         type="text"
-                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                         placeholder="Search by name or phone number..."
                                     />
                                     <div
@@ -261,7 +261,7 @@
                                         @input="filterStaff"
                                         @focus="showStaffDropdown = true"
                                         type="text"
-                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                         placeholder="Search by staff name..."
                                     />
                                     <div
@@ -293,7 +293,7 @@
                             <input
                                 v-model="form.description"
                                 type="text"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                 placeholder="e.g., Corporate Income Tax, Tax on Temporary Differences"
                             />
                         </div>
@@ -306,7 +306,7 @@
                                 step="0.01"
                                 min="0"
                                 required
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                 placeholder="0.00"
                             />
                         </div>
@@ -316,7 +316,7 @@
                             <textarea
                                 v-model="form.notes"
                                 rows="3"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                 placeholder="Additional details (optional)"
                             ></textarea>
                         </div>
@@ -333,7 +333,7 @@
                     <button
                         type="submit"
                         @click="submitForm"
-                        class="bg-[#1e5b43] text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-[#164230] transition-colors shadow-sm"
+                        class="bg-[#1d4ed8] text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-[#1e40af] transition-colors shadow-sm"
                     >
                         {{ editingEntry ? 'Update Entry' : 'Add Entry' }}
                     </button>

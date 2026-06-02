@@ -6,14 +6,14 @@
 
             <!-- Page Header -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-                <div class="bg-[#1e5b43] px-6 py-7 text-white flex items-center justify-between">
+                <div class="bg-[#1d4ed8] px-6 py-7 text-white flex items-center justify-between">
                     <div class="flex items-center gap-4">
                         <div class="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center">
                             <font-awesome-icon icon="plane" class="w-5 h-5 text-white" />
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold">{{ isEdit ? 'Edit Ticket' : 'New Airline Ticket' }}</h1>
-                            <p class="text-emerald-200 text-sm mt-0.5">{{ isEdit ? 'Update ticket details' : 'Add a new passenger ticket' }}</p>
+                            <p class="text-blue-200 text-sm mt-0.5">{{ isEdit ? 'Update ticket details' : 'Add a new passenger ticket' }}</p>
                         </div>
                     </div>
                     <Link href="/airline-tickets" class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition">
@@ -130,7 +130,7 @@
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="bg-[#1e5b43] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition disabled:opacity-60 flex items-center gap-2"
+                        class="bg-[#1d4ed8] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition disabled:opacity-60 flex items-center gap-2"
                     >
                         <font-awesome-icon v-if="form.processing" icon="spinner" class="w-3.5 h-3.5 animate-spin" />
                         {{ isEdit ? 'Update Ticket' : 'Create Ticket' }}
@@ -181,7 +181,7 @@ function submit() {
 
 <style scoped>
 .label { @apply block text-sm font-medium text-gray-700 mb-1.5; }
-.input { @apply w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white; }
+.input { @apply w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white; }
 .req   { @apply text-red-500; }
 .err   { @apply text-xs text-red-500 mt-1; }
 </style>

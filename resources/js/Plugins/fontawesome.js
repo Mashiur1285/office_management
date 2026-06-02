@@ -124,11 +124,18 @@ import {
     faAnglesLeft,
     faAnglesRight,
     faAngleDoubleLeft,
-    faAngleDoubleRight
+    faAngleDoubleRight,
+    faDatabase,
+    faEarthAsia,
+    faBriefcase,
+    faPhone,
+    faArrowRight,
+    faLock
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
 library.add(
+    faDatabase,
     faUserSecret,
     faHouse,
     faBuilding,
@@ -253,7 +260,12 @@ library.add(
     faAnglesLeft,
     faAnglesRight,
     faAngleDoubleLeft,
-    faAngleDoubleRight
+    faAngleDoubleRight,
+    faEarthAsia,
+    faBriefcase,
+    faPhone,
+    faArrowRight,
+    faLock
 );
 
 export default {

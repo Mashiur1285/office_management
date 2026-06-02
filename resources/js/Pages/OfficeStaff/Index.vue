@@ -13,7 +13,7 @@
                     :href="route('office-staff.export', { type: 'excel' })"
                     class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
                 >
-                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-green-600" />
+                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-blue-600" />
                     Excel
                 </a>
                 <a
@@ -24,8 +24,9 @@
                     PDF
                 </a>
                 <Link
+                    v-if="!props.readOnly"
                     href="/office-staff/create"
-                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition flex items-center gap-2 shadow-sm"
+                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition flex items-center gap-2 shadow-sm"
                 >
                     <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                     Add Staff Member
@@ -33,11 +34,66 @@
             </div>
         </div>
 
-        <div v-if="flash.success" class="mb-6 flex items-center gap-3 rounded-[16px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-sm animate-pulse" role="alert">
+        <div v-if="flash.success" class="mb-6 flex items-center gap-3 rounded-[16px] border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800 shadow-sm animate-pulse" role="alert">
             <font-awesome-icon icon="check-circle" class="w-5 h-5" />
             <div class="flex-1">
                 <span class="font-bold">Success:</span>
                 <span class="ml-1">{{ flash.success }}</span>
+            </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="bg-gradient-to-br from-[#1d4ed8] to-[#1e3a8a] rounded-[24px] p-6 text-white relative shadow-md overflow-hidden">
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <h3 class="font-medium text-blue-50 text-[15px]">Total Staff</h3>
+                    <div class="w-8 h-8 rounded-full border border-blue-300/30 flex items-center justify-center bg-white/10 backdrop-blur-sm -mr-1 -mt-1">
+                        <font-awesome-icon icon="users" class="w-3 h-3 text-white" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none relative z-10">{{ filteredStaff.length }}</div>
+                <div class="flex items-center gap-2 text-xs text-blue-100 font-medium relative z-10">
+                    <span>All office staff members</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">Active</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="check" class="w-3 h-3 text-blue-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.active }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Currently active members</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">Inactive</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="times" class="w-3 h-3 text-red-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.inactive }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Inactive staff members</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">With NID</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="id-card" class="w-3 h-3 text-blue-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.withNid }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Staff with NID on file</span>
+                </div>
             </div>
         </div>
 
@@ -96,17 +152,17 @@
                             <td class="px-6 py-4">
                                 <span
                                     class="inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize"
-                                    :class="member.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-700'"
+                                    :class="member.status === 'active' ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-700'"
                                 >
                                     {{ member.status }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right border-l border-transparent group-hover:border-gray-100">
                                 <div class="flex items-center justify-end gap-1.5 transition-opacity">
-                                    <button @click="router.visit(`/office-staff/${member.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1e5b43] hover:bg-emerald-50 transition" title="View">
+                                    <button @click="router.visit(props.readOnly ? `/database/office-staff/${member.id}` : `/office-staff/${member.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1d4ed8] hover:bg-blue-50 transition" title="View">
                                         <font-awesome-icon icon="eye" class="w-3.5 h-3.5" />
                                     </button>
-                                    <button @click="router.visit(`/office-staff/${member.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
+                                    <button v-if="!props.readOnly" @click="router.visit(`/office-staff/${member.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
                                         <font-awesome-icon icon="edit" class="w-3.5 h-3.5" />
                                     </button>
                                 </div>
@@ -121,8 +177,9 @@
                                 <h3 class="text-lg font-bold text-gray-900 mb-1">No office staff yet</h3>
                                 <p class="text-sm text-gray-500 mb-5">Get started by adding your first staff member</p>
                                 <Link
+                                    v-if="!props.readOnly"
                                     href="/office-staff/create"
-                                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition inline-flex items-center gap-2"
+                                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition inline-flex items-center gap-2"
                                 >
                                     <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                                     Add First Staff Member
@@ -161,10 +218,20 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const staff = props.staff || [];
 const searchQuery = ref("");
+
+const stats = computed(() => ({
+    active: staff.filter((s) => s.status === 'active').length,
+    inactive: staff.filter((s) => s.status !== 'active').length,
+    withNid: staff.filter((s) => s.nid_number).length,
+}));
 
 const filteredStaff = computed(() => {
     if (!searchQuery.value) return staff;

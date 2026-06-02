@@ -14,7 +14,7 @@
                     :href="route('clients.export', { type: 'excel', bd_company_status: props.filters?.bd_company_status, bd_company_scope: props.filters?.bd_company_scope ? 1 : 0, agency_scope: props.filters?.agency_scope ? 1 : 0, foreign_country: props.filters?.foreign_country })"
                     class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
                 >
-                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-green-600" />
+                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-blue-600" />
                     Excel
                 </a>
                 <a
@@ -25,8 +25,9 @@
                     PDF
                 </a>
                 <Link
+                    v-if="!props.readOnly"
                     href="/clients/create"
-                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition flex items-center gap-2 shadow-sm"
+                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition flex items-center gap-2 shadow-sm"
                 >
                     <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                     Add Client
@@ -36,15 +37,15 @@
 
         <!-- Stat Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <div class="bg-gradient-to-br from-[#1e5b43] to-[#174633] rounded-[24px] p-6 text-white relative shadow-md overflow-hidden">
+            <div class="bg-gradient-to-br from-[#1d4ed8] to-[#1e3a8a] rounded-[24px] p-6 text-white relative shadow-md overflow-hidden">
                 <div class="flex justify-between items-start mb-4 relative z-10">
-                    <h3 class="font-medium text-emerald-50 text-[15px]">Total Clients</h3>
-                    <div class="w-8 h-8 rounded-full border border-emerald-300/30 flex items-center justify-center bg-white/10 backdrop-blur-sm -mr-1 -mt-1 group-hover:bg-white/20 transition-colors">
+                    <h3 class="font-medium text-blue-50 text-[15px]">Total Clients</h3>
+                    <div class="w-8 h-8 rounded-full border border-blue-300/30 flex items-center justify-center bg-white/10 backdrop-blur-sm -mr-1 -mt-1 group-hover:bg-white/20 transition-colors">
                         <font-awesome-icon icon="users" class="w-3 h-3 text-white" />
                     </div>
                 </div>
                 <div class="text-[52px] font-bold mb-5 tracking-tight leading-none relative z-10">{{ filteredClients.length }}</div>
-                <div class="flex items-center gap-2 text-xs text-emerald-100 font-medium relative z-10">
+                <div class="flex items-center gap-2 text-xs text-blue-100 font-medium relative z-10">
                     <span>All managed clients</span>
                 </div>
             </div>
@@ -66,7 +67,7 @@
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="font-medium text-gray-800 text-[15px]">Completed</h3>
                     <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
-                        <font-awesome-icon icon="check" class="w-3 h-3 text-green-500" />
+                        <font-awesome-icon icon="check" class="w-3 h-3 text-blue-500" />
                     </div>
                 </div>
                 <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.completed }}</div>
@@ -92,7 +93,7 @@
         <!-- Success Alert -->
         <div
             v-if="flash.success"
-            class="mb-6 flex items-center gap-3 rounded-[16px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-sm animate-pulse"
+            class="mb-6 flex items-center gap-3 rounded-[16px] border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800 shadow-sm animate-pulse"
             role="alert"
         >
             <font-awesome-icon icon="check-circle" class="w-5 h-5" />
@@ -127,7 +128,7 @@
                     :class="[
                         'px-4 py-2 text-[13px] font-bold rounded-full transition-all duration-200',
                         selectedStage === 'all'
-                            ? 'bg-[#1e5b43] text-white shadow-md'
+                            ? 'bg-[#1d4ed8] text-white shadow-md'
                             : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50',
                     ]"
                 >
@@ -140,7 +141,7 @@
                     :class="[
                         'px-4 py-2 text-[13px] font-bold rounded-full transition-all duration-200',
                         selectedStage === stage.value
-                            ? 'bg-[#1e5b43] text-white shadow-md'
+                            ? 'bg-[#1d4ed8] text-white shadow-md'
                             : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50',
                     ]"
                 >
@@ -179,7 +180,7 @@
                                             class="w-full h-full rounded-full object-cover"
                                         />
                                         <span v-else>{{ initials(client.name) }}</span>
-                                        <div class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-2 border-white"></div>
+                                        <div class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-blue-500 border-2 border-white"></div>
                                     </div>
                                     <div class="flex flex-col">
                                         <span class="font-bold text-gray-900 text-[14px]">{{ client.name }}</span>
@@ -207,23 +208,23 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">
                                     <div class="font-bold text-gray-900 text-[14px]">{{ money(client.vat_unpaid) }}</div>
-                                    <div v-if="client.vat_paid" class="text-emerald-500" title="VAT Paid">
+                                    <div v-if="client.vat_paid" class="text-blue-500" title="VAT Paid">
                                         <font-awesome-icon icon="check-circle" class="w-4 h-4" />
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right border-l border-transparent group-hover:border-gray-100">
                                 <div class="flex items-center justify-end gap-1.5 transition-opacity">
-                                    <button @click="router.visit(`/clients/${client.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1e5b43] hover:bg-emerald-50 transition" title="View">
+                                    <button @click="router.visit(props.readOnly ? `/database/clients/${client.id}` : `/clients/${client.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1d4ed8] hover:bg-blue-50 transition" title="View">
                                         <font-awesome-icon icon="eye" class="w-3.5 h-3.5" />
                                     </button>
-                                    <button @click="router.visit(`/clients/${client.id}/documents`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition" title="Documents">
+                                    <button v-if="!props.readOnly" @click="router.visit(`/clients/${client.id}/documents`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition" title="Documents">
                                         <font-awesome-icon icon="file-alt" class="w-3.5 h-3.5" />
                                     </button>
-                                    <button @click="router.visit(`/clients/${client.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
+                                    <button v-if="!props.readOnly" @click="router.visit(`/clients/${client.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
                                         <font-awesome-icon icon="edit" class="w-3.5 h-3.5" />
                                     </button>
-                                    <button @click="confirmDelete(client)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition" title="Delete">
+                                    <button v-if="!props.readOnly" @click="confirmDelete(client)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition" title="Delete">
                                         <font-awesome-icon icon="trash" class="w-3.5 h-3.5" />
                                     </button>
                                 </div>
@@ -239,8 +240,9 @@
                                 <h3 class="text-lg font-bold text-gray-900 mb-1">No clients yet</h3>
                                 <p class="text-sm text-gray-500 mb-5">Get started by adding your first client</p>
                                 <Link
+                                    v-if="!props.readOnly"
                                     href="/clients/create"
-                                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition inline-flex items-center gap-2"
+                                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition inline-flex items-center gap-2"
                                 >
                                     <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                                     Add First Client
@@ -278,7 +280,7 @@
                             :class="[
                                 'px-2.5 py-1 rounded-md text-[13px] font-bold transition-colors',
                                 perPage === n
-                                    ? 'bg-[#1e5b43] text-white'
+                                    ? 'bg-[#1d4ed8] text-white'
                                     : 'text-gray-500 hover:bg-gray-200',
                             ]"
                         >
@@ -370,6 +372,10 @@ const props = defineProps({
         type: Object,
         default: () => ({}),
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const flash = computed(() => usePage().props.flash || {});
@@ -455,7 +461,7 @@ const getBadgeStyles = (statusValue) => {
     const map = {
         pending: "bg-gray-50 text-gray-600 border-gray-200",
         company_processing: "bg-amber-50 text-amber-600 border-amber-200",
-        completed: "bg-emerald-50 text-[#1e5b43] border-emerald-200",
+        completed: "bg-blue-50 text-[#1d4ed8] border-blue-200",
         rejected: "bg-red-50 text-red-600 border-red-200",
     };
     return map[statusValue] || "bg-gray-50 text-gray-600 border-gray-200";
@@ -507,7 +513,7 @@ const exportData = () => {
         "Job Sector",
         "Agent",
         "Status",
-        "BD Company",
+        "Vendor",
         "Foreign Company",
         "Due Amount",
     ];

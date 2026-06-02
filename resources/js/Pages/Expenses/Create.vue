@@ -4,7 +4,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
-                <p class="text-[12px] font-bold uppercase tracking-wider text-[#1e5b43] mb-1">Accounting</p>
+                <p class="text-[12px] font-bold uppercase tracking-wider text-[#1d4ed8] mb-1">Accounting</p>
                 <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">
                     {{ isEdit ? "Edit expense" : "Add expense" }}
                 </h1>
@@ -21,7 +21,7 @@
                 </Link>
                 <button
                     type="button"
-                    class="bg-[#1e5b43] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition shadow-sm border border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="bg-[#1d4ed8] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition shadow-sm border border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
                     :disabled="form.processing"
                     @click="submit"
                 >
@@ -43,7 +43,7 @@
                             <h2 class="text-[20px] font-bold text-gray-900 tracking-tight">Expense Details</h2>
                             <p class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mt-1">Title, amount, and optional metadata.</p>
                         </div>
-                        <p class="text-xs font-bold text-[#1e5b43] bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">Fields with * are required.</p>
+                        <p class="text-xs font-bold text-[#1d4ed8] bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">Fields with * are required.</p>
                     </div>
                 </div>
                 <div class="grid gap-6 p-6 md:p-8 md:grid-cols-2">
@@ -93,7 +93,7 @@
                 </Link>
                 <button
                     type="submit"
-                    class="bg-[#1e5b43] text-white px-8 py-2.5 rounded-full text-sm font-bold tracking-tight hover:bg-[#164230] transition shadow-sm border border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="bg-[#1d4ed8] text-white px-8 py-2.5 rounded-full text-sm font-bold tracking-tight hover:bg-[#1e40af] transition shadow-sm border border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
                     :disabled="form.processing"
                 >
                     <span v-if="form.processing">
@@ -140,11 +140,11 @@ const buildFormState = () => ({
 const form = useForm(buildFormState());
 
 const baseInput =
-    "w-full rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-900 focus:border-transparent focus:ring-2 focus:ring-[#1e5b43] bg-gray-50 focus:bg-white transition-all";
+    "w-full rounded-full border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-900 focus:border-transparent focus:ring-2 focus:ring-[#1d4ed8] bg-gray-50 focus:bg-white transition-all";
 const baseFile =
-    "w-full rounded-full border border-gray-200 px-5 py-2 text-sm font-medium text-gray-900 bg-gray-50 file:mr-4 file:rounded-full file:border-0 file:bg-[#1e5b43] file:text-white file:px-4 file:py-1 file:text-xs file:font-bold hover:file:bg-[#164230] file:transition-colors focus:border-transparent focus:ring-2 focus:ring-[#1e5b43] transition-all file:cursor-pointer";
+    "w-full rounded-full border border-gray-200 px-5 py-2 text-sm font-medium text-gray-900 bg-gray-50 file:mr-4 file:rounded-full file:border-0 file:bg-[#1d4ed8] file:text-white file:px-4 file:py-1 file:text-xs file:font-bold hover:file:bg-[#1e40af] file:transition-colors focus:border-transparent focus:ring-2 focus:ring-[#1d4ed8] transition-all file:cursor-pointer";
 const baseTextarea =
-    "w-full rounded-2xl border border-gray-200 px-5 py-3 text-sm font-medium text-gray-900 focus:border-transparent focus:ring-2 focus:ring-[#1e5b43] bg-gray-50 focus:bg-white transition-all";
+    "w-full rounded-2xl border border-gray-200 px-5 py-3 text-sm font-medium text-gray-900 focus:border-transparent focus:ring-2 focus:ring-[#1d4ed8] bg-gray-50 focus:bg-white transition-all";
 
 const inputClass = (field) =>
     [
@@ -218,6 +218,6 @@ const FormGroup = defineComponent({
     background-color: #ffffff !important;
     border-color: transparent !important;
     outline: none !important;
-    box-shadow: 0 0 0 2px #1e5b43 !important; /* focus:ring-[#1e5b43] */
+    box-shadow: 0 0 0 2px #1d4ed8 !important; /* focus:ring-[#1d4ed8] */
 }
 </style>

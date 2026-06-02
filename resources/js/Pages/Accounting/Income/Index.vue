@@ -9,20 +9,20 @@
                 <p class="text-sm text-gray-500">Income Management - {{ period.name }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                        <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1e5b43] outline-none">
+                        <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1d4ed8] outline-none">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
                         <a :href="route('accounting.income.export', { category: category, type: 'excel' })" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-excel text-green-600"></i>
+                            <i class="fa-solid fa-file-excel text-blue-600"></i>
                             Excel
                         </a>
                         <button @click="exportPdf" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
                             <i class="fa-solid fa-file-pdf text-red-600"></i>
                             PDF
                         </button>
-                        <button @click="showAddModal = true" class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition flex items-center gap-2 shadow-sm">
+                        <button @click="showAddModal = true" class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition flex items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-plus w-3.5 h-3.5"></i>
                             Add Entry
                         </button>
@@ -33,7 +33,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
                 <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                     <p class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total Income</p>
-                    <p class="text-3xl font-bold text-[#1e5b43]">{{ money(totalAmount) }}</p>
+                    <p class="text-3xl font-bold text-[#1d4ed8]">{{ money(totalAmount) }}</p>
                 </div>
                 <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                     <p class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total VAT (15%)</p>
@@ -41,7 +41,7 @@
                 </div>
                 <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
                     <p class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total with VAT</p>
-                    <p class="text-3xl font-bold text-[#1e5b43]">{{ money(totalWithVat) }}</p>
+                    <p class="text-3xl font-bold text-[#1d4ed8]">{{ money(totalWithVat) }}</p>
                 </div>
             </div>
 
@@ -112,7 +112,7 @@
                                 <td class="px-6 py-4 text-right font-medium text-gray-900">{{ money(entry.amount) }}</td>
                                 <td class="px-6 py-4 text-right text-gray-500">{{ entry.vat_rate }}%</td>
                                 <td class="px-6 py-4 text-right font-medium text-orange-600">{{ money(entry.vat_amount) }}</td>
-                                <td class="px-6 py-4 text-right font-bold text-[#1e5b43]">{{ money(entry.amount + entry.vat_amount) }}</td>
+                                <td class="px-6 py-4 text-right font-bold text-[#1d4ed8]">{{ money(entry.amount + entry.vat_amount) }}</td>
                                 <td class="px-6 py-4 text-gray-500">{{ entry.created_at }}</td>
                                 <td class="px-6 py-4 text-right border-l border-transparent group-hover:border-gray-100">
                                     <div class="flex items-center justify-end gap-1.5 transition-opacity">
@@ -152,7 +152,7 @@
                                     @focus="showClientDropdown = true"
                                     type="text"
                                     required
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                     placeholder="Search by name or phone number..."
                                 />
                                 <div
@@ -192,7 +192,7 @@
                             <textarea
                                 v-model="form.description"
                                 rows="3"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                 placeholder="Enter detailed description"
                             ></textarea>
                         </div>
@@ -206,7 +206,7 @@
                                     step="0.01"
                                     min="0"
                                     required
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                     placeholder="0.00"
                                 />
                             </div>
@@ -229,7 +229,7 @@
                             </div>
                             <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
                                 <span class="text-[11px] uppercase tracking-wider font-bold text-gray-700">Total with VAT:</span>
-                                <span class="text-lg font-bold text-[#1e5b43]">{{ money(totalWithVatPreview) }}</span>
+                                <span class="text-lg font-bold text-[#1d4ed8]">{{ money(totalWithVatPreview) }}</span>
                             </div>
                         </div>
 
@@ -238,7 +238,7 @@
                             <textarea
                                 v-model="form.notes"
                                 rows="2"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent text-sm transition-shadow"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent text-sm transition-shadow"
                                 placeholder="Additional notes (optional)"
                             ></textarea>
                         </div>
@@ -255,7 +255,7 @@
                     <button
                         type="button"
                         @click="submitForm"
-                        class="bg-[#1e5b43] text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-[#164230] transition-colors shadow-sm"
+                        class="bg-[#1d4ed8] text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-[#1e40af] transition-colors shadow-sm"
                     >
                         {{ editingEntry ? 'Update Entry' : 'Add Entry' }}
                     </button>

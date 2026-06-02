@@ -14,7 +14,7 @@
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search invoices..."
-                        class="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-900 transition-colors focus:border-[#1e5b43] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e5b43]/20"
+                        class="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-900 transition-colors focus:border-[#1d4ed8] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1d4ed8]/20"
                     />
                     <svg
                         class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
@@ -35,7 +35,7 @@
                     :href="route('invoices.export', { type: 'excel', search: searchQuery })"
                     class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors whitespace-nowrap"
                 >
-                    <font-awesome-icon icon="file-excel" class="text-green-600" />
+                    <font-awesome-icon icon="file-excel" class="text-blue-600" />
                     Excel
                 </a>
                 <!-- Export PDF -->
@@ -49,7 +49,7 @@
                 <Link
                     v-if="canAdd"
                     :href="route('invoices.create')"
-                    class="bg-[#1e5b43] hover:bg-[#154130] text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
+                    class="bg-[#1d4ed8] hover:bg-[#154130] text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
                 >
                     <font-awesome-icon icon="plus" />
                     New Invoice
@@ -81,7 +81,7 @@
                             <td class="px-4 py-3 text-gray-700">{{ invoice.client_name }}</td>
                             <td class="px-4 py-3 text-gray-600">{{ formatService(invoice.service_category, invoice.service_type) }}</td>
                             <td class="px-4 py-3 text-right text-gray-900">{{ money(invoice.total_amount) }}</td>
-                            <td class="px-4 py-3 text-right text-green-700">{{ money(invoice.paid_amount) }}</td>
+                            <td class="px-4 py-3 text-right text-blue-700">{{ money(invoice.paid_amount) }}</td>
                             <td class="px-4 py-3 text-right text-orange-700">{{ money(invoice.due_amount) }}</td>
                             <td class="px-4 py-3 text-center">
                                 <span :class="statusClass(invoice.payment_status)" class="px-2 py-1 text-xs font-semibold rounded-full capitalize">
@@ -175,7 +175,7 @@ const money = (value) => {
 };
 
 const statusClass = (status) => {
-    if (status === 'paid') return 'bg-green-100 text-green-800';
+    if (status === 'paid') return 'bg-blue-100 text-blue-800';
     if (status === 'partial') return 'bg-yellow-100 text-yellow-800';
     return 'bg-orange-100 text-orange-800';
 };

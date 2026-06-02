@@ -13,7 +13,7 @@
                     :href="route('foreign-companies.export', { type: 'excel' })"
                     class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
                 >
-                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-green-600" />
+                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-blue-600" />
                     Excel
                 </a>
                 <a
@@ -24,12 +24,68 @@
                     PDF
                 </a>
                 <Link
+                    v-if="!props.readOnly"
                     href="/foreign-companies/create"
-                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition flex items-center gap-2 shadow-sm"
+                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition flex items-center gap-2 shadow-sm"
                 >
                     <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                     Add Company
                 </Link>
+            </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="bg-gradient-to-br from-[#1d4ed8] to-[#1e3a8a] rounded-[24px] p-6 text-white relative shadow-md overflow-hidden">
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <h3 class="font-medium text-blue-50 text-[15px]">Total Companies</h3>
+                    <div class="w-8 h-8 rounded-full border border-blue-300/30 flex items-center justify-center bg-white/10 backdrop-blur-sm -mr-1 -mt-1">
+                        <font-awesome-icon icon="globe" class="w-3 h-3 text-white" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none relative z-10">{{ filteredCompanies.length }}</div>
+                <div class="flex items-center gap-2 text-xs text-blue-100 font-medium relative z-10">
+                    <span>All overseas partners</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">Countries</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="earth-asia" class="w-3 h-3 text-blue-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.countries }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Unique destination countries</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">With Job Categories</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="briefcase" class="w-3 h-3 text-amber-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.withJobCategories }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Companies with job info</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">With Contact</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="phone" class="w-3 h-3 text-blue-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.withContact }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Companies with contact person</span>
+                </div>
             </div>
         </div>
 
@@ -93,10 +149,10 @@
                             </td>
                             <td class="px-6 py-4 text-right border-l border-transparent group-hover:border-gray-100">
                                 <div class="flex items-center justify-end gap-1.5 transition-opacity">
-                                    <button @click="router.visit(`/foreign-companies/${company.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1e5b43] hover:bg-emerald-50 transition" title="View">
+                                    <button @click="router.visit(props.readOnly ? `/database/foreign-companies/${company.id}` : `/foreign-companies/${company.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1d4ed8] hover:bg-blue-50 transition" title="View">
                                         <font-awesome-icon icon="eye" class="w-3.5 h-3.5" />
                                     </button>
-                                    <button @click="router.visit(`/foreign-companies/${company.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
+                                    <button v-if="!props.readOnly" @click="router.visit(`/foreign-companies/${company.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
                                         <font-awesome-icon icon="edit" class="w-3.5 h-3.5" />
                                     </button>
                                 </div>
@@ -111,8 +167,9 @@
                                 <h3 class="text-lg font-bold text-gray-900 mb-1">No overseas partners yet</h3>
                                 <p class="text-sm text-gray-500 mb-5">Get started by adding your first partner</p>
                                 <Link
+                                    v-if="!props.readOnly"
                                     href="/foreign-companies/create"
-                                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition inline-flex items-center gap-2"
+                                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition inline-flex items-center gap-2"
                                 >
                                     <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                                     Add First Partner
@@ -144,17 +201,26 @@
 <script setup>
 import { computed, ref } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import IconButton from "@/Components/Buttons/IconButton.vue";
 
 const props = defineProps({
     companies: {
         type: Array,
         default: () => [],
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const companies = props.companies || [];
 const searchQuery = ref("");
+
+const stats = computed(() => ({
+    countries: new Set(companies.filter((c) => c.country).map((c) => c.country)).size,
+    withJobCategories: companies.filter((c) => c.job_categories).length,
+    withContact: companies.filter((c) => c.contact_person_name).length,
+}));
 
 const filteredCompanies = computed(() => {
     if (!searchQuery.value) return companies;

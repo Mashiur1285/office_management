@@ -10,7 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class AgentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $agents = Agent::query()
             ->withCount('clients')
@@ -29,6 +29,7 @@ class AgentController extends Controller
 
         return Inertia::render('Agents/Index', [
             'agents' => $agents,
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 
@@ -140,7 +141,7 @@ class AgentController extends Controller
         return redirect()->route('agents.index')->with('success', 'Agent created successfully.');
     }
 
-    public function show(Agent $agent)
+    public function show(Request $request, Agent $agent)
     {
         $agent->load('clients:id,agent_id,name,passport_number,nid_number');
 
@@ -194,6 +195,7 @@ class AgentController extends Controller
                 ];
             }),
             'refunds' => $refunds,
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 

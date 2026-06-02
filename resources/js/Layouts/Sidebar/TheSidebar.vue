@@ -1,60 +1,71 @@
 <template>
     <aside
         :class="[
-            'fixed top-0 left-0 z-[60] h-screen transition-all duration-300 bg-white border-r border-green-200 shadow-sm rounded-r-2xl overflow-hidden',
+            'fixed top-0 left-0 z-[60] h-screen transition-all duration-300 border-r border-white/10 shadow-2xl overflow-hidden',
             sidebarCollapsed ? 'w-16 -translate-x-full sm:translate-x-0' : 'w-64 -translate-x-full sm:translate-x-0'
         ]"
+        style="background: linear-gradient(160deg, #0f172a 0%, #1a1040 55%, #0f172a 100%);"
         aria-label="Sidebar"
     >
+        <!-- Decorative glow blobs -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full opacity-20"
+                 style="background: radial-gradient(circle, #6366f1, transparent 70%);"></div>
+            <div class="absolute bottom-10 -left-10 w-44 h-44 rounded-full opacity-15"
+                 style="background: radial-gradient(circle, #7c3aed, transparent 70%);"></div>
+            <div class="absolute top-1/2 right-0 w-32 h-32 rounded-full opacity-10"
+                 style="background: radial-gradient(circle, #3b82f6, transparent 70%);"></div>
+        </div>
+
         <!-- Logo Section -->
         <div
-            class="flex items-center px-3 py-4 border-b border-gray-100"
+            class="relative z-10 flex items-center px-3 py-4 border-b border-white/10"
             :class="sidebarCollapsed ? 'flex-col gap-2' : 'justify-between'"
         >
             <div class="flex items-center gap-3">
-                <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-green-700 shadow-sm flex-shrink-0">
-                    <font-awesome-icon icon="leaf" class="w-3.5 h-3.5 text-white" />
+                <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white/10 shadow-lg flex-shrink-0 ring-1 ring-white/20 overflow-hidden p-0.5">
+                    <img src="/images/zulia.jpeg" alt="Logo" class="w-full h-full object-contain" />
                 </div>
                 <div v-if="!sidebarCollapsed">
-                    <p class="text-gray-900 font-bold text-base leading-tight">{{ appName }}</p>
-                    <p class="text-gray-400 text-[10px] leading-tight">Management</p>
+                    <p class="text-white font-bold text-base leading-tight tracking-wide">{{ appName }}</p>
+                    <p class="text-indigo-300/70 text-[10px] leading-tight tracking-wider uppercase">Management</p>
                 </div>
             </div>
             <button
                 @click="toggleSidebar()"
-                class="flex items-center justify-center w-7 h-7 rounded-full border border-gray-200 bg-white shadow-sm hover:bg-green-50 hover:border-green-400 hover:shadow-green-100 transition-all duration-200 flex-shrink-0 group/toggle"
+                class="flex items-center justify-center w-7 h-7 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 hover:border-white/30 transition-all duration-200 flex-shrink-0 group/toggle"
                 :title="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
             >
                 <font-awesome-icon
                     :icon="sidebarCollapsed ? 'angles-right' : 'angles-left'"
-                    class="w-3 h-3 text-gray-400 group-hover/toggle:text-green-600 transition-colors duration-200"
+                    class="w-3 h-3 text-gray-400 group-hover/toggle:text-white transition-colors duration-200"
                 />
             </button>
         </div>
 
-        <div class="px-2 py-3 pb-4 overflow-y-auto bg-white h-[calc(100%-80px)]">
+        <div class="relative z-10 px-2 py-3 pb-4 overflow-y-auto bg-transparent h-[calc(100%-80px)]">
             <!-- Search bar -->
             <div v-if="!sidebarCollapsed" class="mb-3 px-1">
-                <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-50 border border-green-100 focus-within:border-green-400 focus-within:bg-white focus-within:shadow-sm transition-all duration-200">
-                    <font-awesome-icon icon="magnifying-glass" class="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+                <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 border border-white/10 focus-within:border-indigo-500/50 focus-within:bg-white/15 transition-all duration-200">
+                    <font-awesome-icon icon="magnifying-glass" class="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
                     <input
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search..."
-                        class="flex-1 bg-transparent border-0 text-sm text-gray-700 placeholder-green-400 focus:outline-none focus:ring-0 min-w-0"
+                        class="flex-1 bg-transparent border-0 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-0 min-w-0"
                     />
                     <button
                         v-if="searchQuery"
                         @click="searchQuery = ''"
-                        class="flex items-center justify-center w-4 h-4 rounded-full bg-green-200 hover:bg-green-300 transition-colors flex-shrink-0"
+                        class="flex items-center justify-center w-4 h-4 rounded-full bg-white/20 hover:bg-white/30 transition-colors flex-shrink-0"
                     >
-                        <font-awesome-icon icon="xmark" class="w-2.5 h-2.5 text-green-700" />
+                        <font-awesome-icon icon="xmark" class="w-2.5 h-2.5 text-gray-300" />
                     </button>
                 </div>
             </div>
 
             <!-- MENU label -->
-            <p v-if="!sidebarCollapsed" class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2">Menu</p>
+            <p v-if="!sidebarCollapsed" class="text-[10px] font-semibold text-gray-600 uppercase tracking-widest px-2 mb-2">Menu</p>
 
             <ul class="space-y-0.5 font-medium">
                 <!-- Home -->
@@ -101,8 +112,8 @@
                 <!-- Airline Tickets -->
                 <li v-if="matchesSearch('Airline Tickets')">
                     <Link href="/airline-tickets" :class="linkClass('/airline-tickets')" :title="sidebarCollapsed ? 'Airline Tickets' : ''">
-                        <div :class="iconBox(isActivePath('/airline-tickets'), 'lg', 'blue')">
-                            <font-awesome-icon icon="plane-departure" :class="iconFa(isActivePath('/airline-tickets'), 'lg', 'blue')" />
+                        <div :class="iconBox(isActivePath('/airline-tickets'), 'lg', 'sky')">
+                            <font-awesome-icon icon="plane-departure" :class="iconFa(isActivePath('/airline-tickets'), 'lg', 'sky')" />
                         </div>
                         <span v-if="!sidebarCollapsed" class="ml-3">Airline Tickets</span>
                     </Link>
@@ -144,18 +155,73 @@
                                 <span class="ml-3">Office Staff</span>
                             </Link>
                         </li>
-                        <li v-if="hasPermission('bd-company.view') && matchesSearch('BD Companies')">
+                        <li v-if="hasPermission('bd-company.view') && matchesSearch('Vendors')">
                             <Link href="/bd-companies" :class="linkClass('/bd-companies', true)">
                                 <div :class="iconBox(isActivePath('/bd-companies', true), 'sm', 'violet')">
                                     <font-awesome-icon icon="building" :class="iconFa(isActivePath('/bd-companies', true), 'sm', 'violet')" />
                                 </div>
-                                <span class="ml-3">BD Companies</span>
+                                <span class="ml-3">Vendors</span>
                             </Link>
                         </li>
                         <li v-if="hasPermission('foreign-company.view') && matchesSearch('Foreign Companies')">
                             <Link href="/foreign-companies" :class="linkClass('/foreign-companies', true)">
                                 <div :class="iconBox(isActivePath('/foreign-companies', true), 'sm', 'violet')">
                                     <font-awesome-icon icon="globe" :class="iconFa(isActivePath('/foreign-companies', true), 'sm', 'violet')" />
+                                </div>
+                                <span class="ml-3">Foreign Companies</span>
+                            </Link>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Database -->
+                <li v-if="showDatabase && databaseVisible">
+                    <button type="button" :class="dropdownBtnClass(['/database/clients', '/database/agents', '/database/office-staff', '/database/bd-companies', '/database/foreign-companies'])" @click="handleToggleDatabase" :title="sidebarCollapsed ? 'Database' : ''">
+                        <div :class="iconBox(isAnyChildActive(['/database/clients', '/database/agents', '/database/office-staff', '/database/bd-companies', '/database/foreign-companies']), 'lg', 'blue')">
+                            <font-awesome-icon icon="database" :class="iconFa(isAnyChildActive(['/database/clients', '/database/agents', '/database/office-staff', '/database/bd-companies', '/database/foreign-companies']), 'lg', 'blue')" />
+                        </div>
+                        <span v-if="!sidebarCollapsed" class="flex-1 ml-3 text-left whitespace-nowrap">Database</span>
+                        <svg v-if="!sidebarCollapsed" class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': databaseOpen }" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                        </svg>
+                    </button>
+                    <ul v-show="databaseOpen && !sidebarCollapsed" class="py-2 space-y-2 ml-3">
+                        <li v-if="hasPermission('client.view') && matchesSearch('Clients')">
+                            <Link href="/database/clients" :class="linkClass('/database/clients', true)">
+                                <div :class="iconBox(isActivePath('/database/clients', true), 'sm', 'blue')">
+                                    <font-awesome-icon icon="id-card" :class="iconFa(isActivePath('/database/clients', true), 'sm', 'blue')" />
+                                </div>
+                                <span class="ml-3">Clients</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('agent.view') && matchesSearch('Agents')">
+                            <Link href="/database/agents" :class="linkClass('/database/agents', true)">
+                                <div :class="iconBox(isActivePath('/database/agents', true), 'sm', 'blue')">
+                                    <font-awesome-icon icon="address-card" :class="iconFa(isActivePath('/database/agents', true), 'sm', 'blue')" />
+                                </div>
+                                <span class="ml-3">Agents</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('office-staff.view') && matchesSearch('Office Staff')">
+                            <Link href="/database/office-staff" :class="linkClass('/database/office-staff', true)">
+                                <div :class="iconBox(isActivePath('/database/office-staff', true), 'sm', 'blue')">
+                                    <font-awesome-icon icon="users" :class="iconFa(isActivePath('/database/office-staff', true), 'sm', 'blue')" />
+                                </div>
+                                <span class="ml-3">Office Staff</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('bd-company.view') && matchesSearch('Vendors')">
+                            <Link href="/database/bd-companies" :class="linkClass('/database/bd-companies', true)">
+                                <div :class="iconBox(isActivePath('/database/bd-companies', true), 'sm', 'blue')">
+                                    <font-awesome-icon icon="building" :class="iconFa(isActivePath('/database/bd-companies', true), 'sm', 'blue')" />
+                                </div>
+                                <span class="ml-3">Vendors</span>
+                            </Link>
+                        </li>
+                        <li v-if="hasPermission('foreign-company.view') && matchesSearch('Foreign Companies')">
+                            <Link href="/database/foreign-companies" :class="linkClass('/database/foreign-companies', true)">
+                                <div :class="iconBox(isActivePath('/database/foreign-companies', true), 'sm', 'blue')">
+                                    <font-awesome-icon icon="globe" :class="iconFa(isActivePath('/database/foreign-companies', true), 'sm', 'blue')" />
                                 </div>
                                 <span class="ml-3">Foreign Companies</span>
                             </Link>
@@ -184,7 +250,7 @@
                             </Link>
                         </li>
                         <li>
-                            <button type="button" class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-green-50 hover:text-green-700 text-sm group" @click="toggleIncome">
+                            <button type="button" class="flex items-center w-full p-2 rounded-xl transition-all duration-200 text-gray-400 hover:bg-white/10 hover:text-white text-sm group" @click="toggleIncome">
                                 <div :class="iconBox(isAnyChildActive(['/accounting/income']), 'sm', 'teal')">
                                     <font-awesome-icon icon="money-bill-trend-up" :class="iconFa(isAnyChildActive(['/accounting/income']), 'sm', 'teal')" />
                                 </div>
@@ -221,7 +287,7 @@
                             </ul>
                         </li>
                         <li>
-                            <button type="button" class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-green-50 hover:text-green-700 text-sm group" @click="toggleCostOfSales">
+                            <button type="button" class="flex items-center w-full p-2 rounded-xl transition-all duration-200 text-gray-400 hover:bg-white/10 hover:text-white text-sm group" @click="toggleCostOfSales">
                                 <div :class="iconBox(isAnyChildActive(['/accounting/cost-of-sales']), 'sm', 'teal')">
                                     <font-awesome-icon icon="box" :class="iconFa(isAnyChildActive(['/accounting/cost-of-sales']), 'sm', 'teal')" />
                                 </div>
@@ -260,7 +326,7 @@
                             </Link>
                         </li>
                         <li>
-                            <button type="button" class="flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-green-50 hover:text-green-700 text-sm group" @click="toggleOperatingExpenses">
+                            <button type="button" class="flex items-center w-full p-2 rounded-xl transition-all duration-200 text-gray-400 hover:bg-white/10 hover:text-white text-sm group" @click="toggleOperatingExpenses">
                                 <div :class="iconBox(isAnyChildActive(['/accounting/operating-expenses']), 'sm', 'teal')">
                                     <font-awesome-icon icon="wallet" :class="iconFa(isAnyChildActive(['/accounting/operating-expenses']), 'sm', 'teal')" />
                                 </div>
@@ -447,7 +513,7 @@
                 <li v-if="matchesSearch('Logout')">
                     <button
                         @click="showLogoutModal = true"
-                        :class="['flex items-center w-full p-2 rounded-lg transition-colors duration-200 text-gray-600 hover:bg-red-50 hover:text-red-600 group', sidebarCollapsed ? 'justify-center' : '']"
+                        :class="['flex items-center w-full p-2 rounded-xl transition-colors duration-200 text-gray-400 hover:bg-red-500/20 hover:text-red-400 group', sidebarCollapsed ? 'justify-center' : '']"
                         :title="sidebarCollapsed ? 'Logout' : ''"
                     >
                         <div :class="iconBox(false, 'lg', 'red')">
@@ -487,7 +553,7 @@ const { sidebarCollapsed, toggleSidebar } = useSidebar();
 const $page = usePage();
 const userPermissions = computed(() => $page.props.userPermissions || []);
 const userRoles = computed(() => $page.props.userRoles || []);
-const appName = computed(() => $page.props.settings?.app_name || "MITT");
+const appName = computed(() => $page.props.settings?.app_name || "Zulia");
 
 const hasPermission = (permission) =>
     userPermissions.value.includes(permission) ||
@@ -507,6 +573,7 @@ const showRegistrations = computed(() =>
     hasPermission("office-staff.view") || hasPermission("bd-company.view") ||
     hasPermission("foreign-company.view")
 );
+const showDatabase = computed(() => showRegistrations.value);
 const showAccounting = computed(() => hasPermission("accounting.view"));
 const showReports = computed(() =>
     hasPermission("accounting.view") || hasPermission("reports.view") ||
@@ -522,23 +589,23 @@ const isActivePath = (path, exact = false) => {
 
 const isAnyChildActive = (paths) => paths.some((p) => currentPath.value.startsWith(p));
 
-// --- Color map ---
+// --- Color map (dark sidebar variant) ---
 const colorMap = {
-    blue:   { box: "bg-blue-100 group-hover:bg-blue-50",     fa: "text-blue-600 group-hover:text-blue-500" },
-    orange: { box: "bg-orange-100 group-hover:bg-orange-50", fa: "text-orange-500 group-hover:text-orange-400" },
-    violet: { box: "bg-violet-100 group-hover:bg-violet-50", fa: "text-violet-600 group-hover:text-violet-500" },
-    teal:   { box: "bg-teal-100 group-hover:bg-teal-50",     fa: "text-teal-600 group-hover:text-teal-500" },
-    rose:   { box: "bg-rose-100 group-hover:bg-rose-50",     fa: "text-rose-500 group-hover:text-rose-400" },
-    indigo: { box: "bg-indigo-100 group-hover:bg-indigo-50", fa: "text-indigo-600 group-hover:text-indigo-500" },
-    amber:  { box: "bg-amber-100 group-hover:bg-amber-50",   fa: "text-amber-600 group-hover:text-amber-500" },
-    sky:    { box: "bg-sky-100 group-hover:bg-sky-50",       fa: "text-sky-600 group-hover:text-sky-500" },
-    red:    { box: "bg-red-100 group-hover:bg-red-50",       fa: "text-red-500 group-hover:text-red-400" },
+    blue:   { box: "bg-blue-500/15 group-hover:bg-blue-500/25",     fa: "text-blue-400 group-hover:text-blue-300" },
+    orange: { box: "bg-orange-500/15 group-hover:bg-orange-500/25", fa: "text-orange-400 group-hover:text-orange-300" },
+    violet: { box: "bg-violet-500/15 group-hover:bg-violet-500/25", fa: "text-violet-400 group-hover:text-violet-300" },
+    teal:   { box: "bg-teal-500/15 group-hover:bg-teal-500/25",     fa: "text-teal-400 group-hover:text-teal-300" },
+    rose:   { box: "bg-rose-500/15 group-hover:bg-rose-500/25",     fa: "text-rose-400 group-hover:text-rose-300" },
+    indigo: { box: "bg-indigo-500/15 group-hover:bg-indigo-500/25", fa: "text-indigo-400 group-hover:text-indigo-300" },
+    amber:  { box: "bg-amber-500/15 group-hover:bg-amber-500/25",   fa: "text-amber-400 group-hover:text-amber-300" },
+    sky:    { box: "bg-sky-500/15 group-hover:bg-sky-500/25",       fa: "text-sky-400 group-hover:text-sky-300" },
+    red:    { box: "bg-red-500/15 group-hover:bg-red-500/25",       fa: "text-red-400 group-hover:text-red-300" },
 };
 
 const iconBox = (active, size = "lg", color = "blue") => {
     const sz = size === "lg" ? "w-7 h-7" : "w-6 h-6";
     const base = `flex items-center justify-center ${sz} rounded-md transition-colors duration-200`;
-    if (active) return `${base} bg-green-100`;
+    if (active) return `${base} bg-indigo-500/30`;
     const c = colorMap[color] || colorMap.blue;
     return `${base} ${c.box}`;
 };
@@ -546,7 +613,7 @@ const iconBox = (active, size = "lg", color = "blue") => {
 const iconFa = (active, size = "lg", color = "blue") => {
     const sz = size === "lg" ? "w-4 h-4" : "w-3.5 h-3.5";
     const base = `${sz} transition-colors duration-200`;
-    if (active) return `${base} text-green-700`;
+    if (active) return `${base} text-indigo-300`;
     const c = colorMap[color] || colorMap.blue;
     return `${base} ${c.fa}`;
 };
@@ -554,30 +621,37 @@ const iconFa = (active, size = "lg", color = "blue") => {
 // --- Link / button class helpers ---
 const linkClass = (path, exact = false) => {
     const active = isActivePath(path, exact);
-    const base = "flex items-center p-2 rounded-lg transition-all duration-200 group";
+    const base = "flex items-center p-2 rounded-xl transition-all duration-200 group";
     if (sidebarCollapsed.value) {
-        return [base, "justify-center", active ? "bg-green-50 text-green-800 font-semibold" : "text-gray-600 hover:bg-green-50 hover:text-green-700"];
+        return [base, "justify-center", active
+            ? "bg-indigo-500/20 text-white"
+            : "text-gray-400 hover:bg-white/10 hover:text-white"];
     }
-    return [base, "border-l-[3px] pl-[5px]", active
-        ? "bg-green-50 text-green-800 font-semibold border-green-700"
-        : "text-gray-600 hover:bg-green-50 hover:text-green-700 border-transparent",
-    ];
+    return [base, active
+        ? "bg-indigo-500/20 text-white font-semibold border-l-[3px] border-indigo-400 pl-[5px]"
+        : "text-gray-400 hover:bg-white/10 hover:text-white border-l-[3px] border-transparent pl-[5px]"];
 };
 
 const subLinkClass = (path) => {
     const active = currentPath.value === path;
-    return ["flex items-center p-2 text-sm font-medium rounded-lg transition-all duration-200 border-l-[3px] pl-[5px] group",
-        active ? "bg-green-50 text-green-800 border-green-600" : "text-gray-500 hover:bg-green-50 hover:text-green-700 border-transparent",
+    return ["flex items-center p-2 text-sm font-medium rounded-xl transition-all duration-200 group",
+        active
+            ? "bg-indigo-500/20 text-white border-l-[3px] border-indigo-400 pl-[5px]"
+            : "text-gray-400 hover:bg-white/10 hover:text-white border-l-[3px] border-transparent pl-[5px]",
     ];
 };
 
 const dropdownBtnClass = (childPaths) => {
     const active = isAnyChildActive(childPaths);
-    const base = "flex items-center w-full p-2 rounded-lg transition-colors duration-200 group";
+    const base = "flex items-center w-full p-2 rounded-xl transition-all duration-200 group";
     if (sidebarCollapsed.value) {
-        return [base, "justify-center", active ? "bg-green-50 text-green-700" : "text-gray-600 hover:bg-green-50 hover:text-green-700"];
+        return [base, "justify-center", active
+            ? "bg-indigo-500/20 text-white"
+            : "text-gray-400 hover:bg-white/10 hover:text-white"];
     }
-    return [base, active ? "text-green-700" : "text-gray-600 hover:bg-green-50 hover:text-green-700"];
+    return [base, active
+        ? "text-white bg-indigo-500/10"
+        : "text-gray-400 hover:bg-white/10 hover:text-white"];
 };
 
 // --- Search ---
@@ -588,7 +662,11 @@ const matchesSearch = (label) => !sq.value || label.toLowerCase().includes(sq.va
 const operationsVisible = computed(() => matchesSearch("Operations") || matchesSearch("Quotation") || matchesSearch("Invoice") || matchesSearch("Airline Tickets"));
 const registrationsVisible = computed(() =>
     matchesSearch("Registrations") || matchesSearch("Clients") || matchesSearch("Agents") ||
-    matchesSearch("Office Staff") || matchesSearch("BD Companies") || matchesSearch("Foreign Companies")
+    matchesSearch("Office Staff") || matchesSearch("Vendors") || matchesSearch("Foreign Companies")
+);
+const databaseVisible = computed(() =>
+    matchesSearch("Database") || matchesSearch("Clients") || matchesSearch("Agents") ||
+    matchesSearch("Office Staff") || matchesSearch("Vendors") || matchesSearch("Foreign Companies")
 );
 const accountingVisible = computed(() => matchesSearch("Accounts") || !sq.value);
 const reportsVisible = computed(() => matchesSearch("Reports") || matchesSearch("Refund Report"));
@@ -598,6 +676,7 @@ watch(sq, (val) => {
     if (val) {
         if (operationsVisible.value) operationsOpen.value = true;
         if (registrationsVisible.value) registrationsOpen.value = true;
+        if (databaseVisible.value) databaseOpen.value = true;
         if (accountingVisible.value) accountingOpen.value = true;
         if (reportsVisible.value) reportsOpen.value = true;
         if (accessVisible.value) accessOpen.value = true;
@@ -619,6 +698,12 @@ const registrationsOpen = ref(false);
 const handleToggleRegistrations = () => {
     if (sidebarCollapsed.value) { toggleSidebar(); registrationsOpen.value = true; return; }
     registrationsOpen.value = !registrationsOpen.value;
+};
+
+const databaseOpen = ref(false);
+const handleToggleDatabase = () => {
+    if (sidebarCollapsed.value) { toggleSidebar(); databaseOpen.value = true; return; }
+    databaseOpen.value = !databaseOpen.value;
 };
 
 const accountingOpen = ref(false);

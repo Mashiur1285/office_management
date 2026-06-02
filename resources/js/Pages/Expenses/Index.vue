@@ -4,21 +4,21 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
-                <p class="text-[12px] font-bold uppercase tracking-wider text-[#1e5b43] mb-1">Accounting</p>
+                <p class="text-[12px] font-bold uppercase tracking-wider text-[#1d4ed8] mb-1">Accounting</p>
                 <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">Expenses</h1>
                 <p class="text-sm text-gray-500">Track outflows by category and date.</p>
             </div>
             <Link
                 href="/expenses/create"
-                class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition shadow-sm border border-transparent inline-flex items-center gap-2"
+                class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition shadow-sm border border-transparent inline-flex items-center gap-2"
             >
                 <i class="fa-solid fa-plus"></i>
                 Add Expense
             </Link>
         </div>
 
-        <div v-if="flash.success" class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 mb-6 font-medium flex items-center gap-2 shadow-sm">
-            <i class="fa-solid fa-check-circle text-emerald-600"></i>
+        <div v-if="flash.success" class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 mb-6 font-medium flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-check-circle text-blue-600"></i>
             {{ flash.success }}
         </div>
 
@@ -30,7 +30,7 @@
                     <input
                         v-model="searchQuery"
                         type="text"
-                        class="w-full bg-gray-50 border border-gray-200 rounded-full pl-10 pr-10 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-all"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-full pl-10 pr-10 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-all"
                         placeholder="Search by title, category, vendor, or notes..."
                     />
                     <button
@@ -42,7 +42,7 @@
                     </button>
                 </div>
                 <div v-if="searchQuery" class="text-sm font-medium text-gray-500 bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
-                    Showing <span class="font-bold text-[#1e5b43]">{{ filteredExpenses.length }}</span> of {{ expenses.length }} expenses
+                    Showing <span class="font-bold text-[#1d4ed8]">{{ filteredExpenses.length }}</span> of {{ expenses.length }} expenses
                 </div>
             </div>
         </div>
@@ -103,7 +103,7 @@
                                 </div>
                                 <div class="font-bold text-gray-900 mb-1">No expenses recorded yet</div>
                                 <div class="text-sm font-medium mb-4">Start tracking your outflows to gain accounting insights.</div>
-                                <Link href="/expenses/create" class="inline-flex items-center text-[#1e5b43] font-bold text-sm tracking-wide bg-emerald-50 px-4 py-2 rounded-full hover:bg-emerald-100 transition-colors">
+                                <Link href="/expenses/create" class="inline-flex items-center text-[#1d4ed8] font-bold text-sm tracking-wide bg-blue-50 px-4 py-2 rounded-full hover:bg-blue-100 transition-colors">
                                     <i class="fa-solid fa-plus mr-2"></i> Add your first expense
                                 </Link>
                             </td>

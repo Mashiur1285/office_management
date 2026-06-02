@@ -10,7 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ForeignCompanyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $companies = ForeignCompany::query()
             ->latest()
@@ -18,6 +18,7 @@ class ForeignCompanyController extends Controller
 
         return Inertia::render('ForeignCompanies/Index', [
             'companies' => $companies,
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 
@@ -153,7 +154,7 @@ class ForeignCompanyController extends Controller
         return redirect()->route('foreign-companies.index')->with('success', 'Foreign company updated.');
     }
 
-    public function show(ForeignCompany $foreignCompany)
+    public function show(Request $request, ForeignCompany $foreignCompany)
     {
         $clients = Client::query()
             ->where(function ($query) use ($foreignCompany) {
@@ -185,6 +186,7 @@ class ForeignCompanyController extends Controller
         return Inertia::render('ForeignCompanies/Show', [
             'company' => $foreignCompany,
             'clients' => $clients,
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 

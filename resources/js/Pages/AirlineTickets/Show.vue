@@ -6,7 +6,7 @@
 
             <!-- Header Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="bg-[#1e5b43] px-6 py-8 text-white">
+                <div class="bg-[#1d4ed8] px-6 py-8 text-white">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex items-start gap-4">
                             <div class="h-16 w-16 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
@@ -32,7 +32,7 @@
                                 <font-awesome-icon icon="arrow-left" class="w-4 h-4" />
                                 Back
                             </Link>
-                            <Link :href="`/airline-tickets/${ticket.id}/edit`" class="flex items-center gap-2 px-5 py-2.5 bg-white text-[#1e5b43] hover:bg-emerald-50 rounded-xl text-sm font-semibold shadow transition">
+                            <Link :href="`/airline-tickets/${ticket.id}/edit`" class="flex items-center gap-2 px-5 py-2.5 bg-white text-[#1d4ed8] hover:bg-blue-50 rounded-xl text-sm font-semibold shadow transition">
                                 <font-awesome-icon icon="pen" class="w-4 h-4" />
                                 Edit
                             </Link>
@@ -44,7 +44,7 @@
             <!-- Flash -->
             <div
                 v-if="flash.success"
-                class="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-sm"
+                class="flex items-center gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800 shadow-sm"
             >
                 <font-awesome-icon icon="check-circle" class="w-5 h-5 flex-shrink-0" />
                 <span>{{ flash.success }}</span>
@@ -75,7 +75,7 @@
                             </div>
                             <div class="flex-1 flex items-center gap-2 px-4">
                                 <div class="flex-1 border-t-2 border-dashed border-gray-300"></div>
-                                <font-awesome-icon icon="plane" class="w-5 h-5 text-[#1e5b43]" />
+                                <font-awesome-icon icon="plane" class="w-5 h-5 text-[#1d4ed8]" />
                                 <div class="flex-1 border-t-2 border-dashed border-gray-300"></div>
                             </div>
                             <div class="text-center">
@@ -122,7 +122,7 @@
                             </div>
                             <div v-if="ticket.client">
                                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Linked Client</span>
-                                <Link :href="`/clients/${ticket.client.id}`" class="block mt-1 text-emerald-700 hover:underline font-semibold">
+                                <Link :href="`/clients/${ticket.client.id}`" class="block mt-1 text-blue-700 hover:underline font-semibold">
                                     {{ ticket.client.name }}
                                 </Link>
                             </div>
@@ -276,7 +276,7 @@
                         </div>
 
                         <!-- Email preview hint -->
-                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-xs text-emerald-700 flex items-start gap-2">
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-xs text-blue-700 flex items-start gap-2">
                             <font-awesome-icon icon="envelope" class="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
                             <span>
                                 A notification email will be sent to
@@ -353,7 +353,7 @@ function formatDate(dateStr) {
 
 function statusClass(status) {
     const map = {
-        confirmed:   'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+        confirmed:   'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
         rescheduled: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
         cancelled:   'bg-red-50 text-red-700 ring-1 ring-red-200',
         flown:       'bg-gray-100 text-gray-600 ring-1 ring-gray-200',

@@ -6,7 +6,7 @@
         >
             <div>
                 <p
-                    class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1e5b43]"
+                    class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1d4ed8]"
                 >
                     Clients
                 </p>
@@ -30,7 +30,7 @@
                 </Link>
                 <button
                     type="button"
-                    class="inline-flex items-center justify-center rounded-lg bg-[#1e5b43] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
+                    class="inline-flex items-center justify-center rounded-lg bg-[#1d4ed8] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
                     :disabled="form.processing"
                     @click="submit"
                 >
@@ -121,7 +121,7 @@
                                         v-for="agent in filteredAgents"
                                         :key="agent.id"
                                         @mousedown.prevent="selectAgent(agent)"
-                                        class="px-4 py-2.5 cursor-pointer hover:bg-emerald-50 border-b border-gray-100 last:border-b-0"
+                                        class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
                                     >
                                         <div class="font-medium text-gray-900">
                                             {{ agent.name }}
@@ -144,7 +144,7 @@
                             <button
                                 type="button"
                                 @click="openAddAgentModal"
-                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-[#1e5b43] p-2.5 text-white hover:bg-[#154130] transition"
+                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-[#1d4ed8] p-2.5 text-white hover:bg-[#154130] transition"
                                 title="Add new agent"
                             >
                                 <svg
@@ -311,7 +311,7 @@
                                         @mousedown.prevent="
                                             selectJobSector(sector)
                                         "
-                                        class="px-4 py-2.5 cursor-pointer hover:bg-emerald-50 border-b border-gray-100 last:border-b-0"
+                                        class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
                                     >
                                         <div class="font-medium text-gray-900">
                                             {{ sector.name }}
@@ -328,7 +328,7 @@
                             <button
                                 type="button"
                                 @click="openAddJobSectorModal"
-                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-[#1e5b43] p-2.5 text-white hover:bg-[#154130] transition"
+                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-[#1d4ed8] p-2.5 text-white hover:bg-[#154130] transition"
                                 title="Add new job sector"
                             >
                                 <svg
@@ -398,7 +398,7 @@
                                         @mousedown.prevent="
                                             selectCountry(country)
                                         "
-                                        class="px-4 py-2.5 cursor-pointer hover:bg-emerald-50 border-b border-gray-100 last:border-b-0"
+                                        class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
                                     >
                                         <div class="font-medium text-gray-900">
                                             {{ country }}
@@ -415,7 +415,7 @@
                             <button
                                 type="button"
                                 @click="openAddCountryModal"
-                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-[#1e5b43] p-2.5 text-white hover:bg-[#154130] transition"
+                                class="flex-shrink-0 inline-flex items-center justify-center rounded-lg bg-[#1d4ed8] p-2.5 text-white hover:bg-[#154130] transition"
                                 title="Add new country"
                             >
                                 <svg
@@ -463,7 +463,7 @@
                                     @mousedown.prevent="
                                         selectForeignCompany(company)
                                     "
-                                    class="px-4 py-2.5 cursor-pointer hover:bg-emerald-50 border-b border-gray-100 last:border-b-0"
+                                    class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
                                 >
                                     <div class="font-medium text-gray-900">
                                         {{ company.name }}
@@ -615,7 +615,7 @@
                     </FormGroup>
 
                     <FormGroup
-                        label="Documents Submitted To (BD Company)"
+                        label="Documents Submitted To (Vendor)"
                         :error="form.errors.documents_submitted_to"
                     >
                         <div class="relative">
@@ -640,7 +640,7 @@
                                     @mousedown.prevent="
                                         selectDocumentsCompany(company)
                                     "
-                                    class="px-4 py-2.5 cursor-pointer hover:bg-emerald-50 border-b border-gray-100 last:border-b-0"
+                                    class="px-4 py-2.5 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
                                 >
                                     <div class="font-medium text-gray-900">
                                         {{ company.name }}
@@ -749,14 +749,14 @@
                     class="grid grid-cols-1 md:grid-cols-2 gap-4 px-6 pt-4"
                 >
                     <div
-                        class="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3"
+                        class="rounded-xl border border-blue-100 bg-blue-50/40 p-3"
                     >
                         <p
-                            class="text-xs font-semibold uppercase tracking-wide text-emerald-700"
+                            class="text-xs font-semibold uppercase tracking-wide text-blue-700"
                         >
                             Total Received
                         </p>
-                        <p class="mt-1 text-lg font-bold text-emerald-700">
+                        <p class="mt-1 text-lg font-bold text-blue-700">
                             {{ money(totalReceived) }}
                         </p>
                     </div>
@@ -877,7 +877,7 @@
                             Payment & Refund History
                         </h3>
                         <span
-                            class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full"
+                            class="text-xs font-semibold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full"
                         >
                             {{ paymentHistory.length }}
                             {{
@@ -936,7 +936,7 @@
                                                 class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold"
                                                 :class="
                                                     record.type === 'payment'
-                                                        ? 'bg-emerald-100 text-emerald-700'
+                                                        ? 'bg-blue-100 text-blue-700'
                                                         : 'bg-rose-100 text-rose-700'
                                                 "
                                             >
@@ -957,7 +957,7 @@
                                             :class="
                                                 record.type === 'refund'
                                                     ? 'text-rose-600'
-                                                    : 'text-emerald-700'
+                                                    : 'text-blue-700'
                                             "
                                         >
                                             {{ money(record.amount) }}
@@ -1231,7 +1231,7 @@
                 </Link>
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center rounded-lg bg-[#1e5b43] px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
+                    class="inline-flex items-center justify-center rounded-lg bg-[#1d4ed8] px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
                     :disabled="form.processing"
                 >
                     {{
@@ -1292,7 +1292,7 @@
                         <input
                             v-model="newJobSector.name"
                             type="text"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                             :class="{ 'border-red-500': newJobSectorError }"
                             placeholder="e.g., Driver, Cleaner, etc."
                             @keyup.enter="submitNewJobSector"
@@ -1316,7 +1316,7 @@
                         </label>
                         <select
                             v-model="newJobSector.parent_id"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                         >
                             <option value="">None (Main Category)</option>
                             <option
@@ -1344,7 +1344,7 @@
                         <textarea
                             v-model="newJobSector.description"
                             rows="3"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                             placeholder="Brief description of this job sector..."
                         ></textarea>
                     </div>
@@ -1363,7 +1363,7 @@
                         @click="submitNewJobSector"
                         type="button"
                         :disabled="addingJobSector"
-                        class="flex-1 rounded-lg bg-[#1e5b43] px-4 py-2 text-sm font-semibold text-white hover:bg-[#154130] disabled:opacity-50"
+                        class="flex-1 rounded-lg bg-[#1d4ed8] px-4 py-2 text-sm font-semibold text-white hover:bg-[#154130] disabled:opacity-50"
                     >
                         {{ addingJobSector ? "Adding..." : "Add Job Sector" }}
                     </button>
@@ -1414,7 +1414,7 @@
                         <input
                             v-model="newCountry.country"
                             type="text"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                             :class="{ 'border-red-500': newCountryError }"
                             placeholder="e.g., Malaysia"
                             @keyup.enter="submitNewCountry"
@@ -1439,7 +1439,7 @@
                         <input
                             v-model="newCountry.companyName"
                             type="text"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                             placeholder="Optional company name for this country"
                         />
                     </div>
@@ -1457,7 +1457,7 @@
                         @click="submitNewCountry"
                         type="button"
                         :disabled="addingCountry"
-                        class="flex-1 rounded-lg bg-[#1e5b43] px-4 py-2 text-sm font-semibold text-white hover:bg-[#154130] disabled:opacity-50"
+                        class="flex-1 rounded-lg bg-[#1d4ed8] px-4 py-2 text-sm font-semibold text-white hover:bg-[#154130] disabled:opacity-50"
                     >
                         {{ addingCountry ? "Adding..." : "Add Country" }}
                     </button>
@@ -1508,7 +1508,7 @@
                         <input
                             v-model="newAgent.name"
                             type="text"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                             :class="{ 'border-red-500': newAgentError }"
                             placeholder="Agent full name"
                             @keyup.enter="submitNewAgent"
@@ -1533,7 +1533,7 @@
                         <input
                             v-model="newAgent.mobile"
                             type="text"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                             placeholder="Agent mobile number"
                         />
                     </div>
@@ -1550,7 +1550,7 @@
                         <input
                             v-model="newAgent.district"
                             type="text"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                             placeholder="Agent district"
                         />
                     </div>
@@ -1567,7 +1567,7 @@
                         <textarea
                             v-model="newAgent.address"
                             rows="2"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]"
                             placeholder="Agent address"
                         ></textarea>
                     </div>
@@ -1585,7 +1585,7 @@
                         @click="submitNewAgent"
                         type="button"
                         :disabled="addingAgent"
-                        class="flex-1 rounded-lg bg-[#1e5b43] px-4 py-2 text-sm font-semibold text-white hover:bg-[#154130] disabled:opacity-50"
+                        class="flex-1 rounded-lg bg-[#1d4ed8] px-4 py-2 text-sm font-semibold text-white hover:bg-[#154130] disabled:opacity-50"
                     >
                         {{ addingAgent ? "Adding..." : "Add Agent" }}
                     </button>
@@ -2421,11 +2421,11 @@ if (isEdit.value) {
 }
 
 const baseInput =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43] bg-white";
+    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8] bg-white";
 const baseFile =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 bg-white file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43]";
+    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 bg-white file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8]";
 const baseTextarea =
-    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#1e5b43] focus:ring-2 focus:ring-[#1e5b43] bg-white";
+    "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#1d4ed8] focus:ring-2 focus:ring-[#1d4ed8] bg-white";
 
 const inputClass = (field) =>
     [
@@ -2568,7 +2568,7 @@ const DateField = defineComponent({
                     modelValue: props.modelValue,
                     "onUpdate:modelValue": update,
                     inputClass:
-                        "!rounded-lg !px-3 !py-2 !text-sm !border !border-gray-200 !bg-white !text-gray-900 focus:!border-[#1e5b43] focus:!ring-[#1e5b43]",
+                        "!rounded-lg !px-3 !py-2 !text-sm !border !border-gray-200 !bg-white !text-gray-900 focus:!border-[#1d4ed8] focus:!ring-[#1d4ed8]",
                 }),
                 props.error
                     ? h("p", { class: "text-xs text-red-600" }, props.error)

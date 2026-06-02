@@ -8,20 +8,20 @@
                 <p class="text-sm text-gray-500">Monthly tax summary with payments and balance</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1e5b43] outline-none">
+                <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1d4ed8] outline-none">
                     <option v-for="p in periods" :key="p.id" :value="p.id" :selected="periods.length > 0 && p.id === periods[0].id">
                         {{ p.name }} ({{ p.type }})
                     </option>
                 </select>
                 <a :href="route('accounting.tax-report.report')" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
-                    <i class="fa-solid fa-file-excel text-green-600"></i>
+                    <i class="fa-solid fa-file-excel text-blue-600"></i>
                     Excel
                 </a>
                 <a :href="route('accounting.tax-report.report', { type: 'pdf' })" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
                     <i class="fa-solid fa-file-pdf text-red-600"></i>
                     PDF
                 </a>
-                <Link href="/accounting/tax-summary" class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition shadow-sm border border-transparent">
+                <Link href="/accounting/tax-summary" class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition shadow-sm border border-transparent">
                     Tax Summary
                 </Link>
             </div>
@@ -41,7 +41,7 @@
                         <input
                             v-model="searchTerm"
                             type="text"
-                            class="w-full bg-gray-50 border border-gray-200 rounded-full pl-10 pr-10 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-all"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-full pl-10 pr-10 py-2.5 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-all"
                             placeholder="e.g. 2024-Q1 or CH-12345"
                         />
                         <button
@@ -73,7 +73,7 @@
                             <tr class="hover:bg-gray-50/50 cursor-pointer transition-colors" @click="togglePeriod(period.id)">
                                 <td class="px-6 py-4 font-bold text-gray-900 border-x-0">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center transition-transform text-gray-500" :class="expandedPeriods.includes(period.id) ? 'rotate-90 text-[#1e5b43] bg-emerald-50' : ''">
+                                        <div class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center transition-transform text-gray-500" :class="expandedPeriods.includes(period.id) ? 'rotate-90 text-[#1d4ed8] bg-blue-50' : ''">
                                             <i class="fa-solid fa-chevron-right text-[10px]"></i>
                                         </div>
                                         {{ period.name }}
@@ -85,7 +85,7 @@
                                 <td class="px-6 py-4 font-bold text-right text-gray-900">
                                     {{ money(period.total_tax) }}
                                 </td>
-                                <td class="px-6 py-4 font-bold text-right text-[#1e5b43]">
+                                <td class="px-6 py-4 font-bold text-right text-[#1d4ed8]">
                                     {{ money(period.total_payments) }}
                                 </td>
                                 <td class="px-6 py-4 font-bold text-right" :class="period.balance > 0 ? 'text-orange-600' : 'text-gray-400'">
@@ -93,7 +93,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <span :class="['px-3 py-1 text-[11px] font-bold rounded-md uppercase tracking-wider',
-                                        period.status === 'active' ? 'bg-emerald-100 text-emerald-800' :
+                                        period.status === 'active' ? 'bg-blue-100 text-blue-800' :
                                         period.status === 'closed' ? 'bg-gray-100 text-gray-600' :
                                         'bg-blue-100 text-blue-800']">
                                         {{ period.status }}
@@ -103,7 +103,7 @@
                                     <button
                                         v-if="getChalanFileCount(period) > 0"
                                         @click.stop="togglePeriod(period.id)"
-                                        class="inline-flex items-center px-4 py-1.5 bg-emerald-50 text-[#1e5b43] rounded-full hover:bg-emerald-100 border border-emerald-100 transition-colors text-[12px] font-bold uppercase tracking-wider"
+                                        class="inline-flex items-center px-4 py-1.5 bg-blue-50 text-[#1d4ed8] rounded-full hover:bg-blue-100 border border-blue-100 transition-colors text-[12px] font-bold uppercase tracking-wider"
                                     >
                                         <i class="fa-solid fa-file-invoice mr-2"></i>
                                         View Files ({{ getChalanFileCount(period) }})
@@ -129,7 +129,7 @@
                                             <tbody class="divide-y divide-gray-50">
                                                 <tr v-for="payment in getFilteredPayments(period)" :key="payment.id" class="hover:bg-gray-50 transition-colors">
                                                     <td class="px-4 py-3 font-medium text-gray-700">{{ formatDate(payment.payment_date) }}</td>
-                                                    <td class="px-4 py-3 font-bold text-[#1e5b43]">{{ money(payment.payment_amount) }}</td>
+                                                    <td class="px-4 py-3 font-bold text-[#1d4ed8]">{{ money(payment.payment_amount) }}</td>
                                                     <td class="px-4 py-3 font-mono text-xs text-gray-600 font-semibold bg-gray-50 rounded px-1.5 py-0.5 inline-block mt-2">{{ payment.chalan_number || '—' }}</td>
                                                     <td class="px-4 py-3 text-gray-500">{{ payment.notes || '—' }}</td>
                                                     <td class="px-4 py-3 text-center">
@@ -179,10 +179,10 @@
             </div>
             <div class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-gray-100 p-6 flex flex-col justify-center">
                 <div class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Total Payments (All Periods)</div>
-                <div class="text-[32px] font-bold text-[#1e5b43]">{{ money(totalAllPayments) }}</div>
+                <div class="text-[32px] font-bold text-[#1d4ed8]">{{ money(totalAllPayments) }}</div>
             </div>
-            <div :class="['rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-gray-100 p-6 flex flex-col justify-center transform scale-105', totalBalance > 0 ? 'bg-orange-50 border-orange-200' : 'bg-[#1e5b43] text-white']">
-                <div :class="['text-[12px] uppercase tracking-wider font-bold mb-2', totalBalance > 0 ? 'text-gray-500' : 'text-emerald-100/90']">Outstanding Balance</div>
+            <div :class="['rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-gray-100 p-6 flex flex-col justify-center transform scale-105', totalBalance > 0 ? 'bg-orange-50 border-orange-200' : 'bg-[#1d4ed8] text-white']">
+                <div :class="['text-[12px] uppercase tracking-wider font-bold mb-2', totalBalance > 0 ? 'text-gray-500' : 'text-blue-100/90']">Outstanding Balance</div>
                 <div :class="['text-[36px] font-bold leading-none', totalBalance > 0 ? 'text-orange-600' : 'text-white']">
                     {{ money(totalBalance) }}
                 </div>

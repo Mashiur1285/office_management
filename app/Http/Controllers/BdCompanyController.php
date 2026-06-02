@@ -10,7 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class BdCompanyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $companies = BdCompany::query()
             ->latest()
@@ -18,6 +18,7 @@ class BdCompanyController extends Controller
 
         return Inertia::render('BdCompanies/Index', [
             'companies' => $companies,
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 
@@ -135,7 +136,7 @@ class BdCompanyController extends Controller
         return redirect()->route('bd-companies.index')->with('success', 'Bangladeshi company updated.');
     }
 
-    public function show(BdCompany $bdCompany)
+    public function show(Request $request, BdCompany $bdCompany)
     {
         $clients = Client::query()
             ->where('bd_company_id', $bdCompany->id)
@@ -151,6 +152,7 @@ class BdCompanyController extends Controller
         return Inertia::render('BdCompanies/Show', [
             'company' => $bdCompany,
             'clients' => $clients,
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 }

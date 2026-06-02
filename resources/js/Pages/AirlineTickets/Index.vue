@@ -11,7 +11,7 @@
             </div>
             <Link
                 href="/airline-tickets/create"
-                class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition flex items-center gap-2 shadow-sm w-fit"
+                class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition flex items-center gap-2 shadow-sm w-fit"
             >
                 <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                 Add Ticket
@@ -20,22 +20,22 @@
 
         <!-- Stat Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <div class="bg-gradient-to-br from-[#1e5b43] to-[#174633] rounded-[24px] p-6 text-white shadow-md overflow-hidden">
+            <div class="bg-gradient-to-br from-[#1d4ed8] to-[#1e3a8a] rounded-[24px] p-6 text-white shadow-md overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="font-medium text-emerald-50 text-[15px]">Total Tickets</h3>
-                    <div class="w-8 h-8 rounded-full border border-emerald-300/30 flex items-center justify-center bg-white/10">
+                    <h3 class="font-medium text-blue-50 text-[15px]">Total Tickets</h3>
+                    <div class="w-8 h-8 rounded-full border border-blue-300/30 flex items-center justify-center bg-white/10">
                         <font-awesome-icon icon="ticket" class="w-3 h-3 text-white" />
                     </div>
                 </div>
                 <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.total }}</div>
-                <div class="text-xs text-emerald-100 font-medium">All managed tickets</div>
+                <div class="text-xs text-blue-100 font-medium">All managed tickets</div>
             </div>
 
             <div class="bg-white rounded-[24px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="font-medium text-gray-800 text-[15px]">Confirmed</h3>
                     <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center">
-                        <font-awesome-icon icon="check" class="w-3 h-3 text-emerald-500" />
+                        <font-awesome-icon icon="check" class="w-3 h-3 text-blue-500" />
                     </div>
                 </div>
                 <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.confirmed }}</div>
@@ -68,7 +68,7 @@
         <!-- Flash -->
         <div
             v-if="flash.success"
-            class="mb-6 flex items-center gap-3 rounded-[16px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800 shadow-sm"
+            class="mb-6 flex items-center gap-3 rounded-[16px] border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800 shadow-sm"
         >
             <font-awesome-icon icon="check-circle" class="w-5 h-5" />
             <span>{{ flash.success }}</span>
@@ -82,13 +82,13 @@
                     v-model="search"
                     type="text"
                     placeholder="Search by name, email, PNR, flight no..."
-                    class="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    class="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                     @input="applyFilters"
                 />
             </div>
             <select
                 v-model="statusFilter"
-                class="text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                class="text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 @change="applyFilters"
             >
                 <option value="">All Statuses</option>
@@ -155,7 +155,7 @@
                             <td class="px-5 py-4 text-right">
                                 <Link
                                     :href="`/airline-tickets/${ticket.id}`"
-                                    class="text-emerald-700 hover:text-emerald-900 font-semibold text-xs px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition"
+                                    class="text-blue-700 hover:text-blue-900 font-semibold text-xs px-3 py-1.5 rounded-lg hover:bg-blue-50 transition"
                                 >
                                     View
                                 </Link>
@@ -218,7 +218,7 @@ function formatDate(dateStr) {
 
 function statusClass(status) {
     const map = {
-        confirmed:   'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+        confirmed:   'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
         rescheduled: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
         cancelled:   'bg-red-50 text-red-700 ring-1 ring-red-200',
         flown:       'bg-gray-100 text-gray-600 ring-1 ring-gray-200',

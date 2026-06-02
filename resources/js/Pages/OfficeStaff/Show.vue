@@ -18,7 +18,7 @@
                     />
                 </div>
                 <Link
-                    href="/office-staff"
+                    :href="props.readOnly ? '/database/office-staff' : '/office-staff'"
                     class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
                 >
                     <font-awesome-icon icon="arrow-left" class="w-3.5 h-3.5" />
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div class="bg-white rounded-[24px] border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-5 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
                     <font-awesome-icon icon="gift" class="w-5 h-5" />
                 </div>
                 <div>
@@ -119,12 +119,17 @@ const props = defineProps({
     month: Object,
     summary: Object,
     entries: Array,
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const selectedMonth = ref(props.month?.value || '');
 
 const applyMonth = () => {
-    router.get(`/office-staff/${props.staff.id}`, { month: selectedMonth.value }, { preserveState: true });
+    const baseUrl = props.readOnly ? `/database/office-staff/${props.staff.id}` : `/office-staff/${props.staff.id}`;
+    router.get(baseUrl, { month: selectedMonth.value }, { preserveState: true });
 };
 
 const money = (value) => {

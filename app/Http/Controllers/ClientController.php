@@ -122,6 +122,7 @@ class ClientController extends Controller
                 'agency_scope' => $agencyScope,
                 'foreign_country' => $foreignCountry,
             ],
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 
@@ -292,7 +293,7 @@ class ClientController extends Controller
         ]);
     }
 
-    public function show(Client $client)
+    public function show(Request $request, Client $client)
     {
         $client->load(['bdCompany', 'foreignCompany', 'agent', 'documentLocation']);
 
@@ -458,6 +459,7 @@ class ClientController extends Controller
                     'status'               => $t->status,
                     'status_badge'         => $t->status_badge_class,
                 ]),
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 

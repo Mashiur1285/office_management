@@ -1,9 +1,9 @@
 <template>
-    <Head title="Create BD Company" />
+    <Head title="Create Vendor" />
     <div class="py-8 space-y-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1e5b43]">Bangladeshi Companies</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1d4ed8]">Bangladeshi Companies</p>
                 <h1 class="text-2xl font-bold text-gray-900">
                     {{ isEdit ? "Edit processing company" : "Add a processing company" }}
                 </h1>
@@ -20,7 +20,7 @@
                 </Link>
                 <button
                     type="button"
-                    class="inline-flex items-center justify-center rounded-lg bg-[#1e5b43] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
+                    class="inline-flex items-center justify-center rounded-lg bg-[#1d4ed8] px-4 py-2 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
                     :disabled="form.processing"
                     @click="submit"
                 >
@@ -83,7 +83,7 @@
                 </Link>
                 <button
                     type="submit"
-                    class="inline-flex items-center justify-center rounded-lg bg-[#1e5b43] px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
+                    class="inline-flex items-center justify-center rounded-lg bg-[#1d4ed8] px-6 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#154130] disabled:opacity-60"
                     :disabled="form.processing"
                 >
                     {{
@@ -132,9 +132,9 @@ const buildFormState = () => ({
 const form = useForm(buildFormState());
 
 const baseInput =
-    "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43] outline-none text-gray-900 bg-white";
+    "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8] outline-none text-gray-900 bg-white";
 const baseTextarea =
-    "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43] outline-none text-gray-900 bg-white";
+    "w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8] outline-none text-gray-900 bg-white";
 
 const inputClass = (field) =>
     [

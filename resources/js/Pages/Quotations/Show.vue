@@ -20,7 +20,7 @@
                 </Link>
                 <a
                     :href="route('quotations.download', quotation.id)"
-                    class="inline-flex items-center gap-2 rounded-full bg-[#1e5b43] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#154130] transition-colors shadow-sm"
+                    class="inline-flex items-center gap-2 rounded-full bg-[#1d4ed8] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#154130] transition-colors shadow-sm"
                 >
                     <font-awesome-icon icon="file-pdf" />
                     Download PDF

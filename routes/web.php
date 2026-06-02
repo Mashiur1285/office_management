@@ -17,15 +17,18 @@ use App\Http\Controllers\Acl\RoleController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LauncherController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\Reports\RefundReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    return redirect()->route('launcher');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/launcher', [LauncherController::class, 'index'])->name('launcher');
+
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:dashboard.view')
         ->name('dashboard');
@@ -359,6 +362,24 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Database read-only routes
+    Route::prefix('database')->name('database.')->group(function () {
+        Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
+        Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
+
+        Route::get('agents', [AgentController::class, 'index'])->name('agents.index');
+        Route::get('agents/{agent}', [AgentController::class, 'show'])->name('agents.show');
+
+        Route::get('office-staff', [OfficeStaffController::class, 'index'])->name('office-staff.index');
+        Route::get('office-staff/{officeStaff}', [OfficeStaffController::class, 'show'])->name('office-staff.show');
+
+        Route::get('bd-companies', [BdCompanyController::class, 'index'])->name('bd-companies.index');
+        Route::get('bd-companies/{bdCompany}', [BdCompanyController::class, 'show'])->name('bd-companies.show');
+
+        Route::get('foreign-companies', [ForeignCompanyController::class, 'index'])->name('foreign-companies.index');
+        Route::get('foreign-companies/{foreignCompany}', [ForeignCompanyController::class, 'show'])->name('foreign-companies.show');
+    });
 });
 
 require __DIR__ . '/auth.php';

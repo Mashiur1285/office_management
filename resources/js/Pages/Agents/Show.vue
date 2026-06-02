@@ -4,7 +4,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header Section -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="bg-[#1e5b43] px-6 py-8 text-white">
+                <div class="bg-[#1d4ed8] px-6 py-8 text-white">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0">
@@ -15,7 +15,7 @@
                                 </div>
                             </div>
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100 mb-1">Agent Profile</p>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-100 mb-1">Agent Profile</p>
                                 <h1 class="text-3xl font-bold mb-2">{{ agent.name }}</h1>
                                 <div class="flex flex-wrap items-center gap-3 text-sm">
                                     <span v-if="agent.mobile" class="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full">
@@ -35,13 +35,13 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <Link href="/agents" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm">
+                            <Link :href="props.readOnly ? '/database/agents' : '/agents'" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                                 </svg>
                                 Back
                             </Link>
-                            <Link :href="`/agents/${agent.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1e5b43] hover:bg-emerald-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
+                            <Link v-if="!props.readOnly" :href="`/agents/${agent.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1d4ed8] hover:bg-blue-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
@@ -69,8 +69,8 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
-                        <div class="p-3 bg-emerald-50 rounded-xl">
-                            <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-3 bg-blue-50 rounded-xl">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
@@ -82,14 +82,14 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
-                        <div class="p-3 bg-emerald-50 rounded-xl">
-                            <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-3 bg-blue-50 rounded-xl">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3-1.343 3-3S13.657 2 12 2s-3 1.343-3 3 1.343 3 3 3zm0 2c-2.761 0-5 2.239-5 5v3h10v-3c0-2.761-2.239-5-5-5z" />
                             </svg>
                         </div>
                         <div>
                             <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Received</p>
-                            <p class="text-xl font-bold text-emerald-700">{{ formatMoney(agent.total_received) }}</p>
+                            <p class="text-xl font-bold text-blue-700">{{ formatMoney(agent.total_received) }}</p>
                         </div>
                     </div>
                 </div>
@@ -131,9 +131,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">Total Received</p>
-                        <p class="mt-2 text-2xl font-bold text-emerald-700">{{ formatMoney(agent.total_received) }}</p>
+                    <div class="rounded-xl border border-blue-100 bg-blue-50/40 p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Total Received</p>
+                        <p class="mt-2 text-2xl font-bold text-blue-700">{{ formatMoney(agent.total_received) }}</p>
                     </div>
                     <div class="rounded-xl border border-rose-100 bg-rose-50/40 p-4">
                         <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Total Refunded</p>
@@ -193,7 +193,7 @@
                             :class="[
                                 'flex-1 py-4 px-6 text-center font-semibold text-sm transition-all',
                                 activeTab === 'overview'
-                                    ? 'border-b-2 border-[#1e5b43] text-[#1e5b43]'
+                                    ? 'border-b-2 border-[#1d4ed8] text-[#1d4ed8]'
                                     : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             ]"
                         >
@@ -204,7 +204,7 @@
                             :class="[
                                 'flex-1 py-4 px-6 text-center font-semibold text-sm transition-all',
                                 activeTab === 'documents'
-                                    ? 'border-b-2 border-[#1e5b43] text-[#1e5b43]'
+                                    ? 'border-b-2 border-[#1d4ed8] text-[#1d4ed8]'
                                     : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             ]"
                         >
@@ -220,7 +220,7 @@
                         <div class="space-y-6">
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                                 <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                                     Contact Information
                                 </h2>
                                 <div class="space-y-3">
@@ -258,14 +258,14 @@
                             <!-- Services -->
                             <div v-if="agent.services && agent.services.length" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                                 <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                                     Services Offered
                                 </h2>
                                 <div class="flex flex-wrap gap-2">
                                     <span
                                         v-for="service in agent.services"
                                         :key="service"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold border border-emerald-100"
+                                        class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold border border-blue-100"
                                     >
                                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -278,7 +278,7 @@
                             <!-- Bank Details -->
                             <div v-if="agent.bank_details" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                                 <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                                    <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                                     Bank Details
                                 </h2>
                                 <div class="p-3 bg-gray-50 rounded-xl">
@@ -293,12 +293,12 @@
                                 <div class="flex items-center justify-between mb-4">
                                     <div>
                                         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                            <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                                            <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                                             Linked Clients
                                         </h2>
                                         <p class="text-sm text-gray-600 ml-3">Click a client to view their details</p>
                                     </div>
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold border border-emerald-100">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100">
                                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                         </svg>
@@ -338,8 +338,8 @@
                                                 </div>
                                             </div>
                                             <Link
-                                                :href="`/clients/${client.id}`"
-                                                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-[#1e5b43] text-white rounded-lg text-xs font-semibold shadow-md hover:bg-[#154130] transition-all group-hover:scale-105"
+                                                :href="props.readOnly ? `/database/clients/${client.id}` : `/clients/${client.id}`"
+                                                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-[#1d4ed8] text-white rounded-lg text-xs font-semibold shadow-md hover:bg-[#154130] transition-all group-hover:scale-105"
                                             >
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -434,6 +434,10 @@ const props = defineProps({
     refunds: {
         type: Array,
         default: () => [],
+    },
+    readOnly: {
+        type: Boolean,
+        default: false,
     },
 });
 

@@ -124,7 +124,7 @@
                         <textarea
                             v-model="form.description"
                             rows="8"
-                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
                             placeholder="Write detailed description (maximum 350 words)"
                         ></textarea>
                         <p class="mt-2 text-xs text-gray-500">
@@ -168,7 +168,7 @@
                                 <td class="px-3 py-2">
                                     <input
                                         v-model="item.service_description"
-                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
+                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
                                         placeholder="Service description"
                                     />
                                     <p v-if="form.errors[`items.${index}.service_description`]" class="mt-1 text-xs text-red-600">
@@ -182,7 +182,7 @@
                                         min="1"
                                         step="1"
                                         inputmode="numeric"
-                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
+                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
                                         placeholder="1"
                                     />
                                     <p v-if="form.errors[`items.${index}.quantity`]" class="mt-1 text-xs text-red-600">
@@ -196,7 +196,7 @@
                                         min="0"
                                         step="1"
                                         inputmode="numeric"
-                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
+                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
                                         placeholder="0.00"
                                     />
                                     <p v-if="form.errors[`items.${index}.unit_price`]" class="mt-1 text-xs text-red-600">
@@ -207,7 +207,7 @@
                                     <div class="flex items-center gap-2">
                                         <select
                                             v-model="item.discount_type"
-                                            class="w-24 rounded-xl border border-gray-200 px-2 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
+                                            class="w-24 rounded-xl border border-gray-200 px-2 py-2 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
                                         >
                                             <option value="percent">%</option>
                                             <option value="amount">৳</option>
@@ -217,7 +217,7 @@
                                             type="number"
                                             min="0"
                                             step="0.01"
-                                            class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
+                                            class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
                                             placeholder="0"
                                         />
                                     </div>
@@ -231,7 +231,7 @@
                                         type="number"
                                         min="0"
                                         step="0.01"
-                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
+                                        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
                                         placeholder="0"
                                     />
                                 </td>
@@ -321,7 +321,7 @@
                 <textarea
                     v-model="form.terms_text"
                     rows="6"
-                    class="mt-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1e5b43] focus:ring-1 focus:ring-[#1e5b43]"
+                    class="mt-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
                     :readonly="form.terms_type === 'default'"
                 ></textarea>
                 <p v-if="form.errors.terms_text" class="mt-2 text-sm text-red-600">
@@ -332,7 +332,7 @@
             <div class="flex items-center justify-end gap-3">
                 <button
                     type="submit"
-                    class="inline-flex items-center gap-2 rounded-full bg-[#1e5b43] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#154130] transition-colors shadow-sm"
+                    class="inline-flex items-center gap-2 rounded-full bg-[#1d4ed8] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#154130] transition-colors shadow-sm"
                     :disabled="form.processing"
                 >
                     <span v-if="!form.processing">Save & Generate PDF</span>

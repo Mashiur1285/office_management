@@ -370,7 +370,7 @@ const charCount = computed(() => content.value.length);
 const saveStatusClass = computed(() => {
     const classes = {
         saving: 'text-yellow-600',
-        saved: 'text-green-600',
+        saved: 'text-blue-600',
         error: 'text-red-600',
     };
     return classes[saveStatus.value] || '';

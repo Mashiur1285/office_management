@@ -11,12 +11,13 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OfficeStaffController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $staff = OfficeStaff::orderBy('name')->get();
 
         return Inertia::render('OfficeStaff/Index', [
             'staff' => $staff,
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 
@@ -178,6 +179,7 @@ class OfficeStaffController extends Controller
                 'due_amount' => (float) $entry->due_amount,
                 'created_at' => $entry->created_at->format('Y-m-d'),
             ]),
+            'readOnly' => $request->routeIs('database.*'),
         ]);
     }
 

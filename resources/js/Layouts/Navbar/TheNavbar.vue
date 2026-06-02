@@ -17,7 +17,7 @@
                 <div class="relative" ref="notificationRef">
                     <button
                         type="button"
-                        class="relative flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-600 hover:border-emerald-300 hover:text-emerald-700 hover:bg-emerald-50 focus:outline-none transition"
+                        class="relative flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-600 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 focus:outline-none transition"
                         @click="notificationsOpen = !notificationsOpen"
                     >
                         <div class="relative">
@@ -121,10 +121,10 @@
                 <div class="relative" ref="dropdownRef">
                     <button
                         type="button"
-                        class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-emerald-700 focus:outline-none bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:border-emerald-300 hover:bg-emerald-50 transition"
+                        class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-700 focus:outline-none bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:border-blue-300 hover:bg-blue-50 transition"
                         @click="dropdownOpen = !dropdownOpen"
                     >
-                        <div class="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
+                        <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
                             {{ userName.charAt(0).toUpperCase() }}
                         </div>
                         <span class="mr-1">{{ userName }}</span>
@@ -187,8 +187,8 @@ const visibleNotifications = computed(() =>
 );
 const page = usePage();
 const userName = computed(() => page.props.auth?.user?.name || "User");
-const appName = computed(() => page.props.settings?.app_name || "MITT");
-const logoUrl = computed(() => page.props.settings?.logo_url || "/images/mtt-logo.png");
+const appName = computed(() => page.props.settings?.app_name || "Zulia");
+const logoUrl = computed(() => page.props.settings?.logo_url || "/images/zulia.jpeg");
 
 const currentPageLabel = computed(() => {
     const path = page.url.split("?")[0];
@@ -196,7 +196,7 @@ const currentPageLabel = computed(() => {
     if (path.startsWith("/clients")) return "Clients";
     if (path.startsWith("/agents")) return "Agents";
     if (path.startsWith("/office-staff")) return "Office Staff";
-    if (path.startsWith("/bd-companies")) return "BD Companies";
+    if (path.startsWith("/bd-companies")) return "Vendors";
     if (path.startsWith("/foreign-companies")) return "Foreign Companies";
     if (path.startsWith("/invoices")) return "Invoices";
     if (path.startsWith("/airline-tickets")) return "Airline Tickets";

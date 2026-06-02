@@ -8,13 +8,13 @@
                 <p class="text-sm text-gray-500">Period: {{ period.name }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1e5b43] outline-none">
+                <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1d4ed8] outline-none">
                             <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                                 {{ p.name }} ({{ p.type }})
                             </option>
                         </select>
                         <a :href="route('accounting.net-profit-after-tax.report')" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
-                            <i class="fa-solid fa-file-excel text-green-600"></i>
+                            <i class="fa-solid fa-file-excel text-blue-600"></i>
                             Excel
                         </a>
                         <a :href="route('accounting.net-profit-after-tax.report', { type: 'pdf' })" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
@@ -25,9 +25,9 @@
                 </div>
 
             <!-- Net Profit After Tax Calculation -->
-            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(30,91,67,0.1)] border-2 border-[#1e5b43]/20 overflow-hidden mb-6">
-                <div class="bg-[#1e5b43]/5 border-b border-[#1e5b43]/10 px-6 py-4">
-                    <h2 class="text-xl font-bold text-[#1e5b43]">Bottom-Line Profit (After Tax)</h2>
+            <div class="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(30,91,67,0.1)] border-2 border-[#1d4ed8]/20 overflow-hidden mb-6">
+                <div class="bg-[#1d4ed8]/5 border-b border-[#1d4ed8]/10 px-6 py-4">
+                    <h2 class="text-xl font-bold text-[#1d4ed8]">Bottom-Line Profit (After Tax)</h2>
                 </div>
                 <div class="p-6 space-y-4">
                     <!-- Formula Display -->
@@ -35,7 +35,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="bg-white rounded-[20px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] border border-gray-100 p-5 text-center transition-transform hover:-translate-y-1">
                                 <div class="text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-2">Net Profit Before Tax</div>
-                                <Link href="/accounting/net-profit-before-tax" class="text-2xl font-bold" :class="netProfitBeforeTax >= 0 ? 'text-[#1e5b43] hover:text-[#164230]' : 'text-red-600 hover:text-red-700'">
+                                <Link href="/accounting/net-profit-before-tax" class="text-2xl font-bold" :class="netProfitBeforeTax >= 0 ? 'text-[#1d4ed8] hover:text-[#1e40af]' : 'text-red-600 hover:text-red-700'">
                                     {{ money(netProfitBeforeTax) }}
                                 </Link>
                             </div>
@@ -45,8 +45,8 @@
                                     {{ money(totalTax) }}
                                 </Link>
                             </div>
-                            <div class="bg-[#1e5b43] rounded-[20px] shadow-[0_4px_12px_rgba(30,91,67,0.2)] p-5 text-center transform scale-105">
-                                <div class="text-[11px] uppercase tracking-wider font-bold text-emerald-100/90 mb-2">Net Profit After Tax</div>
+                            <div class="bg-[#1d4ed8] rounded-[20px] shadow-[0_4px_12px_rgba(30,91,67,0.2)] p-5 text-center transform scale-105">
+                                <div class="text-[11px] uppercase tracking-wider font-bold text-blue-100/90 mb-2">Net Profit After Tax</div>
                                 <div class="text-3xl font-bold" :class="netProfitAfterTax >= 0 ? 'text-white' : 'text-red-300'">
                                     {{ money(netProfitAfterTax) }}
                                 </div>
@@ -55,11 +55,11 @@
                     </div>
 
                     <!-- Performance Indicator -->
-                    <div v-if="netProfitAfterTax >= 0" class="bg-emerald-50 border border-emerald-100 rounded-[16px] p-4 flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                    <div v-if="netProfitAfterTax >= 0" class="bg-blue-50 border border-blue-100 rounded-[16px] p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
                             <i class="fa-solid fa-check"></i>
                         </div>
-                        <span class="text-sm font-bold text-[#1e5b43]">Profitable after tax - Strong bottom-line performance</span>
+                        <span class="text-sm font-bold text-[#1d4ed8]">Profitable after tax - Strong bottom-line performance</span>
                     </div>
                     <div v-else class="bg-red-50 border border-red-100 rounded-[16px] p-4 flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
@@ -81,7 +81,7 @@
                         <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-600 font-medium">Total Income</span>
-                                <span class="font-bold text-[#1e5b43]">{{ money(totalIncome) }}</span>
+                                <span class="font-bold text-[#1d4ed8]">{{ money(totalIncome) }}</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-600 font-medium">Less: Cost of Sales</span>
@@ -89,7 +89,7 @@
                             </div>
                             <div class="pt-3 border-t border-gray-200 flex justify-between items-center">
                                 <span class="font-bold text-gray-900">Gross Profit</span>
-                                <Link href="/accounting/gross-profit" class="text-xl font-bold text-[#1e5b43] hover:text-[#164230] hover:underline">
+                                <Link href="/accounting/gross-profit" class="text-xl font-bold text-[#1d4ed8] hover:text-[#1e40af] hover:underline">
                                     {{ money(grossProfit) }}
                                 </Link>
                             </div>
@@ -102,7 +102,7 @@
                         <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-600 font-medium">Gross Profit</span>
-                                <span class="font-bold text-[#1e5b43]">{{ money(grossProfit) }}</span>
+                                <span class="font-bold text-[#1d4ed8]">{{ money(grossProfit) }}</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-600 font-medium">Less: Operating Expenses (with VAT &amp; Tax)</span>
@@ -123,7 +123,7 @@
                         <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-600 font-medium">Non-Operating Income</span>
-                                <span class="font-bold text-[#1e5b43]">{{ money(nonOperatingIncome) }}</span>
+                                <span class="font-bold text-[#1d4ed8]">{{ money(nonOperatingIncome) }}</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-600 font-medium">Less: Non-Operating Expenses</span>
@@ -139,13 +139,13 @@
                     </div>
 
                     <!-- Pre-Tax Profit Section -->
-                    <div class="bg-gray-50/50 rounded-2xl p-5 border-l-4 border-l-[#1e5b43] border border-gray-100">
+                    <div class="bg-gray-50/50 rounded-2xl p-5 border-l-4 border-l-[#1d4ed8] border border-gray-100">
                         <div class="flex justify-between items-center">
                             <div>
                                 <div class="text-[11px] uppercase tracking-wider font-bold text-gray-500 mb-1">Before Tax</div>
                                 <div class="font-bold text-gray-900">Net Profit Before Tax</div>
                             </div>
-                            <Link href="/accounting/net-profit-before-tax" class="text-3xl font-bold hover:underline" :class="netProfitBeforeTax >= 0 ? 'text-[#1e5b43] hover:text-[#164230]' : 'text-red-600 hover:text-red-700'">
+                            <Link href="/accounting/net-profit-before-tax" class="text-3xl font-bold hover:underline" :class="netProfitBeforeTax >= 0 ? 'text-[#1d4ed8] hover:text-[#1e40af]' : 'text-red-600 hover:text-red-700'">
                                 {{ money(netProfitBeforeTax) }}
                             </Link>
                         </div>
@@ -173,10 +173,10 @@
                     </div>
 
                     <!-- Final Bottom Line -->
-                    <div class="bg-[#1e5b43] rounded-2xl p-6 text-white shadow-[0_2px_12px_rgba(30,91,67,0.15)]">
+                    <div class="bg-[#1d4ed8] rounded-2xl p-6 text-white shadow-[0_2px_12px_rgba(30,91,67,0.15)]">
                         <div class="flex justify-between items-center">
                             <div>
-                                <div class="text-sm text-emerald-100/90 mb-1">Bottom-Line Result</div>
+                                <div class="text-sm text-blue-100/90 mb-1">Bottom-Line Result</div>
                                 <div class="text-[22px] font-bold">Net Profit After Tax</div>
                             </div>
                             <div class="text-4xl font-bold" :class="netProfitAfterTax >= 0 ? 'text-white' : 'text-red-300'">

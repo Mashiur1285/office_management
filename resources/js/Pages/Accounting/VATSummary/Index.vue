@@ -8,13 +8,13 @@
                 <p class="text-sm text-gray-500">Period: {{ period.name }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1e5b43] outline-none">
+                <select class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-[#1d4ed8] outline-none">
                     <option v-for="p in periods" :key="p.id" :value="p.id" :selected="p.id === period.id">
                         {{ p.name }} ({{ p.type }})
                     </option>
                 </select>
                 <a :href="route('accounting.vat-summary.report')" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
-                    <i class="fa-solid fa-file-excel text-green-600"></i>
+                    <i class="fa-solid fa-file-excel text-blue-600"></i>
                     Excel
                 </a>
                 <a :href="route('accounting.vat-summary.report', { type: 'pdf' })" class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
@@ -39,14 +39,14 @@
                 <!-- Total Payments -->
                 <div class="bg-gray-50/50 rounded-[20px] p-6 border border-gray-100 flex flex-col justify-center transition-all hover:bg-gray-50 hover:shadow-sm">
                     <div class="text-[12px] uppercase tracking-wider font-bold text-gray-500 mb-2">Total Payments Made</div>
-                    <div class="text-[32px] font-bold text-[#1e5b43]">
+                    <div class="text-[32px] font-bold text-[#1d4ed8]">
                         {{ money(totalVatPayments) }}
                     </div>
                 </div>
 
                 <!-- Balance -->
-                <div :class="['rounded-[20px] p-6 border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transform scale-105 flex flex-col justify-center', vatBalance > 0 ? 'bg-orange-50 border-orange-200' : 'bg-[#1e5b43] text-white']">
-                    <div :class="['text-[12px] uppercase tracking-wider font-bold mb-2', vatBalance > 0 ? 'text-gray-500' : 'text-emerald-100/90']">Remaining Balance</div>
+                <div :class="['rounded-[20px] p-6 border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.05)] transform scale-105 flex flex-col justify-center', vatBalance > 0 ? 'bg-orange-50 border-orange-200' : 'bg-[#1d4ed8] text-white']">
+                    <div :class="['text-[12px] uppercase tracking-wider font-bold mb-2', vatBalance > 0 ? 'text-gray-500' : 'text-blue-100/90']">Remaining Balance</div>
                     <div :class="['text-[36px] font-bold leading-none', vatBalance > 0 ? 'text-orange-600' : 'text-white']">
                         {{ money(vatBalance) }}
                     </div>
@@ -63,7 +63,7 @@
                         <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Payment Type *</label>
                         <select
                             v-model="paymentForm.payment_type"
-                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none cursor-pointer"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-colors outline-none cursor-pointer"
                             required
                         >
                             <option value="bulk">Bulk Payment (All Clients)</option>
@@ -75,7 +75,7 @@
                         <label class="block text-[11px] font-bold text-gray-700 mb-2 uppercase tracking-wider">Select Client *</label>
                         <select
                             v-model="paymentForm.client_id"
-                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none cursor-pointer"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-colors outline-none cursor-pointer"
                             required
                         >
                             <option :value="null">-- Select Client --</option>
@@ -92,7 +92,7 @@
                             type="number"
                             step="0.01"
                             required
-                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-colors outline-none"
                             placeholder="0.00"
                         />
                     </div>
@@ -100,7 +100,7 @@
                     <div v-else class="p-5 bg-gray-50 border border-gray-200 rounded-[16px]">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-[12px] uppercase tracking-wider font-bold text-gray-500">Total Payment Amount:</span>
-                            <span class="text-[24px] font-bold text-[#1e5b43]">{{ money(vatBalance) }}</span>
+                            <span class="text-[24px] font-bold text-[#1d4ed8]">{{ money(vatBalance) }}</span>
                         </div>
                         <p class="text-xs text-gray-500 font-medium">This amount will be distributed across all clients with unpaid VAT</p>
                     </div>
@@ -124,7 +124,7 @@
                             v-model="paymentForm.chalan_number"
                             type="text"
                             required
-                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-colors outline-none"
                             placeholder="Enter chalan number"
                         />
                     </div>
@@ -136,7 +136,7 @@
                             type="file"
                             @change="handleChalanSlipChange"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            class="w-full px-4 py-3 border border-gray-200 rounded-[12px] text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1e5b43] file:text-white hover:file:bg-[#164230]"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-[12px] text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#1d4ed8] file:text-white hover:file:bg-[#1e40af]"
                         />
                     </div>
 
@@ -145,7 +145,7 @@
                         <textarea
                             v-model="paymentForm.notes"
                             rows="3"
-                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-colors outline-none resize-none"
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-colors outline-none resize-none"
                             placeholder="Any additional notes..."
                         ></textarea>
                     </div>
@@ -155,7 +155,7 @@
                     <button
                         type="submit"
                         :disabled="isSubmitting"
-                        class="px-8 py-3 bg-[#1e5b43] text-white rounded-full hover:bg-[#164230] transition-colors font-bold text-sm shadow-[0_4px_12px_rgba(30,91,67,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="px-8 py-3 bg-[#1d4ed8] text-white rounded-full hover:bg-[#1e40af] transition-colors font-bold text-sm shadow-[0_4px_12px_rgba(30,91,67,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {{ isSubmitting ? 'Saving...' : 'Record Payment' }}
                     </button>
@@ -191,21 +191,21 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <tr v-for="client in clientsWithVat" :key="client.id" :class="client.vat_paid ? 'bg-emerald-50/30' : 'hover:bg-gray-50/50 transition-colors'">
+                        <tr v-for="client in clientsWithVat" :key="client.id" :class="client.vat_paid ? 'bg-blue-50/30' : 'hover:bg-gray-50/50 transition-colors'">
                             <td class="px-6 py-4 font-bold text-gray-900 border-x-0">
                                 {{ client.name }}
                             </td>
                             <td class="px-6 py-4 font-bold text-gray-900 text-right">
                                 {{ money(client.total_vat_receivable) }}
                             </td>
-                            <td class="px-6 py-4 text-[#1e5b43] font-semibold text-right">
+                            <td class="px-6 py-4 text-[#1d4ed8] font-semibold text-right">
                                 {{ money(client.vat_paid_amount) }}
                             </td>
                             <td class="px-6 py-4 font-bold text-right" :class="client.vat_paid ? 'text-gray-400' : 'text-orange-600'">
                                 {{ money(client.vat_unpaid_amount) }}
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <span v-if="client.vat_paid" class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-md text-[11px] font-bold uppercase tracking-wider">
+                                <span v-if="client.vat_paid" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-md text-[11px] font-bold uppercase tracking-wider">
                                     Fully Paid
                                 </span>
                                 <span v-else-if="client.vat_paid_amount > 0" class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-md text-[11px] font-bold uppercase tracking-wider">
@@ -240,7 +240,7 @@
                     <input
                         v-model="searchPayments"
                         type="text"
-                        class="w-full bg-white border border-gray-200 rounded-full pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e5b43] focus:border-transparent transition-all shadow-sm"
+                        class="w-full bg-white border border-gray-200 rounded-full pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:border-transparent transition-all shadow-sm"
                         placeholder="Search by challan number, client, date..."
                     />
                     <button
@@ -283,7 +283,7 @@
                             <td class="px-6 py-4 text-gray-600 font-medium">
                                 {{ payment.client_name || '—' }}
                             </td>
-                            <td class="px-6 py-4 font-bold text-[#1e5b43]">
+                            <td class="px-6 py-4 font-bold text-[#1d4ed8]">
                                 {{ money(payment.payment_amount) }}
                             </td>
                             <td class="px-6 py-4 font-mono text-xs text-gray-600 font-semibold bg-gray-50 rounded select-all inline-block mt-2 px-1">
@@ -318,7 +318,7 @@
                             <td colspan="8" class="px-6 py-12 text-center text-sm text-gray-500">
                                 <i class="fa-solid fa-search text-gray-300 text-2xl mb-3 block"></i>
                                 No payments found matching your search.
-                                <button @click="searchPayments = ''" class="text-[#1e5b43] font-bold hover:underline ml-1">Clear search</button>
+                                <button @click="searchPayments = ''" class="text-[#1d4ed8] font-bold hover:underline ml-1">Clear search</button>
                             </td>
                         </tr>
                     </tbody>
@@ -344,14 +344,14 @@
                     <tbody class="divide-y divide-gray-100">
                         <!-- Travel & Tourism Section -->
                         <template v-if="vatData.travel_tourism && vatData.travel_tourism.length > 0">
-                            <tr class="bg-emerald-50/30">
+                            <tr class="bg-blue-50/30">
                                 <td colspan="2" class="px-6 py-4">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-plane text-[#1e5b43]"></i>
+                                            <i class="fa-solid fa-plane text-[#1d4ed8]"></i>
                                             <span class="font-bold text-gray-900">1. Travel & Tourism Income VAT</span>
                                         </div>
-                                        <Link href="/accounting/income/travel-tourism" class="text-xs text-[#1e5b43] hover:text-[#164230] hover:underline font-bold">
+                                        <Link href="/accounting/income/travel-tourism" class="text-xs text-[#1d4ed8] hover:text-[#1e40af] hover:underline font-bold">
                                             View Entries →
                                         </Link>
                                     </div>
@@ -369,7 +369,7 @@
                                 <td class="px-6 py-4 pl-12 text-[11px] uppercase tracking-wider font-bold text-gray-500">
                                     Subtotal - Travel & Tourism VAT
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right font-bold text-[#1e5b43]">
+                                <td class="px-6 py-4 text-sm text-right font-bold text-[#1d4ed8]">
                                     {{ money(categoryTotals.travel_tourism) }}
                                 </td>
                             </tr>
@@ -377,14 +377,14 @@
 
                         <!-- Manpower Exporting Section -->
                         <template v-if="vatData.manpower_exporting && vatData.manpower_exporting.length > 0">
-                            <tr class="bg-emerald-50/30">
+                            <tr class="bg-blue-50/30">
                                 <td colspan="2" class="px-6 py-4">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-users text-[#1e5b43]"></i>
+                                            <i class="fa-solid fa-users text-[#1d4ed8]"></i>
                                             <span class="font-bold text-gray-900">2. Manpower Exporting Income VAT</span>
                                         </div>
-                                        <Link href="/accounting/income/manpower" class="text-xs text-[#1e5b43] hover:text-[#164230] hover:underline font-bold">
+                                        <Link href="/accounting/income/manpower" class="text-xs text-[#1d4ed8] hover:text-[#1e40af] hover:underline font-bold">
                                             View Entries →
                                         </Link>
                                     </div>
@@ -402,7 +402,7 @@
                                 <td class="px-6 py-4 pl-12 text-[11px] uppercase tracking-wider font-bold text-gray-500">
                                     Subtotal - Manpower Exporting VAT
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right font-bold text-[#1e5b43]">
+                                <td class="px-6 py-4 text-sm text-right font-bold text-[#1d4ed8]">
                                     {{ money(categoryTotals.manpower_exporting) }}
                                 </td>
                             </tr>
@@ -410,14 +410,14 @@
 
                         <!-- Student Package Section -->
                         <template v-if="vatData.student_package && vatData.student_package.length > 0">
-                            <tr class="bg-emerald-50/30">
+                            <tr class="bg-blue-50/30">
                                 <td colspan="2" class="px-6 py-4">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-graduation-cap text-[#1e5b43]"></i>
+                                            <i class="fa-solid fa-graduation-cap text-[#1d4ed8]"></i>
                                             <span class="font-bold text-gray-900">3. Student Package Income VAT</span>
                                         </div>
-                                        <Link href="/accounting/income/student" class="text-xs text-[#1e5b43] hover:text-[#164230] hover:underline font-bold">
+                                        <Link href="/accounting/income/student" class="text-xs text-[#1d4ed8] hover:text-[#1e40af] hover:underline font-bold">
                                             View Entries →
                                         </Link>
                                     </div>
@@ -435,7 +435,7 @@
                                 <td class="px-6 py-4 pl-12 text-[11px] uppercase tracking-wider font-bold text-gray-500">
                                     Subtotal - Student Package VAT
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right font-bold text-[#1e5b43]">
+                                <td class="px-6 py-4 text-sm text-right font-bold text-[#1d4ed8]">
                                     {{ money(categoryTotals.student_package) }}
                                 </td>
                             </tr>
@@ -443,14 +443,14 @@
 
                         <!-- Other Income Section -->
                         <template v-if="vatData.other_income && vatData.other_income.length > 0">
-                            <tr class="bg-emerald-50/30">
+                            <tr class="bg-blue-50/30">
                                 <td colspan="2" class="px-6 py-4">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
-                                            <i class="fa-solid fa-layer-group text-[#1e5b43]"></i>
+                                            <i class="fa-solid fa-layer-group text-[#1d4ed8]"></i>
                                             <span class="font-bold text-gray-900">4. Other Income VAT</span>
                                         </div>
-                                        <Link href="/accounting/income/other" class="text-xs text-[#1e5b43] hover:text-[#164230] hover:underline font-bold">
+                                        <Link href="/accounting/income/other" class="text-xs text-[#1d4ed8] hover:text-[#1e40af] hover:underline font-bold">
                                             View Entries →
                                         </Link>
                                     </div>
@@ -468,7 +468,7 @@
                                 <td class="px-6 py-4 pl-12 text-[11px] uppercase tracking-wider font-bold text-gray-500">
                                     Subtotal - Other Income VAT
                                 </td>
-                                <td class="px-6 py-4 text-sm text-right font-bold text-[#1e5b43]">
+                                <td class="px-6 py-4 text-sm text-right font-bold text-[#1d4ed8]">
                                     {{ money(categoryTotals.other_income) }}
                                 </td>
                             </tr>
@@ -484,12 +484,12 @@
                         </tr>
 
                         <!-- Grand Total -->
-                        <tr v-if="hasAnyVat" class="bg-[#1e5b43] text-white rounded-b-[24px]">
+                        <tr v-if="hasAnyVat" class="bg-[#1d4ed8] text-white rounded-b-[24px]">
                             <td class="px-6 py-5 text-[14px] uppercase tracking-wider font-bold">
                                 Total VAT Payable (All Categories)
                             </td>
                             <td class="px-6 py-5 text-right">
-                                <div class="text-[28px] font-bold text-emerald-100/90 leading-none">
+                                <div class="text-[28px] font-bold text-blue-100/90 leading-none">
                                     {{ money(totalVat) }}
                                 </div>
                             </td>
@@ -517,22 +517,22 @@
 
         <!-- Navigation Links -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-8">
-            <Link href="/accounting/income/travel-tourism" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1e5b43]/20 p-6 flex flex-col justify-center text-center group hover:border-[#1e5b43]/40 transition-colors relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#1e5b43]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            <Link href="/accounting/income/travel-tourism" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1d4ed8]/20 p-6 flex flex-col justify-center text-center group hover:border-[#1d4ed8]/40 transition-colors relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#1d4ed8]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 <div class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Income Sections</div>
-                <div class="font-bold text-gray-900 group-hover:text-[#1e5b43] transition-colors">View & Edit Income Entries</div>
+                <div class="font-bold text-gray-900 group-hover:text-[#1d4ed8] transition-colors">View & Edit Income Entries</div>
             </Link>
-            <Link href="/accounting/net-profit-after-tax" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1e5b43]/20 p-6 flex flex-col justify-center text-center group hover:border-[#1e5b43]/40 transition-colors relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#1e5b43]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            <Link href="/accounting/net-profit-after-tax" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1d4ed8]/20 p-6 flex flex-col justify-center text-center group hover:border-[#1d4ed8]/40 transition-colors relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#1d4ed8]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 <div class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">P&L Summary</div>
-                <div class="font-bold text-gray-900 group-hover:text-[#1e5b43] transition-colors">Net Profit After Tax</div>
+                <div class="font-bold text-gray-900 group-hover:text-[#1d4ed8] transition-colors">Net Profit After Tax</div>
             </Link>
-            <Link href="/accounting" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1e5b43]/20 p-6 flex items-center justify-between group hover:border-[#1e5b43]/40 transition-colors">
+            <Link href="/accounting" class="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-[#1d4ed8]/20 p-6 flex items-center justify-between group hover:border-[#1d4ed8]/40 transition-colors">
                 <div>
                     <div class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Dashboard</div>
-                    <div class="font-bold text-gray-900 group-hover:text-[#1e5b43] transition-colors">Accounting Home</div>
+                    <div class="font-bold text-gray-900 group-hover:text-[#1d4ed8] transition-colors">Accounting Home</div>
                 </div>
-                <i class="fa-solid fa-house text-gray-300 group-hover:text-[#1e5b43] transition-colors"></i>
+                <i class="fa-solid fa-house text-gray-300 group-hover:text-[#1d4ed8] transition-colors"></i>
             </Link>
         </div>
     </div>

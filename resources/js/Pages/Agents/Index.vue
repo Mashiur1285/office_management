@@ -13,7 +13,7 @@
                     :href="route('agents.export', { type: 'excel' })"
                     class="border border-gray-200 text-gray-700 bg-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
                 >
-                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-green-600" />
+                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5 text-blue-600" />
                     Excel
                 </a>
                 <a
@@ -24,12 +24,68 @@
                     PDF
                 </a>
                 <Link
+                    v-if="!props.readOnly"
                     href="/agents/create"
-                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition flex items-center gap-2 shadow-sm"
+                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition flex items-center gap-2 shadow-sm"
                 >
                     <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                     Add Agent
                 </Link>
+            </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="bg-gradient-to-br from-[#1d4ed8] to-[#1e3a8a] rounded-[24px] p-6 text-white relative shadow-md overflow-hidden">
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <h3 class="font-medium text-blue-50 text-[15px]">Total Agents</h3>
+                    <div class="w-8 h-8 rounded-full border border-blue-300/30 flex items-center justify-center bg-white/10 backdrop-blur-sm -mr-1 -mt-1">
+                        <font-awesome-icon icon="address-card" class="w-3 h-3 text-white" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none relative z-10">{{ filteredAgents.length }}</div>
+                <div class="flex items-center gap-2 text-xs text-blue-100 font-medium relative z-10">
+                    <span>All registered agents</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">Clients Managed</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="users" class="w-3 h-3 text-blue-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.totalClients }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Total clients across all agents</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">With NID</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="id-card" class="w-3 h-3 text-blue-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.withNid }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Agents with NID on file</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="font-medium text-gray-800 text-[15px]">With Services</h3>
+                    <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1">
+                        <font-awesome-icon icon="briefcase" class="w-3 h-3 text-amber-500" />
+                    </div>
+                </div>
+                <div class="text-[52px] font-bold mb-5 tracking-tight leading-none">{{ stats.withServices }}</div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span>Agents with assigned services</span>
+                </div>
             </div>
         </div>
 
@@ -100,10 +156,10 @@
                             </td>
                             <td class="px-6 py-4 text-right border-l border-transparent group-hover:border-gray-100">
                                 <div class="flex items-center justify-end gap-1.5 transition-opacity">
-                                    <button @click="router.visit(`/agents/${agent.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1e5b43] hover:bg-emerald-50 transition" title="View">
+                                    <button @click="router.visit(props.readOnly ? `/database/agents/${agent.id}` : `/agents/${agent.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1d4ed8] hover:bg-blue-50 transition" title="View">
                                         <font-awesome-icon icon="eye" class="w-3.5 h-3.5" />
                                     </button>
-                                    <button @click="router.visit(`/agents/${agent.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
+                                    <button v-if="!props.readOnly" @click="router.visit(`/agents/${agent.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
                                         <font-awesome-icon icon="edit" class="w-3.5 h-3.5" />
                                     </button>
                                 </div>
@@ -118,8 +174,9 @@
                                 <h3 class="text-lg font-bold text-gray-900 mb-1">No agents yet</h3>
                                 <p class="text-sm text-gray-500 mb-5">Get started by adding your first agent</p>
                                 <Link
+                                    v-if="!props.readOnly"
                                     href="/agents/create"
-                                    class="bg-[#1e5b43] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#164230] transition inline-flex items-center gap-2"
+                                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition inline-flex items-center gap-2"
                                 >
                                     <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
                                     Add First Agent
@@ -158,10 +215,20 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    readOnly: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const agents = props.agents || [];
 const searchQuery = ref("");
+
+const stats = computed(() => ({
+    totalClients: agents.reduce((sum, a) => sum + (a.clients_count || 0), 0),
+    withNid: agents.filter((a) => a.nid_number).length,
+    withServices: agents.filter((a) => a.services && a.services.length > 0).length,
+}));
 
 const filteredAgents = computed(() => {
     if (!searchQuery.value) return agents;

@@ -1,10 +1,10 @@
 <template>
-    <Head title="BD Company Details" />
+    <Head title="Vendor Details" />
     <div class="min-h-screen bg-gray-50 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <!-- Header Section -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="bg-[#1e5b43] px-6 py-8 text-white">
+                <div class="bg-[#1d4ed8] px-6 py-8 text-white">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0">
@@ -15,7 +15,7 @@
                                 </div>
                             </div>
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-purple-100 mb-1">BD Company</p>
+                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-purple-100 mb-1">Vendor</p>
                                 <h1 class="text-3xl font-bold mb-2">{{ company.name }}</h1>
                                 <div class="flex flex-wrap items-center gap-3 text-sm">
                                     <span v-if="company.contact_person_name" class="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full">
@@ -34,13 +34,13 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <Link href="/bd-companies" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm">
+                            <Link :href="props.readOnly ? '/database/bd-companies' : '/bd-companies'" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                                 </svg>
                                 Back
                             </Link>
-                            <Link :href="`/bd-companies/${company.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1e5b43] hover:bg-emerald-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
+                            <Link v-if="!props.readOnly" :href="`/bd-companies/${company.id}/edit`" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-[#1d4ed8] hover:bg-blue-50 rounded-xl font-semibold shadow-lg transition-all duration-200">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
@@ -81,8 +81,8 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
-                        <div class="p-3 bg-emerald-50 rounded-xl">
-                            <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-3 bg-blue-50 rounded-xl">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3-1.343 3-3S13.657 2 12 2s-3 1.343-3 3 1.343 3 3 3zM20 21a8 8 0 10-16 0"/>
                             </svg>
                         </div>
@@ -99,7 +99,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                            <div class="h-8 w-1 bg-gradient-to-b from-[#1d4ed8] to-[#2d8262] rounded-full"></div>
                             Linked Clients
                         </h2>
                         <p class="text-sm text-gray-600 ml-3">Click a client to view their details</p>
@@ -141,8 +141,8 @@
                                 </div>
                             </div>
                             <Link
-                                :href="`/clients/${client.id}`"
-                                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-[#1e5b43] text-white rounded-lg text-xs font-semibold shadow-md hover:bg-[#154130] transition-all group-hover:scale-105"
+                                :href="props.readOnly ? `/database/clients/${client.id}` : `/clients/${client.id}`"
+                                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-[#1d4ed8] text-white rounded-lg text-xs font-semibold shadow-md hover:bg-[#154130] transition-all group-hover:scale-105"
                             >
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -177,6 +177,10 @@ const props = defineProps({
     clients: {
         type: Array,
         default: () => [],
+    },
+    readOnly: {
+        type: Boolean,
+        default: false,
     },
 });
 
