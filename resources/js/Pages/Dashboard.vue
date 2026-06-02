@@ -70,6 +70,7 @@ const state = reactive({
     refundSummary: { total: 0, count: 0, items: [] },
     appName: "",
     errorLog: null,
+    ticketStats: { total: 0, confirmed: 0, rescheduled: 0, upcoming: [] },
 });
 
 const fetchData = async () => {
@@ -106,6 +107,7 @@ const fetchData = async () => {
             items: [],
         };
         state.appName = data.appName || "";
+        state.ticketStats = data.ticketStats || { total: 0, confirmed: 0, rescheduled: 0, upcoming: [] };
     } catch (e) {
         state.errorLog = e.message || String(e);
         if (e.response && e.response.data) {
@@ -350,7 +352,7 @@ const bdCompanyFilesOptions = {
         <!-- Stat Cards (4 cols) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
             <!-- Card 1: Green (Clients) -->
-            <div class="bg-gradient-to-br from-[#1e5b43] to-[#174633] rounded-[24px] p-6 text-white relative shadow-md hover:-translate-y-1 transition duration-300 cursor-pointer overflow-hidden group" @click="navigateTo('Clients')">
+            <div class="bg-gradient-to-br from-[#1e5b43] to-[#174633] rounded-[24px] p-6 text-white relative shadow-[0_4px_30px_rgba(22,163,74,0.45)] hover:shadow-[0_8px_55px_rgba(22,163,74,0.7)] hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden group" @click="navigateTo('Clients')">
                 <div class="flex justify-between items-start mb-4 relative z-10">
                     <h3 class="font-medium text-emerald-50 text-[15px]">Total Clients</h3>
                     <div class="w-8 h-8 rounded-full border border-emerald-300/30 flex items-center justify-center bg-white/10 backdrop-blur-sm -mr-1 -mt-1 group-hover:bg-white/20 transition-colors">
@@ -367,7 +369,7 @@ const bdCompanyFilesOptions = {
             </div>
 
             <!-- Card 2: White (Agents) -->
-            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative hover:-translate-y-1 transition duration-300 cursor-pointer group" @click="navigateTo('Agents')">
+            <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 relative hover:-translate-y-1 transition duration-300 cursor-pointer group" @click="navigateTo('Agents')">
                  <div class="flex justify-between items-start mb-4">
                     <h3 class="font-medium text-gray-800 text-[15px]">Agents</h3>
                     <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1 group-hover:border-gray-300 transition-colors">
@@ -384,7 +386,7 @@ const bdCompanyFilesOptions = {
             </div>
 
              <!-- Card 3: White (BD Companies) -->
-             <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative hover:-translate-y-1 transition duration-300 cursor-pointer group" @click="navigateTo('BD Companies')">
+             <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 relative hover:-translate-y-1 transition duration-300 cursor-pointer group" @click="navigateTo('BD Companies')">
                  <div class="flex justify-between items-start mb-4">
                     <h3 class="font-medium text-gray-800 text-[15px]">BD Companies</h3>
                     <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1 group-hover:border-gray-300 transition-colors">
@@ -401,7 +403,7 @@ const bdCompanyFilesOptions = {
             </div>
 
              <!-- Card 4: White (Foreign Companies) -->
-             <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] relative hover:-translate-y-1 transition duration-300 cursor-pointer group" @click="navigateTo('Foreign Companies')">
+             <div class="bg-white rounded-[24px] p-6 text-gray-900 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 relative hover:-translate-y-1 transition duration-300 cursor-pointer group" @click="navigateTo('Foreign Companies')">
                  <div class="flex justify-between items-start mb-4">
                     <h3 class="font-medium text-gray-800 text-[15px]">Foreign Companies</h3>
                     <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center bg-white -mr-1 -mt-1 group-hover:border-gray-300 transition-colors">
@@ -418,7 +420,7 @@ const bdCompanyFilesOptions = {
         <!-- Middle Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-5">
             <!-- Project Analytics (Sales/Expenses) -->
-            <div class="lg:col-span-6 bg-white rounded-[24px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+            <div class="lg:col-span-6 bg-white rounded-[24px] p-6 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 transition-all duration-300">
                  <h3 class="font-bold text-gray-900 mb-6 text-lg">Sales Analytics</h3>
                  <!-- Legend inside chart -->
                  <div class="flex justify-center gap-4 text-[11px] font-medium text-gray-500 mb-2">
@@ -431,7 +433,7 @@ const bdCompanyFilesOptions = {
             </div>
 
              <!-- Reminders -->
-            <div class="lg:col-span-3 bg-white rounded-[24px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between relative overflow-hidden">
+            <div class="lg:col-span-3 bg-white rounded-[24px] p-6 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
                 <div class="relative z-10">
                     <h3 class="font-bold text-gray-900 mb-6 text-lg">Reminders</h3>
                     <div class="text-xl font-bold text-[#1e5b43] leading-tight mb-2">
@@ -448,7 +450,7 @@ const bdCompanyFilesOptions = {
             </div>
 
              <!-- Projects List (Receivable Today/Client Due) -->
-             <div class="lg:col-span-3 bg-white rounded-[24px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-y-auto" style="height: 320px;">
+             <div class="lg:col-span-3 bg-white rounded-[24px] p-6 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 transition-all duration-300 overflow-y-auto" style="height: 320px;">
                  <div class="flex justify-between items-center mb-6">
                      <h3 class="font-bold text-gray-900 text-lg">Client Dues</h3>
                      <button class="border border-gray-200 text-gray-800 text-[11px] font-bold px-3 py-1.5 rounded-full hover:bg-gray-50 flex items-center gap-1 transition"><font-awesome-icon icon="plus" class="w-2.5 h-2.5 text-gray-500" /> New</button>
@@ -478,7 +480,7 @@ const bdCompanyFilesOptions = {
         <!-- Bottom Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-5 pb-8">
             <!-- Team Collaboration (Agent Summary) -->
-             <div class="lg:col-span-5 bg-white rounded-[24px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] h-[320px] overflow-y-auto">
+             <div class="lg:col-span-5 bg-white rounded-[24px] p-6 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 transition-all duration-300 h-[320px] overflow-y-auto">
                  <div class="flex justify-between items-center mb-6">
                      <h3 class="font-bold text-gray-900 text-lg">Agent Collaboration</h3>
                      <button class="border border-gray-200 text-gray-800 text-[11px] font-bold px-4 py-1.5 rounded-full hover:bg-gray-50 flex items-center gap-1 transition"><font-awesome-icon icon="plus" class="w-2.5 h-2.5 text-gray-500" /> Add Member</button>
@@ -515,7 +517,7 @@ const bdCompanyFilesOptions = {
              </div>
 
              <!-- Project Progress (Doughnut) -->
-              <div class="lg:col-span-4 bg-white rounded-[24px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] h-[320px] flex flex-col relative overflow-hidden">
+              <div class="lg:col-span-4 bg-white rounded-[24px] p-6 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 transition-all duration-300 h-[320px] flex flex-col relative overflow-hidden">
                   <h3 class="font-bold text-gray-900 text-lg mb-2 z-10">Receivable vs Payable</h3>
                   <div class="flex-1 mt-6 relative z-10 flex justify-center w-full">
                       <div class="w-56 h-auto">
@@ -533,7 +535,7 @@ const bdCompanyFilesOptions = {
               </div>
 
              <!-- Time Tracker Tracker -->
-             <div class="lg:col-span-3 bg-gradient-to-br from-[#0c2419] to-[#1e5b43] rounded-[24px] p-6 text-white shadow-xl h-[320px] flex flex-col relative overflow-hidden group">
+             <div class="lg:col-span-3 bg-gradient-to-br from-[#0c2419] to-[#1e5b43] rounded-[24px] p-6 text-white shadow-[0_0_45px_rgba(22,163,74,0.45)] hover:shadow-[0_0_70px_rgba(22,163,74,0.7)] h-[320px] flex flex-col relative overflow-hidden group transition-all duration-300">
                  <!-- Aesthetic wave effects using radial gradients -->
                  <div class="absolute -right-8 -top-8 w-48 h-48 bg-[#2f8863]/40 rounded-full blur-[40px] mix-blend-screen transition duration-700 group-hover:bg-[#2f8863]/60"></div>
                  <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-[#10b981]/20 rounded-full blur-[60px] mix-blend-screen transition duration-700"></div>
@@ -558,10 +560,82 @@ const bdCompanyFilesOptions = {
              </div>
         </div>
 
+        <!-- Airline Tickets Widget -->
+        <div class="mb-6">
+            <div class="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                            <font-awesome-icon icon="plane-departure" class="w-4 h-4 text-[#1e5b43]" />
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900">Upcoming Flights</h3>
+                            <p class="text-xs text-gray-400">Next 7 days</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-center">
+                            <div class="text-lg font-black text-gray-900">{{ state.ticketStats.total }}</div>
+                            <div class="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Total</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-black text-emerald-600">{{ state.ticketStats.confirmed }}</div>
+                            <div class="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Confirmed</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-black text-amber-500">{{ state.ticketStats.rescheduled }}</div>
+                            <div class="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Rescheduled</div>
+                        </div>
+                        <Link href="/airline-tickets" class="text-xs text-emerald-700 font-semibold hover:underline">
+                            View all →
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Upcoming list -->
+                <div v-if="state.ticketStats.upcoming.length === 0" class="px-6 py-8 text-center text-gray-400 text-sm">
+                    No flights in the next 7 days.
+                </div>
+                <div v-else class="divide-y divide-gray-50">
+                    <div
+                        v-for="ticket in state.ticketStats.upcoming"
+                        :key="ticket.id"
+                        class="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50/50 transition"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+                                <font-awesome-icon icon="plane" class="w-4 h-4 text-gray-500" />
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-900 text-sm">{{ ticket.passenger_name }}</div>
+                                <div class="text-xs text-gray-500">{{ ticket.flight_number }} · {{ ticket.airline_name }}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6 text-sm">
+                            <div class="flex items-center gap-1.5 text-gray-700 font-medium">
+                                <span>{{ ticket.origin }}</span>
+                                <font-awesome-icon icon="arrow-right" class="w-3 h-3 text-gray-400" />
+                                <span>{{ ticket.destination }}</span>
+                            </div>
+                            <div class="text-gray-900 font-bold text-sm w-24 text-right">
+                                {{ new Date(ticket.flight_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) }}
+                            </div>
+                            <span
+                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold capitalize"
+                                :class="ticket.status === 'confirmed' ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'"
+                            >{{ ticket.status }}</span>
+                            <Link :href="`/airline-tickets/${ticket.id}`" class="text-xs text-emerald-700 font-semibold hover:underline">View</Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Tracking Graph Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pb-8">
             <!-- Tracking Donut -->
-            <div class="bg-white rounded-[24px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] h-[320px] flex flex-col relative overflow-hidden">
+            <div class="bg-white rounded-[24px] p-6 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 transition-all duration-300 h-[320px] flex flex-col relative overflow-hidden">
                 <div class="flex items-center justify-between mb-2 z-10">
                     <h3 class="font-bold text-gray-900 text-lg">Tracking Graph</h3>
                     <span class="text-[11px] font-semibold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">Live</span>
@@ -596,7 +670,7 @@ const bdCompanyFilesOptions = {
             </div>
 
             <!-- Tracking Bars -->
-            <div class="bg-white rounded-[24px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] h-[320px] flex flex-col relative overflow-hidden">
+            <div class="bg-white rounded-[24px] p-6 border border-green-200 shadow-[0_0_22px_rgba(34,197,94,0.15)] hover:shadow-[0_0_40px_rgba(34,197,94,0.32)] hover:border-green-300 transition-all duration-300 h-[320px] flex flex-col relative overflow-hidden">
                 <div class="flex items-center justify-between mb-4 z-10">
                     <h3 class="font-bold text-gray-900 text-lg">Tracking Bars</h3>
                     <span class="text-[11px] font-semibold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">Status Array</span>

@@ -206,6 +206,76 @@
                 </div>
             </section>
 
+            <!-- Airline Tickets Section -->
+            <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <div class="h-8 w-1 bg-gradient-to-b from-[#1e5b43] to-[#2d8262] rounded-full"></div>
+                            Airline Tickets
+                        </h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Flight bookings linked to this client</p>
+                    </div>
+                    <Link
+                        :href="`/airline-tickets/create?client_id=${client.id}`"
+                        class="flex items-center gap-2 bg-[#1e5b43] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#164230] transition"
+                    >
+                        <font-awesome-icon icon="plus" class="w-3 h-3" />
+                        Add Ticket
+                    </Link>
+                </div>
+
+                <div v-if="tickets.length === 0" class="text-center py-10 text-gray-400">
+                    <font-awesome-icon icon="plane-slash" class="w-8 h-8 mb-2 opacity-30 block mx-auto" />
+                    <p class="text-sm">No tickets found for this client.</p>
+                </div>
+
+                <div v-else class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-100">
+                                <th class="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Flight</th>
+                                <th class="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Route</th>
+                                <th class="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
+                                <th class="text-left py-2.5 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="py-2.5 px-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            <tr v-for="ticket in tickets" :key="ticket.id" class="hover:bg-gray-50/50">
+                                <td class="py-3 px-3">
+                                    <div class="font-semibold text-gray-900">{{ ticket.flight_number }}</div>
+                                    <div class="text-xs text-gray-500">{{ ticket.airline_name }}</div>
+                                </td>
+                                <td class="py-3 px-3">
+                                    <div class="flex items-center gap-1 font-medium text-gray-800">
+                                        <span>{{ ticket.origin }}</span>
+                                        <font-awesome-icon icon="arrow-right" class="w-2.5 h-2.5 text-gray-400" />
+                                        <span>{{ ticket.destination }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-3">
+                                    <div class="font-medium text-gray-900">{{ formatDate(ticket.flight_date) }}</div>
+                                    <div v-if="ticket.original_flight_date" class="text-xs text-red-400 line-through">
+                                        {{ formatDate(ticket.original_flight_date) }}
+                                    </div>
+                                </td>
+                                <td class="py-3 px-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold capitalize" :class="ticket.status_badge">
+                                        {{ ticket.status }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-3 text-right">
+                                    <Link :href="`/airline-tickets/${ticket.id}`" class="text-emerald-700 hover:text-emerald-900 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition">
+                                        View
+                                    </Link>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Tabs -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
                 <div class="border-b border-gray-200">
@@ -669,6 +739,10 @@ const props = defineProps({
         default: null,
     },
     paymentHistory: {
+        type: Array,
+        default: () => [],
+    },
+    tickets: {
         type: Array,
         default: () => [],
     },

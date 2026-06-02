@@ -149,6 +149,11 @@ class Client extends Model
         return $this->morphMany(Payment::class, 'payable');
     }
 
+    public function airlineTickets(): HasMany
+    {
+        return $this->hasMany(AirlineTicket::class);
+    }
+
     /**
      * Get human-readable visa stage label
      */

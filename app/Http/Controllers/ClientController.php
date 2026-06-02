@@ -443,6 +443,21 @@ class ClientController extends Controller
             'stages' => $stages,
             'currentStageIndex' => $stageIndex === false ? null : $stageIndex,
             'paymentHistory' => $paymentHistory,
+            'tickets' => $client->airlineTickets()
+                ->orderByDesc('flight_date')
+                ->get(['id', 'passenger_name', 'airline_name', 'flight_number', 'origin', 'destination', 'flight_date', 'status', 'original_flight_date'])
+                ->map(fn ($t) => [
+                    'id'                   => $t->id,
+                    'passenger_name'       => $t->passenger_name,
+                    'airline_name'         => $t->airline_name,
+                    'flight_number'        => $t->flight_number,
+                    'origin'               => $t->origin,
+                    'destination'          => $t->destination,
+                    'flight_date'          => $t->flight_date?->format('Y-m-d'),
+                    'original_flight_date' => $t->original_flight_date?->format('Y-m-d'),
+                    'status'               => $t->status,
+                    'status_badge'         => $t->status_badge_class,
+                ]),
         ]);
     }
 

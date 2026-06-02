@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agent;
+use App\Models\AirlineTicket;
 use App\Models\BdCompany;
 use App\Models\Client;
 use App\Models\Expense;
@@ -257,6 +258,16 @@ class DashboardController extends Controller
             'foreignCountrySummary' => $foreignCountrySummary,
             'refundSummary' => $refundSummary,
             'appName' => config('app.name'),
+            'ticketStats' => [
+                'total'       => AirlineTicket::count(),
+                'confirmed'   => AirlineTicket::where('status', 'confirmed')->count(),
+                'rescheduled' => AirlineTicket::where('status', 'rescheduled')->count(),
+                'upcoming'    => AirlineTicket::whereIn('status', ['confirmed', 'rescheduled'])
+                    ->whereBetween('flight_date', [now()->toDateString(), now()->addDays(7)->toDateString()])
+                    ->orderBy('flight_date')
+                    ->with('client:id,name')
+                    ->get(['id', 'passenger_name', 'flight_number', 'airline_name', 'origin', 'destination', 'flight_date', 'status', 'client_id']),
+            ],
         ]);
     }
 

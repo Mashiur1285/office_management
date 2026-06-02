@@ -5,7 +5,7 @@
         <TheSidebar class="print:hidden" />
 
         <div
-            class="flex flex-col min-h-screen justify-between transition-all duration-200 sm:ml-64 pt-16 print:sm:ml-0 print:pt-0 layout-main-container bg-gray-50"
+            :class="['flex flex-col min-h-screen justify-between transition-all duration-300 pt-16 print:sm:ml-0 print:pt-0 layout-main-container bg-gray-50', sidebarCollapsed ? 'sm:ml-16' : 'sm:ml-64']"
         >
             <!-- Main Content Area -->
             <div class="flex-1 p-3 md:p-4 lg:p-5 print:p-0">
@@ -50,9 +50,11 @@ import TheFooter from "./TheFooter.vue";
 import TheNavbar from "./Navbar/TheNavbar.vue";
 import TheSidebar from "./Sidebar/TheSidebar.vue";
 import { computed } from "vue";
+import { useSidebar } from "@/Composables/useSidebar";
 
 const page = usePage();
 const isAuth = computed(() => page.props?.auth?.user);
+const { sidebarCollapsed } = useSidebar();
 </script>
 
 <style scoped>

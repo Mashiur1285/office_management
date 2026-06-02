@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aurora Digital Labs — Select Platform</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #ffffff;
+            --bg-2: #f8f7f4;
+            --surface: #ffffff;
+            --surface-2: #f3f1ec;
+            --line: rgba(0, 0, 0, 0.08);
+            --line-2: rgba(0, 0, 0, 0.13);
+            --ink: #1a1916;
+            --ink-2: rgba(26, 25, 22, 0.55);
+            --ink-3: rgba(26, 25, 22, 0.35);
+            --gold: oklch(46% 0.13 50);
+            --gold-dim: oklch(46% 0.13 50 / 0.12);
+            --gold-glow: oklch(46% 0.13 50 / 0.05);
+            --teal: oklch(44% 0.13 160);
+            --teal-dim: oklch(44% 0.13 160 / 0.12);
+            --teal-glow: oklch(44% 0.13 160 / 0.05);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ── BACKGROUND TEXTURE ── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 20% 80%, oklch(44% 0.13 160 / 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, oklch(46% 0.13 50 / 0.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 56px;
+            height: 68px;
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-mark {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--line-2);
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px;
+            padding: 7px;
+        }
+
+        .logo-mark span {
+            border-radius: 1.5px;
+        }
+
+        .logo-mark span:nth-child(1) {
+            background: var(--gold);
+        }
+
+        .logo-mark span:nth-child(2) {
+            background: rgba(26, 25, 22, 0.15);
+        }
+
+        .logo-mark span:nth-child(3) {
+            background: rgba(26, 25, 22, 0.15);
+        }
+
+        .logo-mark span:nth-child(4) {
+            background: var(--teal);
+        }
+
+        .logo-text {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        nav a {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-2);
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--ink);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-signin {
+            border: 1px solid var(--line-2) !important;
+            color: var(--ink) !important;
+            margin-left: 10px;
+        }
+
+        .nav-signin:hover {
+            border-color: var(--line-2) !important;
+            background: rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            z-index: 1;
+            padding: 160px 56px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .hero-left {
+            flex: 1;
+            max-width: 640px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .eyebrow-line {
+            width: 36px;
+            height: 1px;
+            background: var(--ink-3);
+        }
+
+        .eyebrow-text {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(52px, 6vw, 88px);
+            font-weight: 300;
+            line-height: 1.0;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+            margin-bottom: 24px;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            font-weight: 300;
+            color: var(--ink-2);
+        }
+
+        .hero h1 strong {
+            font-weight: 600;
+            font-style: italic;
+            color: var(--ink);
+        }
+
+        .hero-right {
+            max-width: 320px;
+            padding-bottom: 8px;
+        }
+
+        .hero-desc {
+            font-size: 13.5px;
+            color: var(--ink-2);
+            line-height: 1.8;
+            font-weight: 400;
+            border-left: 1px solid var(--line-2);
+            padding-left: 20px;
+        }
+
+        /* ── DIVIDER ── */
+        .h-rule {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 56px;
+        }
+
+        .h-rule-line {
+            height: 1px;
+            background: var(--line);
+        }
+
+        /* ── TILES SECTION ── */
+        .tiles-section {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 56px 56px 80px;
+        }
+
+        .tiles-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .tiles-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+
+        .tiles-count {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            color: var(--ink-3);
+        }
+
+        /* ── TILE GRID ── */
+        .tiles-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .tile {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+            min-height: 520px;
+        }
+
+        .tile-travel:hover {
+            border-color: oklch(44% 0.13 160 / 0.35);
+            box-shadow: 0 24px 60px oklch(44% 0.13 160 / 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+            transform: translateY(-4px);
+        }
+
+        .tile-hospital:hover {
+            border-color: oklch(46% 0.13 50 / 0.35);
+            box-shadow: 0 24px 60px oklch(46% 0.13 50 / 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+            transform: translateY(-4px);
+        }
+
+        /* Tile visual top */
+        .tile-visual {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .tile-travel .tile-visual {
+            background:
+                radial-gradient(ellipse 100% 100% at 80% 20%, oklch(44% 0.13 160 / 0.13) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 20% 80%, oklch(44% 0.13 160 / 0.05) 0%, transparent 50%),
+                oklch(97% 0.02 160);
+        }
+
+        .tile-hospital .tile-visual {
+            background:
+                radial-gradient(ellipse 100% 100% at 20% 20%, oklch(46% 0.13 50 / 0.13) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, oklch(46% 0.13 50 / 0.05) 0%, transparent 50%),
+                oklch(97% 0.02 50);
+        }
+
+        /* Grid pattern in visual */
+        .tile-visual::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        /* Number label */
+        .tile-num {
+            position: absolute;
+            top: 24px;
+            left: 28px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 72px;
+            font-weight: 300;
+            line-height: 1;
+            letter-spacing: -0.03em;
+            opacity: 0.12;
+            color: var(--ink);
+        }
+
+        /* SVG icon in visual */
+        .tile-visual-icon {
+            position: absolute;
+            top: 50%;
+            right: 48px;
+            transform: translateY(-50%);
+            opacity: 0.7;
+            transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .tile:hover .tile-visual-icon {
+            opacity: 1;
+            transform: translateY(-54%);
+        }
+
+        /* Status pill */
+        .tile-status-pill {
+            position: absolute;
+            bottom: 20px;
+            left: 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 100px;
+            border: 1px solid;
+        }
+
+        .tile-travel .tile-status-pill {
+            color: var(--teal);
+            border-color: oklch(44% 0.13 160 / 0.25);
+            background: oklch(44% 0.13 160 / 0.08);
+        }
+
+        .tile-hospital .tile-status-pill {
+            color: var(--gold);
+            border-color: oklch(46% 0.13 50 / 0.25);
+            background: oklch(46% 0.13 50 / 0.08);
+        }
+
+        .status-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+
+        .tile-travel .status-dot {
+            background: var(--teal);
+            box-shadow: 0 0 5px oklch(44% 0.13 160 / 0.5);
+        }
+
+        .tile-hospital .status-dot {
+            background: var(--gold);
+            box-shadow: 0 0 5px oklch(46% 0.13 50 / 0.5);
+        }
+
+        /* Tile body */
+        .tile-body {
+            padding: 32px 36px 36px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 0;
+        }
+
+        .tile-category {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .tile-travel .tile-category {
+            color: var(--teal);
+        }
+
+        .tile-hospital .tile-category {
+            color: var(--gold);
+        }
+
+        .tile h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            font-weight: 400;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+            margin-bottom: 16px;
+        }
+
+        .tile-desc {
+            font-size: 13px;
+            color: var(--ink-2);
+            line-height: 1.75;
+            font-weight: 400;
+            margin-bottom: 28px;
+            flex: 1;
+        }
+
+        /* Feature chips */
+        .tile-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 32px;
+        }
+
+        .chip {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 100px;
+            border: 1px solid var(--line-2);
+            color: var(--ink-2);
+            background: var(--surface-2);
+            letter-spacing: 0.02em;
+        }
+
+        /* Tile footer */
+        .tile-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 24px;
+            border-top: 1px solid var(--line);
+        }
+
+        .tile-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 12px 22px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s, gap 0.25s;
+        }
+
+        .tile-travel .tile-cta {
+            background: var(--teal);
+            color: #ffffff;
+        }
+
+        .tile-hospital .tile-cta {
+            background: var(--gold);
+            color: #ffffff;
+        }
+
+        .tile-cta:hover {
+            opacity: 0.85;
+            gap: 12px;
+        }
+
+        .tile-arrow {
+            transition: transform 0.25s ease;
+        }
+
+        .tile:hover .tile-cta .tile-arrow {
+            transform: translateX(3px);
+        }
+
+        .tile-meta {
+            font-size: 11px;
+            color: var(--ink-3);
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            line-height: 1.6;
+            text-align: right;
+        }
+
+        .tile-meta strong {
+            display: block;
+            font-size: 18px;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 400;
+            color: var(--ink-2);
+            letter-spacing: 0;
+        }
+
+        /* ── BOTTOM BAR ── */
+        .bottom-bar {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--line);
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 28px 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .badges {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--ink-3);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-item svg {
+            opacity: 0.4;
+        }
+
+        .bottom-right {
+            font-size: 11.5px;
+            color: var(--ink-3);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--line);
+            padding: 22px 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-copy {
+            font-size: 11.5px;
+            color: var(--ink-3);
+            letter-spacing: 0.04em;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            font-size: 11.5px;
+            color: var(--ink-3);
+            text-decoration: none;
+            letter-spacing: 0.04em;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--ink-2);
+        }
+
+        /* ── PAGE ENTRY ANIMATIONS ── */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .hero-left {
+            animation: fadeUp 0.9s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .hero-right {
+            animation: fadeUp 0.9s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .tile:nth-child(1) {
+            animation: fadeUp 0.8s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .tile:nth-child(2) {
+            animation: fadeUp 0.8s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .bottom-bar {
+            animation: fadeIn 0.8s 0.5s both;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            header {
+                padding: 0 24px;
+            }
+
+            .hero {
+                padding: 120px 24px 60px;
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .hero-right {
+                max-width: 100%;
+            }
+
+            .tiles-section {
+                padding: 40px 24px 60px;
+            }
+
+            .tiles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-bar {
+                padding: 24px;
+            }
+
+            footer {
+                padding: 20px 24px;
+            }
+
+            nav a:not(.nav-signin) {
+                display: none;
+            }
+        }
+
+        /* ── TWEAKS PANEL ── */
+        #tweaks-panel {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            width: 256px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 20px 22px;
+            font-family: 'Syne', sans-serif;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+        }
+
+        .tp-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .tp-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .tp-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--ink-3);
+            font-size: 18px;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .tp-section {
+            margin-bottom: 16px;
+        }
+
+        .tp-label {
+            font-size: 9.5px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+            margin-bottom: 8px;
+        }
+
+        .tp-opts {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tp-btn {
+            flex: 1;
+            padding: 7px 6px;
+            border-radius: 7px;
+            border: 1px solid var(--line-2);
+            background: var(--surface-2);
+            color: var(--ink-2);
+            font-size: 11px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+
+        .tp-btn.active {
+            background: var(--ink);
+            color: #ffffff;
+            border-color: var(--ink);
+        }
+
+        .tp-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .tp-row-label {
+            font-size: 12px;
+            color: var(--ink-2);
+        }
+
+        .tp-toggle {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .tp-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .tp-track {
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            background: var(--line-2);
+            transition: background 0.2s;
+        }
+
+        .tp-toggle input:checked+.tp-track {
+            background: var(--ink);
+        }
+
+        .tp-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .tp-toggle input:checked~.tp-knob {
+            transform: translateX(16px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <a href="#" class="logo">
+            <img src="/images/aurora.jpeg" style="width:34px;height:34px;border-radius:8px;object-fit:contain;border:1px solid rgba(0,0,0,0.1);" alt="Aurora" />
+            <span class="logo-text">Aurora Digital Labs</span>
+        </a>
+        <nav>
+            <a href="http://tours.adlit.link/login" class="nav-signin">Sign in</a>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-left">
+            <div class="eyebrow">
+                <span class="eyebrow-line"></span>
+                <span class="eyebrow-text">Integrated Platform Suite</span>
+            </div>
+            <h1>Choose your<br /><strong>platform.</strong><br /><em>Start today.</em></h1>
+        </div>
+        <div class="hero-right">
+            <p class="hero-desc">Two purpose-built management systems — one for travel operations, one for healthcare.
+                Both enterprise-grade, both ready to deploy.</p>
+        </div>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="h-rule">
+        <div class="h-rule-line"></div>
+    </div>
+
+    <!-- TILES SECTION -->
+    <div class="tiles-section">
+        <div class="tiles-header">
+            <span class="tiles-label">Available platforms</span>
+            <span class="tiles-count">02 systems</span>
+        </div>
+
+        <div class="tiles-grid">
+
+            <!-- TILE 1: Tours & Travel -->
+            <a href="http://tours.adlit.link/login" class="tile tile-travel">
+                <!-- Visual top -->
+                <div class="tile-visual">
+                    <span class="tile-num">01</span>
+
+                    <!-- Travel SVG -->
+                    <div class="tile-visual-icon">
+                        <svg width="140" height="140" viewBox="0 0 140 140" fill="none">
+                            <circle cx="70" cy="70" r="55" stroke="oklch(44% 0.13 160)" stroke-width="1"
+                                stroke-dasharray="3 5" opacity="0.35" />
+                            <circle cx="70" cy="70" r="38" stroke="oklch(44% 0.13 160)" stroke-width="1.5"
+                                opacity="0.55" />
+                            <ellipse cx="70" cy="70" rx="38" ry="14" stroke="oklch(44% 0.13 160)" stroke-width="1"
+                                opacity="0.28" />
+                            <ellipse cx="70" cy="70" rx="38" ry="28" stroke="oklch(44% 0.13 160)" stroke-width="1"
+                                opacity="0.18" />
+                            <line x1="32" y1="70" x2="108" y2="70" stroke="oklch(44% 0.13 160)" stroke-width="1"
+                                opacity="0.25" />
+                            <line x1="70" y1="32" x2="70" y2="108" stroke="oklch(44% 0.13 160)" stroke-width="1"
+                                opacity="0.25" />
+                            <!-- Plane -->
+                            <g transform="translate(95,40) rotate(-25)">
+                                <path d="M0 0L12-4 14 0 12 4Z" fill="oklch(44% 0.13 160)" />
+                                <path d="M5-4 8-10 10-9 8-3" fill="oklch(44% 0.13 160)" opacity="0.7" />
+                                <path d="M7 4 9 9 11 8 10 3" fill="oklch(44% 0.13 160)" opacity="0.7" />
+                            </g>
+                            <!-- Path -->
+                            <path d="M36 100 Q65 48 104 50" stroke="oklch(44% 0.13 160)" stroke-width="1.5"
+                                stroke-dasharray="3 4" fill="none" opacity="0.5" />
+                            <circle cx="36" cy="100" r="3.5" fill="oklch(44% 0.13 160)" opacity="0.8" />
+                            <circle cx="104" cy="50" r="3.5" fill="oklch(44% 0.13 160)" opacity="0.8" />
+                        </svg>
+                    </div>
+
+                    <div class="tile-status-pill">
+                        <span class="status-dot"></span>
+                        Live
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="tile-body">
+                    <div class="tile-category">Tours &amp; Travel</div>
+                    <h2>Travel Management<br />System</h2>
+                    <p class="tile-desc">A unified workspace for tour operators — covering bookings, itineraries, agent
+                        networks, payments and customer experience management at scale.</p>
+
+                    <div class="tile-chips">
+                        <span class="chip">Smart Booking</span>
+                        <span class="chip">Itinerary Builder</span>
+                        <span class="chip">Multi-currency</span>
+                        <span class="chip">Agent CRM</span>
+                        <span class="chip">Analytics</span>
+                    </div>
+
+                    <div class="tile-foot">
+                        <button class="tile-cta">
+                            Enter Platform
+                            <svg class="tile-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" stroke="currentColor" stroke-width="1.8"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                        <div class="tile-meta">
+                            <strong>120+</strong>
+                            destinations active
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- TILE 2: Hospital & Diagnostic -->
+            <div class="tile tile-hospital" style="cursor:not-allowed;opacity:0.6;">
+                <!-- Visual top -->
+                <div class="tile-visual">
+                    <span class="tile-num">02</span>
+
+                    <!-- Hospital SVG -->
+                    <div class="tile-visual-icon">
+                        <svg width="140" height="140" viewBox="0 0 140 140" fill="none">
+                            <circle cx="70" cy="70" r="55" stroke="oklch(46% 0.13 50)" stroke-width="1"
+                                stroke-dasharray="3 5" opacity="0.3" />
+                            <!-- Cross -->
+                            <rect x="58" y="36" width="24" height="68" rx="5" fill="oklch(46% 0.13 50)"
+                                opacity="0.08" />
+                            <rect x="36" y="58" width="68" height="24" rx="5" fill="oklch(46% 0.13 50)"
+                                opacity="0.08" />
+                            <rect x="58" y="36" width="24" height="68" rx="5" stroke="oklch(46% 0.13 50)"
+                                stroke-width="1.5" opacity="0.65" />
+                            <rect x="36" y="58" width="68" height="24" rx="5" stroke="oklch(46% 0.13 50)"
+                                stroke-width="1.5" opacity="0.65" />
+                            <!-- ECG pulse -->
+                            <path d="M22 70 L42 70 L50 52 L58 88 L65 64 L72 70 L118 70" stroke="oklch(46% 0.13 50)"
+                                stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="42" cy="70" r="2.5" fill="oklch(46% 0.13 50)" opacity="0.6" />
+                            <circle cx="118" cy="70" r="2.5" fill="oklch(46% 0.13 50)" opacity="0.6" />
+                        </svg>
+                    </div>
+
+                    <div class="tile-status-pill">
+                        <span class="status-dot"></span>
+                        Coming Soon
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="tile-body">
+                    <div class="tile-category">Healthcare</div>
+                    <h2>Hospital &amp; Diagnostic<br />Management</h2>
+                    <p class="tile-desc">Complete hospital information system — from patient records and diagnostic
+                        workflows to ward management, billing and compliance, built for clinical-grade reliability.</p>
+
+                    <div class="tile-chips">
+                        <span class="chip">EHR / EMR</span>
+                        <span class="chip">Lab Reports</span>
+                        <span class="chip">OPD / IPD</span>
+                        <span class="chip">Billing</span>
+                        <span class="chip">HIPAA</span>
+                    </div>
+
+                    <div class="tile-foot">
+                        <button class="tile-cta">
+                            Enter Platform
+                            <svg class="tile-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" stroke="currentColor" stroke-width="1.8"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                        <div class="tile-meta">
+                            <strong>99.9%</strong>
+                            uptime guaranteed
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+        <div class="badges">
+            <div class="badge-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 1.5L8.5 5.5H13L9.8 8L11 12L7 9.5 3 12l1.2-4L1 5.5h4.5L7 1.5Z" stroke="currentColor"
+                        stroke-width="1.3" stroke-linejoin="round" />
+                </svg>
+                Trusted by 500+ organizations worldwide
+            </div>
+            <div class="badge-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 1.5L12 4v4.5C12 11 9.8 13 7 13.5 4.2 13 2 11 2 8.5V4L7 1.5z" stroke="currentColor"
+                        stroke-width="1.3" stroke-linejoin="round" />
+                </svg>
+                SOC 2 Type II · HIPAA · GDPR
+            </div>
+            <div class="badge-item">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" />
+                    <path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+                </svg>
+                24 / 7 dedicated support
+            </div>
+        </div>
+        <div class="bottom-right">v3.1.0 · All systems operational</div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <span class="footer-copy">© <script>document.write(new Date().getFullYear())</script> Aurora Digital Labs. All rights reserved.</span>
+        <div class="footer-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Security</a>
+            <a href="#">Contact</a>
+        </div>
+    </footer>
+
+    <!-- TWEAKS PANEL -->
+    <div id="tweaks-panel">
+        <div class="tp-head">
+            <span class="tp-title">Tweaks</span>
+            <button class="tp-close" onclick="closeTweaks()">×</button>
+        </div>
+
+        <div class="tp-section">
+            <div class="tp-label">Color Accent</div>
+            <div class="tp-opts">
+                <button class="tp-btn active" id="ta-classic" onclick="setAccent('classic')">Classic</button>
+                <button class="tp-btn" id="ta-cool" onclick="setAccent('cool')">Cool</button>
+                <button class="tp-btn" id="ta-warm" onclick="setAccent('warm')">Warm</button>
+            </div>
+        </div>
+
+        <div class="tp-section">
+            <div class="tp-label">Layout</div>
+            <div class="tp-opts">
+                <button class="tp-btn active" id="tl-grid" onclick="setLayout('grid')">Grid</button>
+                <button class="tp-btn" id="tl-stack" onclick="setLayout('stack')">Stack</button>
+            </div>
+        </div>
+
+        <div class="tp-section">
+            <div class="tp-row">
+                <span class="tp-row-label">Feature chips</span>
+                <label class="tp-toggle">
+                    <input type="checkbox" checked id="tog-chips" onchange="toggleChips(this.checked)" />
+                    <span class="tp-track"></span>
+                    <span class="tp-knob"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="tp-section">
+            <div class="tp-row">
+                <span class="tp-row-label">Background grid</span>
+                <label class="tp-toggle">
+                    <input type="checkbox" checked id="tog-grid" onchange="toggleBgGrid(this.checked)" />
+                    <span class="tp-track"></span>
+                    <span class="tp-knob"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+            "accent": "warm",
+            "layout": "grid",
+            "chips": true,
+            "bgGrid": false
+        }/*EDITMODE-END*/;
+
+        let T = Object.assign({}, TWEAK_DEFAULTS);
+
+        window.addEventListener('message', e => {
+            if (e.data?.type === '__activate_edit_mode') document.getElementById('tweaks-panel').style.display = 'block';
+            if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').style.display = 'none';
+        });
+        window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+        function closeTweaks() {
+            document.getElementById('tweaks-panel').style.display = 'none';
+            window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+        }
+        function persist(k, v) {
+            T[k] = v;
+            window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+        }
+
+        const accents = {
+            classic: { teal: 'oklch(44% 0.13 160)', tealDim: 'oklch(44% 0.13 160 / 0.12)', gold: 'oklch(46% 0.13 50)', goldDim: 'oklch(46% 0.13 50 / 0.12)' },
+            cool: { teal: 'oklch(44% 0.14 240)', tealDim: 'oklch(44% 0.14 240 / 0.12)', gold: 'oklch(44% 0.12 192)', goldDim: 'oklch(44% 0.12 192 / 0.12)' },
+            warm: { teal: 'oklch(44% 0.13 148)', tealDim: 'oklch(44% 0.13 148 / 0.12)', gold: 'oklch(46% 0.14 42)', goldDim: 'oklch(46% 0.14 42 / 0.12)' },
+        };
+        function setAccent(name) {
+            const a = accents[name], r = document.documentElement;
+            r.style.setProperty('--teal', a.teal);
+            r.style.setProperty('--teal-dim', a.tealDim);
+            r.style.setProperty('--gold', a.gold);
+            r.style.setProperty('--gold-dim', a.goldDim);
+            document.querySelectorAll('[id^="ta-"]').forEach(b => b.classList.remove('active'));
+            document.getElementById('ta-' + name).classList.add('active');
+            persist('accent', name);
+        }
+        function setLayout(mode) {
+            document.querySelector('.tiles-grid').style.gridTemplateColumns = mode === 'stack' ? '1fr' : '1fr 1fr';
+            document.querySelectorAll('[id^="tl-"]').forEach(b => b.classList.remove('active'));
+            document.getElementById('tl-' + mode).classList.add('active');
+            persist('layout', mode);
+        }
+        function toggleChips(on) {
+            document.querySelectorAll('.tile-chips').forEach(el => el.style.display = on ? 'flex' : 'none');
+            persist('chips', on);
+        }
+        function toggleBgGrid(on) {
+            document.querySelectorAll('.tile-visual::before').forEach(el => el.style.display = on ? '' : 'none');
+            // inject/remove a style rule
+            let s = document.getElementById('bg-grid-override');
+            if (!on) {
+                if (!s) { s = document.createElement('style'); s.id = 'bg-grid-override'; document.head.appendChild(s); }
+                s.textContent = '.tile-visual::before { display: none !important; }';
+            } else {
+                if (s) s.textContent = '';
+            }
+            persist('bgGrid', on);
+        }
+
+        // Apply saved defaults
+        setAccent(T.accent || 'classic');
+        setLayout(T.layout || 'grid');
+        if (!T.chips) toggleChips(false);
+        if (!T.bgGrid) toggleBgGrid(false);
+    </script>
+
+</body>
+
+</html>

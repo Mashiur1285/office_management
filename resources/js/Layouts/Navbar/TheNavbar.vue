@@ -1,6 +1,6 @@
 <template>
     <nav
-        class="fixed top-0 z-50 w-full bg-white border-b border-gray-100 shadow-sm sm:pl-64"
+        :class="['fixed top-0 z-50 w-full bg-white border-b border-gray-100 shadow-sm transition-all duration-300', sidebarCollapsed ? 'sm:pl-16' : 'sm:pl-64']"
     >
         <div
             class="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
@@ -166,6 +166,9 @@
 import { Link, usePage, router } from "@inertiajs/vue3";
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import axios from "axios";
+import { useSidebar } from "@/Composables/useSidebar";
+
+const { sidebarCollapsed } = useSidebar();
 
 const dropdownOpen = ref(false);
 const dropdownRef = ref(null);
@@ -196,6 +199,7 @@ const currentPageLabel = computed(() => {
     if (path.startsWith("/bd-companies")) return "BD Companies";
     if (path.startsWith("/foreign-companies")) return "Foreign Companies";
     if (path.startsWith("/invoices")) return "Invoices";
+    if (path.startsWith("/airline-tickets")) return "Airline Tickets";
     if (path.startsWith("/quotations")) return "Quotations";
     if (path.startsWith("/accounting")) return "Accounting";
     if (path.startsWith("/reports")) return "Reports";

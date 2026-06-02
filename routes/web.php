@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\AirlineTicketController;
 use App\Http\Controllers\BdCompanyController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
@@ -100,6 +101,11 @@ Route::middleware('auth')->group(function () {
         Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
         Route::get('invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
     });
+
+    // Airline Tickets
+    Route::resource('airline-tickets', AirlineTicketController::class);
+    Route::post('airline-tickets/{airlineTicket}/reschedule', [AirlineTicketController::class, 'reschedule'])
+        ->name('airline-tickets.reschedule');
 
     Route::middleware('permission:agent.add')->group(function () {
         Route::get('agents/create', [AgentController::class, 'create'])->name('agents.create');
