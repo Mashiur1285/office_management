@@ -413,13 +413,98 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Portal Account Card -->
+                <div v-if="!props.readOnly" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
+                                <font-awesome-icon icon="user-shield" class="w-4 h-4 text-indigo-500" />
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-[15px]">Agent Portal Account</h3>
+                                <p class="text-[11px] text-gray-400">Online access for this agent</p>
+                            </div>
+                        </div>
+                        <!-- Has account -->
+                        <div v-if="agent.has_account" class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                                ✓ Account Active
+                            </span>
+                            <button @click="showResetPassword = !showResetPassword"
+                                class="text-[11px] font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 hover:bg-amber-100 transition">
+                                Reset Password
+                            </button>
+                        </div>
+                        <!-- No account -->
+                        <button v-else @click="showCreateAccount = !showCreateAccount"
+                            class="flex items-center gap-1.5 text-[12px] font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full border border-indigo-100 hover:bg-indigo-100 transition">
+                            <font-awesome-icon icon="plus" class="w-3 h-3" />
+                            Create Account
+                        </button>
+                    </div>
+
+                    <!-- Account email display -->
+                    <div v-if="agent.has_account" class="bg-gray-50 rounded-xl px-4 py-3 text-[13px] text-gray-600 mb-3">
+                        <span class="text-gray-400 font-medium">Email: </span>
+                        <span class="font-semibold">{{ agent.account_email }}</span>
+                    </div>
+
+                    <!-- Create account form -->
+                    <div v-if="showCreateAccount && !agent.has_account" class="border border-indigo-100 rounded-xl p-4 bg-indigo-50/30 mt-3">
+                        <p class="text-[12px] font-semibold text-gray-600 mb-3">Set login credentials for this agent:</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Email</label>
+                                <input v-model="accountForm.email" type="email" placeholder="agent@email.com"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                                <p v-if="accountForm.errors.email" class="text-xs text-red-500 mt-1">{{ accountForm.errors.email }}</p>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Password</label>
+                                <input v-model="accountForm.password" type="password" placeholder="Min 8 characters"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                                <p v-if="accountForm.errors.password" class="text-xs text-red-500 mt-1">{{ accountForm.errors.password }}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <button @click="createAccount" :disabled="accountForm.processing"
+                                class="px-4 py-2 bg-indigo-600 text-white text-[12px] font-bold rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
+                                {{ accountForm.processing ? 'Creating...' : 'Create Account' }}
+                            </button>
+                            <button @click="showCreateAccount = false" class="px-4 py-2 bg-gray-100 text-gray-600 text-[12px] font-bold rounded-lg hover:bg-gray-200 transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reset password form -->
+                    <div v-if="showResetPassword && agent.has_account" class="border border-amber-100 rounded-xl p-4 bg-amber-50/30 mt-3">
+                        <p class="text-[12px] font-semibold text-gray-600 mb-3">Set new password:</p>
+                        <div class="flex gap-3 items-start">
+                            <div class="flex-1">
+                                <input v-model="resetForm.password" type="password" placeholder="New password (min 8 chars)"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-200" />
+                                <p v-if="resetForm.errors.password" class="text-xs text-red-500 mt-1">{{ resetForm.errors.password }}</p>
+                            </div>
+                            <button @click="resetPassword" :disabled="resetForm.processing"
+                                class="px-4 py-2 bg-amber-500 text-white text-[12px] font-bold rounded-lg hover:bg-amber-600 transition disabled:opacity-50">
+                                {{ resetForm.processing ? 'Saving...' : 'Update' }}
+                            </button>
+                            <button @click="showResetPassword = false" class="px-4 py-2 bg-gray-100 text-gray-600 text-[12px] font-bold rounded-lg hover:bg-gray-200 transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 const props = defineProps({
@@ -446,6 +531,22 @@ const clients = props.clients || [];
 const refunds = props.refunds || [];
 
 const activeTab = ref('overview');
+
+const accountForm = useForm({ email: '', password: '' });
+const resetForm   = useForm({ password: '' });
+const showCreateAccount = ref(false);
+const showResetPassword = ref(false);
+
+const createAccount = () => {
+    accountForm.post(route('agents.create-account', agent.id), {
+        onSuccess: () => { showCreateAccount.value = false; accountForm.reset(); }
+    });
+};
+const resetPassword = () => {
+    resetForm.post(route('agents.reset-password', agent.id), {
+        onSuccess: () => { showResetPassword.value = false; resetForm.reset(); }
+    });
+};
 
 const formatMoney = (value) => {
     const amount = Number(value) || 0;

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\AgentPortalController;
 use App\Http\Controllers\AirlineTicketController;
 use App\Http\Controllers\BdCompanyController;
 use App\Http\Controllers\ClientController;
@@ -380,6 +381,18 @@ Route::middleware('auth')->group(function () {
         Route::get('foreign-companies', [ForeignCompanyController::class, 'index'])->name('foreign-companies.index');
         Route::get('foreign-companies/{foreignCompany}', [ForeignCompanyController::class, 'show'])->name('foreign-companies.show');
     });
+});
+
+// ── Agent Portal ──
+Route::middleware(['auth', 'verified', 'role:agent'])->prefix('agent-portal')->name('agent-portal.')->group(function () {
+    Route::get('/', [AgentPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/data', [AgentPortalController::class, 'data'])->name('data');
+});
+
+// Admin: create/reset agent accounts (inside main auth group)
+Route::middleware(['auth', 'verified', 'permission:agent.update'])->group(function () {
+    Route::post('agents/{agent}/create-account', [AgentPortalController::class, 'createAccount'])->name('agents.create-account');
+    Route::post('agents/{agent}/reset-password', [AgentPortalController::class, 'resetPassword'])->name('agents.reset-password');
 });
 
 require __DIR__ . '/auth.php';

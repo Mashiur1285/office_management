@@ -33,6 +33,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if (auth()->user()->hasRole('agent')) {
+            return redirect()->route('agent-portal.dashboard');
+        }
+
         return redirect()->intended(route('launcher', absolute: false));
     }
 

@@ -50,8 +50,8 @@ class DocumentLocationController extends Controller
                 ]);
         } else {
             $holders = collect([
-                ['value' => 'agency_user', 'label' => 'MITT Staff Member', 'is_system' => true],
-                ['value' => 'bd_company', 'label' => 'BD Processing Company', 'is_system' => true],
+                ['value' => 'agency_user', 'label' => 'ZTTBL Staff Member', 'is_system' => true],
+                ['value' => 'bd_company', 'label' => 'Vendors', 'is_system' => true],
             ]);
         }
 

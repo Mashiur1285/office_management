@@ -34,5 +34,11 @@ class RoleSeeder extends Seeder
             'guard_name' => 'web',
         ]);
         $viewer->syncPermissions($viewerPermissions);
+
+        // Agent role — no system permissions, portal access handled separately
+        Role::firstOrCreate([
+            'name' => 'agent',
+            'guard_name' => 'web',
+        ]);
     }
 }

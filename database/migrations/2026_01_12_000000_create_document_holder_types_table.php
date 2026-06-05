@@ -20,14 +20,14 @@ return new class extends Migration
         DB::table('document_holder_types')->insert([
             [
                 'value' => 'agency_user',
-                'label' => 'MITT Staff Member',
+                'label' => 'ZTTBL Staff Member',
                 'is_system' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'value' => 'bd_company',
-                'label' => 'BD Processing Company',
+                'label' => 'Vendors',
                 'is_system' => true,
                 'created_at' => now(),
                 'updated_at' => now(),

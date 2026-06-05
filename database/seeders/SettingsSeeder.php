@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Setting;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class SettingsSeeder extends Seeder
@@ -16,7 +15,7 @@ class SettingsSeeder extends Seeder
         Setting::firstOrCreate(
             ['id' => 1],
             [
-                'app_name' => 'MITT',
+                'app_name' => 'Zulia Tours & Traveles BD Limited',
                 'logo_path' => null,
             ]
         );

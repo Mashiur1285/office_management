@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Notepad::class);
     }
+
+    public function agent()
+    {
+        return $this->hasOne(Agent::class);
+    }
 }

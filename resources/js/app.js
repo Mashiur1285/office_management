@@ -20,11 +20,12 @@ createInertiaApp({
 
         page.then((module) => {
             const component = module.default;
-            const isAuthPage = name.startsWith('Auth/');
-            const isWelcomePage = name === 'Welcome';
-            const isLauncherPage = name === 'Launcher';
+            const isAuthPage        = name.startsWith('Auth/');
+            const isWelcomePage     = name === 'Welcome';
+            const isLauncherPage    = name === 'Launcher';
+            const isAgentPortalPage = name.startsWith('AgentPortal/');
 
-            if (!component.layout && !isAuthPage && !isWelcomePage && !isLauncherPage) {
+            if (!component.layout && !isAuthPage && !isWelcomePage && !isLauncherPage && !isAgentPortalPage) {
                 component.layout = BaseLayout;
             }
         });

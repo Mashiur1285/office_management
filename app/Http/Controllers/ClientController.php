@@ -356,7 +356,7 @@ class ClientController extends Controller
         // Stage 1: Processing at Agency
         $stages[] = [
             'name' => 'Processing at Agency',
-            'description' => 'Documents received and being processed by MITT staff',
+            'description' => 'Documents received and being processed by ZTTBL staff',
             'date' => null,
         ];
 
@@ -365,7 +365,7 @@ class ClientController extends Controller
         if ($client->bdCompany || $isAtBdCompany) {
             $stages[] = [
                 'name' => "Processing at BD Company",
-                'description' => $bdCompanyName ?? 'BD Processing Company',
+                'description' => $bdCompanyName ?? 'Vendors',
                 'date' => null,
             ];
         }
@@ -551,6 +551,13 @@ class ClientController extends Controller
         }
 
         $client->update($data);
+
+        // Always keep current_due in sync with total_fee - partial_paid_amount
+        $client->refresh();
+        $syncedDue = max(0, (float) $client->total_fee - (float) $client->partial_paid_amount);
+        if (abs($syncedDue - (float) $client->current_due) > 0.001) {
+            $client->update(['current_due' => $syncedDue]);
+        }
 
         if ($delta > 0) {
             $client->payments()->create([
@@ -789,7 +796,7 @@ class ClientController extends Controller
     private function resolveStatus($holder): array
     {
         if (!$holder) {
-            return ['value' => 'pending', 'label' => 'Pending at MITT', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
+            return ['value' => 'pending', 'label' => 'Pending at ZTTBL', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
         }
 
         if ($holder->processing_status === 'rejected') {
@@ -804,6 +811,6 @@ class ClientController extends Controller
             return ['value' => 'company_processing', 'label' => 'Company Processing', 'badge' => 'bg-blue-100 text-blue-700 ring-blue-200'];
         }
 
-        return ['value' => 'pending', 'label' => 'Pending at MITT', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
+        return ['value' => 'pending', 'label' => 'Pending at ZTTBL', 'badge' => 'bg-amber-100 text-amber-700 ring-amber-200'];
     }
 }

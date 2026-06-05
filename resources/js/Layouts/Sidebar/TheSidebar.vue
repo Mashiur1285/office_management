@@ -26,9 +26,8 @@
                 <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white/10 shadow-lg flex-shrink-0 ring-1 ring-white/20 overflow-hidden p-0.5">
                     <img src="/images/zulia.jpeg" alt="Logo" class="w-full h-full object-contain" />
                 </div>
-                <div v-if="!sidebarCollapsed">
-                    <p class="text-white font-bold text-base leading-tight tracking-wide">{{ appName }}</p>
-                    <p class="text-indigo-300/70 text-[10px] leading-tight tracking-wider uppercase">Management</p>
+                <div v-if="!sidebarCollapsed" class="min-w-0">
+                    <p class="text-white font-bold text-[12px] leading-snug tracking-wide">{{ appName }}</p>
                 </div>
             </div>
             <button

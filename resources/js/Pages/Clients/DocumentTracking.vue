@@ -72,7 +72,7 @@
 
             <div class="md:col-span-2 rounded-xl border border-gray-100 bg-white shadow-sm p-4 space-y-4">
                 <h2 class="text-lg font-semibold text-gray-900">Transfer Documents</h2>
-                <p class="text-sm text-gray-600">Hand over papers to MITT staff, BD company, or other parties</p>
+                <p class="text-sm text-gray-600">Hand over papers to ZTTBL staff, Vendors, or other parties</p>
                 <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submit">
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-700">Holder Type *</label>
@@ -85,7 +85,7 @@
 
                     <!-- Specific holder selection based on type -->
                     <div v-if="form.to_holder_type === 'agency_user'" class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">MITT Staff Member *</label>
+                        <label class="text-sm font-medium text-gray-700">ZTTBL Staff Member *</label>
                         <div class="relative">
                             <input
                                 v-model="mittStaffSearch"
@@ -125,7 +125,7 @@
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
-                            Add MITT Staff
+                            Add ZTTBL Staff
                         </button>
                         <p v-if="form.errors.to_holder_id" class="text-xs text-red-600">{{ form.errors.to_holder_id }}</p>
                     </div>
@@ -142,7 +142,7 @@
                     </div>
 
                     <div v-if="form.to_holder_type === 'bd_company'" class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700">BD Processing Company *</label>
+                        <label class="text-sm font-medium text-gray-700">Vendors *</label>
                         <select v-model="form.to_holder_id" class="input">
                             <option value="">Select company</option>
                             <option v-for="company in bdCompanies" :key="company.value" :value="company.value">
@@ -254,7 +254,7 @@
 
         <Modal :show="showMittStaffModal" @close="closeAddMittStaffModal" max-width="sm">
             <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Add MITT Staff</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Add ZTTBL Staff</h3>
                 <div class="space-y-3">
                     <div>
                         <label class="text-xs font-semibold text-gray-600">Name *</label>
@@ -546,8 +546,8 @@ const getHolderTypeLabel = (value) => {
         return holder.label;
     }
     const map = {
-        agency: "MITT (General)",
-        agency_user: "MITT Staff",
+        agency: "ZTTBL (General)",
+        agency_user: "ZTTBL Staff",
         bd_company: "Vendor",
         foreign_company: "Foreign Company",
         agent: "Agent",

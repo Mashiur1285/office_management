@@ -19,7 +19,7 @@ class Setting extends Model
         return static::firstOrCreate(
             ['id' => 1],
             [
-                'app_name' => 'MITT',
+                'app_name' => 'Zulia Tours & Traveles BD Limited',
                 'logo_path' => null,
             ]
         );

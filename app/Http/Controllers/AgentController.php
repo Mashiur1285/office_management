@@ -171,19 +171,23 @@ class AgentController extends Controller
                 ];
             });
 
+        $agent->load('user');
+
         return Inertia::render('Agents/Show', [
             'agent' => [
-                'id' => $agent->id,
-                'name' => $agent->name,
-                'mobile' => $agent->mobile,
-                'district' => $agent->district,
-                'address' => $agent->address,
-                'bank_details' => $agent->bank_details,
-                'services' => $agent->services ?? [],
-                'nid_file_path' => $agent->nid_file_path,
-                'clients_count' => $agent->clients->count(),
+                'id'             => $agent->id,
+                'name'           => $agent->name,
+                'mobile'         => $agent->mobile,
+                'district'       => $agent->district,
+                'address'        => $agent->address,
+                'bank_details'   => $agent->bank_details,
+                'services'       => $agent->services ?? [],
+                'nid_file_path'  => $agent->nid_file_path,
+                'clients_count'  => $agent->clients->count(),
                 'total_received' => $totalReceived,
                 'total_refunded' => $totalRefunded,
+                'has_account'    => (bool) $agent->user_id,
+                'account_email'  => $agent->user?->email,
             ],
             'clients' => $agent->clients->map(function ($client) {
                 return [
