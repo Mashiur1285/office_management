@@ -130,7 +130,11 @@ import {
     faBriefcase,
     faPhone,
     faArrowRight,
-    faLock
+    faArrowTrendDown,
+    faLock,
+    faRotate,
+    faPlaneSlash,
+    faPaperPlane
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -265,7 +269,11 @@ library.add(
     faBriefcase,
     faPhone,
     faArrowRight,
-    faLock
+    faArrowTrendDown,
+    faLock,
+    faRotate,
+    faPlaneSlash,
+    faPaperPlane
 );
 
 export default {

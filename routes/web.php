@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AgentPortalController;
 use App\Http\Controllers\AirlineTicketController;
+use App\Http\Controllers\AirportController;
 use App\Http\Controllers\BdCompanyController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
@@ -110,6 +111,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('airline-tickets', AirlineTicketController::class);
     Route::post('airline-tickets/{airlineTicket}/reschedule', [AirlineTicketController::class, 'reschedule'])
         ->name('airline-tickets.reschedule');
+
+    // Airports (for origin/destination combobox)
+    Route::get('airports', [AirportController::class, 'index'])->name('airports.index');
+    Route::post('airports', [AirportController::class, 'store'])->name('airports.store');
+    Route::put('airports/{airport}', [AirportController::class, 'update'])->name('airports.update');
+    Route::delete('airports/{airport}', [AirportController::class, 'destroy'])->name('airports.destroy');
 
     Route::middleware('permission:agent.add')->group(function () {
         Route::get('agents/create', [AgentController::class, 'create'])->name('agents.create');

@@ -85,12 +85,12 @@
                         </div>
                         <div>
                             <label class="label">Origin <span class="req">*</span></label>
-                            <input v-model="form.origin" type="text" class="input" placeholder="e.g. DAC - Dhaka" />
+                            <AirportCombobox v-model="form.origin" placeholder="Search origin airport..." />
                             <p v-if="form.errors.origin" class="err">{{ form.errors.origin }}</p>
                         </div>
                         <div>
                             <label class="label">Destination <span class="req">*</span></label>
-                            <input v-model="form.destination" type="text" class="input" placeholder="e.g. DXB - Dubai" />
+                            <AirportCombobox v-model="form.destination" placeholder="Search destination airport..." />
                             <p v-if="form.errors.destination" class="err">{{ form.errors.destination }}</p>
                         </div>
                         <div>
@@ -145,6 +145,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import AirportCombobox from '@/Components/AirportCombobox.vue';
 
 const props = defineProps({
     ticket:  Object,

@@ -160,9 +160,9 @@ class QuotationController extends Controller
             'subcategories' => $subcategories,
             'defaultTerms' => self::DEFAULT_TERMS,
             'companyDefaults' => [
-                'phone' => '+8801743-879171',
-                'email' => 'info@mefwayinternationaltravelandtours.com',
-                'address' => 'Confidence Center, Level - 1, Shop - 114, Shahjadpur, Gulshan - 2, Dhaka, Bangladesh.',
+                'phone' => '+88 01716 864 109 / +88 01332 502 234',
+                'email' => 'zulia.tourstravelsbd@gmail.com',
+                'address' => '25,26,27, Kazi Nazrul Islam Avenue, Banglamotor Trade Center, (Former Happy Rahman Plaza) 4th Floor, Banglamotor Shahbagh, Dhaka-1000.',
             ],
         ]);
     }
@@ -346,9 +346,9 @@ class QuotationController extends Controller
             'subcategories' => $subcategories,
             'defaultTerms' => self::DEFAULT_TERMS,
             'companyDefaults' => [
-                'phone' => '+8801743-879171',
-                'email' => 'info@mefwayinternationaltravelandtours.com',
-                'address' => 'Confidence Center, Level - 1, Shop - 114, Shahjadpur, Gulshan - 2, Dhaka, Bangladesh.',
+                'phone' => '+88 01716 864 109 / +88 01332 502 234',
+                'email' => 'zulia.tourstravelsbd@gmail.com',
+                'address' => '25,26,27, Kazi Nazrul Islam Avenue, Banglamotor Trade Center, (Former Happy Rahman Plaza) 4th Floor, Banglamotor Shahbagh, Dhaka-1000.',
             ],
         ]);
     }

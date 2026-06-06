@@ -23,7 +23,7 @@
             :class="sidebarCollapsed ? 'flex-col gap-2' : 'justify-between'"
         >
             <div class="flex items-center gap-3">
-                <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white/10 shadow-lg flex-shrink-0 ring-1 ring-white/20 overflow-hidden p-0.5">
+                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-white shadow-lg flex-shrink-0 overflow-hidden p-1">
                     <img src="/images/zulia.jpeg" alt="Logo" class="w-full h-full object-contain" />
                 </div>
                 <div v-if="!sidebarCollapsed" class="min-w-0">
