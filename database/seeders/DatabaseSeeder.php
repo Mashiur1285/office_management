@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             JobSectorSeeder::class,
             SettingsSeeder::class,
             SubcategorySeeder::class,
+            AirportSeeder::class,
         ]);
     }
 }

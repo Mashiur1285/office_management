@@ -642,7 +642,7 @@ const bdCompanyFilesOptions = {
 <template>
     <Head title="Dashboard" />
 
-    <div class="px-4 py-7 md:px-6 lg:px-8 min-h-screen font-sans relative" style="background: #a8d8ef;">
+    <div class="px-4 py-7 md:px-6 lg:px-8 min-h-screen font-sans relative rounded-3xl" style="background: #a8d8ef;">
 
         <!-- Background blobs -->
         <div class="fixed inset-0 pointer-events-none overflow-hidden" style="z-index: 0;">

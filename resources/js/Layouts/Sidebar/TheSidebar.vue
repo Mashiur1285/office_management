@@ -1,7 +1,7 @@
 <template>
     <aside
         :class="[
-            'fixed top-0 left-0 z-[60] h-screen transition-all duration-300 border-r border-white/10 shadow-2xl overflow-hidden',
+            'fixed top-0 left-0 z-[60] h-screen transition-all duration-300 border-r border-white/10 shadow-2xl overflow-hidden rounded-r-3xl',
             sidebarCollapsed ? 'w-16 -translate-x-full sm:translate-x-0' : 'w-64 -translate-x-full sm:translate-x-0'
         ]"
         style="background: linear-gradient(160deg, #0f172a 0%, #1a1040 55%, #0f172a 100%);"
