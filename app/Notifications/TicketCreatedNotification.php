@@ -18,9 +18,14 @@ class TicketCreatedNotification extends Notification implements ShouldQueue
         private readonly string  $origin,
         private readonly string  $destination,
         private readonly string  $flightDate,
-        private readonly ?string $departureTime = null,
-        private readonly ?string $pnr = null,
-        private readonly ?string $ticketNumber = null,
+        private readonly ?string $departureTime  = null,
+        private readonly ?string $pnr            = null,
+        private readonly ?string $ticketNumber   = null,
+        private readonly ?string $passportNumber = null,
+        private readonly ?string $issueDate      = null,
+        private readonly ?string $arrivalDate    = null,
+        private readonly ?string $arrivalTime    = null,
+        private readonly ?array  $transits       = null,
     ) {}
 
     public function via($notifiable): array
@@ -33,15 +38,20 @@ class TicketCreatedNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject("Ticket Confirmed – {$this->flightNumber} | {$this->airlineName}")
             ->view('emails.notifications.ticket_created', [
-                'passengerName' => $this->passengerName,
-                'airlineName'   => $this->airlineName,
-                'flightNumber'  => $this->flightNumber,
-                'origin'        => $this->origin,
-                'destination'   => $this->destination,
-                'flightDate'    => $this->flightDate,
-                'departureTime' => $this->departureTime,
-                'pnr'           => $this->pnr,
-                'ticketNumber'  => $this->ticketNumber,
+                'passengerName'  => $this->passengerName,
+                'airlineName'    => $this->airlineName,
+                'flightNumber'   => $this->flightNumber,
+                'origin'         => $this->origin,
+                'destination'    => $this->destination,
+                'flightDate'     => $this->flightDate,
+                'departureTime'  => $this->departureTime,
+                'pnr'            => $this->pnr,
+                'ticketNumber'   => $this->ticketNumber,
+                'passportNumber' => $this->passportNumber,
+                'issueDate'      => $this->issueDate,
+                'arrivalDate'    => $this->arrivalDate,
+                'arrivalTime'    => $this->arrivalTime,
+                'transits'       => $this->transits,
             ]);
     }
 }

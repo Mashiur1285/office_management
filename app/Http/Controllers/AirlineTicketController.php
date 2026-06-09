@@ -70,16 +70,25 @@ class AirlineTicketController extends Controller
         $data = $request->validate([
             'client_id'       => ['nullable', 'exists:clients,id'],
             'passenger_name'  => ['required', 'string', 'max:255'],
-            'passenger_email' => ['required', 'email', 'max:255'],
+            'passenger_email' => ['nullable', 'email', 'max:255'],
             'passenger_phone' => ['nullable', 'string', 'max:30'],
+            'passport_number' => ['nullable', 'string', 'max:50'],
             'airline_name'    => ['required', 'string', 'max:255'],
             'flight_number'   => ['required', 'string', 'max:20'],
             'pnr'             => ['nullable', 'string', 'max:20'],
             'ticket_number'   => ['nullable', 'string', 'max:50'],
+            'issue_date'      => ['nullable', 'date'],
             'origin'          => ['required', 'string', 'max:100'],
             'destination'     => ['required', 'string', 'max:100'],
             'flight_date'     => ['required', 'date'],
             'departure_time'  => ['nullable', 'date_format:H:i'],
+            'arrival_date'    => ['nullable', 'date'],
+            'arrival_time'    => ['nullable', 'date_format:H:i'],
+            'has_transit'     => ['boolean'],
+            'transits'        => ['nullable', 'array'],
+            'transits.*.at'   => ['nullable', 'string', 'max:100'],
+            'transits.*.date' => ['nullable', 'date'],
+            'transits.*.time' => ['nullable', 'date_format:H:i'],
             'status'          => ['required', 'in:confirmed,rescheduled,cancelled,flown'],
             'notes'           => ['nullable', 'string'],
         ]);
@@ -88,18 +97,25 @@ class AirlineTicketController extends Controller
 
         $ticket = AirlineTicket::create($data);
 
-        Notification::route('mail', $ticket->passenger_email)
-            ->notify(new TicketCreatedNotification(
-                passengerName: $ticket->passenger_name,
-                airlineName:   $ticket->airline_name,
-                flightNumber:  $ticket->flight_number,
-                origin:        $ticket->origin,
-                destination:   $ticket->destination,
-                flightDate:    Carbon::parse($ticket->flight_date)->format('d M Y'),
-                departureTime: $ticket->departure_time,
-                pnr:           $ticket->pnr,
-                ticketNumber:  $ticket->ticket_number,
-            ));
+        if ($ticket->passenger_email) {
+            Notification::route('mail', $ticket->passenger_email)
+                ->notify(new TicketCreatedNotification(
+                    passengerName:  $ticket->passenger_name,
+                    airlineName:    $ticket->airline_name,
+                    flightNumber:   $ticket->flight_number,
+                    origin:         $ticket->origin,
+                    destination:    $ticket->destination,
+                    flightDate:     Carbon::parse($ticket->flight_date)->format('d M Y'),
+                    departureTime:  $ticket->departure_time,
+                    pnr:            $ticket->pnr,
+                    ticketNumber:   $ticket->ticket_number,
+                    passportNumber: $ticket->passport_number,
+                    issueDate:      $ticket->issue_date ? Carbon::parse($ticket->issue_date)->format('d M Y') : null,
+                    arrivalDate:    $ticket->arrival_date ? Carbon::parse($ticket->arrival_date)->format('d M Y') : null,
+                    arrivalTime:    $ticket->arrival_time,
+                    transits:       $ticket->transits,
+                ));
+        }
 
         return redirect()->route('airline-tickets.show', $ticket)
             ->with('success', 'Ticket created and confirmation email sent.');
@@ -131,16 +147,25 @@ class AirlineTicketController extends Controller
         $data = $request->validate([
             'client_id'       => ['nullable', 'exists:clients,id'],
             'passenger_name'  => ['required', 'string', 'max:255'],
-            'passenger_email' => ['required', 'email', 'max:255'],
+            'passenger_email' => ['nullable', 'email', 'max:255'],
             'passenger_phone' => ['nullable', 'string', 'max:30'],
+            'passport_number' => ['nullable', 'string', 'max:50'],
             'airline_name'    => ['required', 'string', 'max:255'],
             'flight_number'   => ['required', 'string', 'max:20'],
             'pnr'             => ['nullable', 'string', 'max:20'],
             'ticket_number'   => ['nullable', 'string', 'max:50'],
+            'issue_date'      => ['nullable', 'date'],
             'origin'          => ['required', 'string', 'max:100'],
             'destination'     => ['required', 'string', 'max:100'],
             'flight_date'     => ['required', 'date'],
             'departure_time'  => ['nullable', 'date_format:H:i'],
+            'arrival_date'    => ['nullable', 'date'],
+            'arrival_time'    => ['nullable', 'date_format:H:i'],
+            'has_transit'     => ['boolean'],
+            'transits'        => ['nullable', 'array'],
+            'transits.*.at'   => ['nullable', 'string', 'max:100'],
+            'transits.*.date' => ['nullable', 'date'],
+            'transits.*.time' => ['nullable', 'date_format:H:i'],
             'status'          => ['required', 'in:confirmed,rescheduled,cancelled,flown'],
             'notes'           => ['nullable', 'string'],
         ]);
@@ -181,18 +206,26 @@ class AirlineTicketController extends Controller
 
         $newDate = Carbon::parse($airlineTicket->fresh()->flight_date)->format('d M Y');
 
-        Notification::route('mail', $airlineTicket->passenger_email)
-            ->notify(new FlightDateChangedNotification(
-                passengerName:  $airlineTicket->passenger_name,
-                airlineName:    $airlineTicket->airline_name,
-                flightNumber:   $airlineTicket->flight_number,
-                origin:         $airlineTicket->origin,
-                destination:    $airlineTicket->destination,
-                oldDate:        $oldDate,
-                newDate:        $newDate,
-                departureTime:  $data['new_departure_time'] ?? $airlineTicket->departure_time,
-                pnr:            $airlineTicket->pnr,
-            ));
+        if ($airlineTicket->passenger_email) {
+            Notification::route('mail', $airlineTicket->passenger_email)
+                ->notify(new FlightDateChangedNotification(
+                    passengerName:  $airlineTicket->passenger_name,
+                    airlineName:    $airlineTicket->airline_name,
+                    flightNumber:   $airlineTicket->flight_number,
+                    origin:         $airlineTicket->origin,
+                    destination:    $airlineTicket->destination,
+                    oldDate:        $oldDate,
+                    newDate:        $newDate,
+                    departureTime:  $data['new_departure_time'] ?? $airlineTicket->departure_time,
+                    pnr:            $airlineTicket->pnr,
+                    ticketNumber:   $airlineTicket->ticket_number,
+                    passportNumber: $airlineTicket->passport_number,
+                    issueDate:      $airlineTicket->issue_date ? Carbon::parse($airlineTicket->issue_date)->format('d M Y') : null,
+                    arrivalDate:    $airlineTicket->arrival_date ? Carbon::parse($airlineTicket->arrival_date)->format('d M Y') : null,
+                    arrivalTime:    $airlineTicket->arrival_time,
+                    transits:       $airlineTicket->transits,
+                ));
+        }
 
         return back()->with('success', "Flight rescheduled. Notification sent to {$airlineTicket->passenger_email}.");
     }

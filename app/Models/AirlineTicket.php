@@ -12,23 +12,33 @@ class AirlineTicket extends Model
         'passenger_name',
         'passenger_email',
         'passenger_phone',
+        'passport_number',
         'airline_name',
         'flight_number',
         'pnr',
         'ticket_number',
+        'issue_date',
         'origin',
         'destination',
         'flight_date',
         'original_flight_date',
         'departure_time',
+        'arrival_date',
+        'arrival_time',
+        'has_transit',
+        'transits',
         'status',
         'notes',
         'created_by',
     ];
 
     protected $casts = [
-        'flight_date' => 'date',
+        'flight_date'          => 'date',
         'original_flight_date' => 'date',
+        'issue_date'           => 'date',
+        'arrival_date'         => 'date',
+        'has_transit'          => 'boolean',
+        'transits'             => 'array',
     ];
 
     public function client(): BelongsTo

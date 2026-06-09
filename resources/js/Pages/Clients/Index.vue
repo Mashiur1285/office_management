@@ -221,7 +221,7 @@
                                     <button v-if="!props.readOnly" @click="router.visit(`/clients/${client.id}/documents`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition" title="Documents">
                                         <font-awesome-icon icon="file-alt" class="w-3.5 h-3.5" />
                                     </button>
-                                    <button v-if="!props.readOnly" @click="router.visit(`/clients/${client.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
+                                    <button @click="router.visit(`/clients/${client.id}/edit`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition" title="Edit">
                                         <font-awesome-icon icon="edit" class="w-3.5 h-3.5" />
                                     </button>
                                     <button v-if="!props.readOnly" @click="confirmDelete(client)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition" title="Delete">

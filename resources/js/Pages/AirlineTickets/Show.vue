@@ -2,7 +2,7 @@
     <Head title="Ticket Details" />
 
     <div class="min-h-screen bg-gray-50 py-8">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Header Card -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -84,7 +84,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-6 text-sm">
                             <div>
                                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Airline</span>
                                 <p class="font-semibold text-gray-900 mt-1">{{ ticket.airline_name }}</p>
@@ -101,24 +101,45 @@
                                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ticket No.</span>
                                 <p class="font-semibold text-gray-900 font-mono mt-1">{{ ticket.ticket_number }}</p>
                             </div>
+                            <div v-if="ticket.issue_date">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Issue Date</span>
+                                <p class="font-semibold text-gray-900 mt-1">{{ formatDate(ticket.issue_date) }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Transit Info -->
+                        <div v-if="ticket.has_transit && ticket.transits?.length" class="mt-5 pt-5 border-t border-gray-100">
+                            <h3 class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-3">Transit</h3>
+                            <div class="space-y-2">
+                                <div v-for="(t, i) in ticket.transits" :key="i" class="bg-amber-50 rounded-lg px-4 py-2.5 text-sm flex flex-wrap gap-x-4 gap-y-1">
+                                    <span class="font-bold text-amber-700">{{ i + 1 }}.</span>
+                                    <span class="font-semibold text-gray-800">{{ t.at }}</span>
+                                    <span v-if="t.date" class="text-gray-500">{{ formatDate(t.date) }}</span>
+                                    <span v-if="t.time" class="text-gray-500">{{ t.time }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Passenger Info -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Passenger Info</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
                             <div>
-                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</span>
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Full Name</span>
                                 <p class="font-semibold text-gray-900 mt-1">{{ ticket.passenger_name }}</p>
                             </div>
-                            <div>
-                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</span>
-                                <p class="font-medium text-gray-700 mt-1">{{ ticket.passenger_email }}</p>
+                            <div v-if="ticket.passport_number">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Passport No.</span>
+                                <p class="font-semibold text-gray-900 font-mono mt-1">{{ ticket.passport_number }}</p>
                             </div>
                             <div v-if="ticket.passenger_phone">
                                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</span>
                                 <p class="font-medium text-gray-700 mt-1">{{ ticket.passenger_phone }}</p>
+                            </div>
+                            <div v-if="ticket.passenger_email">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</span>
+                                <p class="font-medium text-gray-700 mt-1">{{ ticket.passenger_email }}</p>
                             </div>
                             <div v-if="ticket.client">
                                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Linked Client</span>
@@ -156,6 +177,14 @@
                             <div v-if="ticket.departure_time">
                                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Departure</span>
                                 <p class="font-semibold text-gray-900 mt-1">{{ ticket.departure_time }}</p>
+                            </div>
+                            <div v-if="ticket.arrival_date" class="pt-3 border-t border-gray-100">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Arrival Date</span>
+                                <p class="text-lg font-black text-gray-900 mt-1">{{ formatDate(ticket.arrival_date) }}</p>
+                            </div>
+                            <div v-if="ticket.arrival_time">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Arrival</span>
+                                <p class="font-semibold text-gray-900 mt-1">{{ ticket.arrival_time }}</p>
                             </div>
                         </div>
 

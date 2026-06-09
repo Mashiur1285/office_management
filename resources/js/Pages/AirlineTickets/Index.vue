@@ -153,12 +153,20 @@
                                 </span>
                             </td>
                             <td class="px-5 py-4 text-right">
-                                <Link
-                                    :href="`/airline-tickets/${ticket.id}`"
-                                    class="text-blue-700 hover:text-blue-900 font-semibold text-xs px-3 py-1.5 rounded-lg hover:bg-blue-50 transition"
-                                >
-                                    View
-                                </Link>
+                                <div class="flex items-center justify-end gap-1">
+                                    <Link
+                                        :href="`/airline-tickets/${ticket.id}`"
+                                        class="text-blue-700 hover:text-blue-900 font-semibold text-xs px-3 py-1.5 rounded-lg hover:bg-blue-50 transition"
+                                    >
+                                        View
+                                    </Link>
+                                    <Link
+                                        :href="`/airline-tickets/${ticket.id}/edit`"
+                                        class="text-gray-600 hover:text-gray-900 font-semibold text-xs px-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
+                                    >
+                                        Edit
+                                    </Link>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
