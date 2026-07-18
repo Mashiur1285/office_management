@@ -10,10 +10,31 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class AgentController extends Controller
 {
+    /**
+     * Lightweight agent creation used by the inline "+" button on other forms (e.g. quotations).
+     */
+    public function quickStore(Request $request)
+    {
+        $data = $request->validate([
+            'name'   => ['required', 'string', 'max:255'],
+            'mobile' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        $data['services'] = [];
+
+        $agent = Agent::create($data);
+
+        return response()->json([
+            'agent' => $agent->only(['id', 'name']),
+        ], 201);
+    }
+
     public function index(Request $request)
     {
         $agents = Agent::query()
             ->withCount('clients')
+            ->withSum('clients as total_amount', 'total_fee')
+            ->withSum('clients as total_due', 'current_due')
             ->latest()
             ->get()
             ->map(function (Agent $agent) {
@@ -24,6 +45,8 @@ class AgentController extends Controller
                     'district' => $agent->district,
                     'services' => $agent->services ?? [],
                     'clients_count' => $agent->clients_count,
+                    'total_amount' => (float) ($agent->total_amount ?? 0),
+                    'total_due' => (float) ($agent->total_due ?? 0),
                 ];
             });
 

@@ -50,7 +50,7 @@
         <form @submit.prevent="submit" class="space-y-6">
             <!-- Identity -->
             <section
-                class="rounded-xl border border-gray-100 bg-white shadow-sm"
+                class="rounded-xl border border-blue-200 bg-blue-50/40 shadow-sm"
             >
                 <div
                     class="flex items-center justify-between border-b border-gray-100 px-6 py-4"
@@ -270,13 +270,13 @@
                 </div>
             </section>
 
-            <!-- Job & Placement -->
+            <!-- Manpower: Job & Placement -->
             <section
-                class="rounded-xl border border-gray-100 bg-white shadow-sm"
+                class="rounded-xl border border-gray-400 bg-gray-200/70 shadow-sm"
             >
                 <div class="border-b border-gray-100 px-6 py-4">
                     <h2 class="text-lg font-semibold text-gray-900">
-                        Job & Placement
+                        Manpower: Job &amp; Placement
                     </h2>
                     <p class="text-sm text-gray-600">
                         Select job sector and foreign company details.
@@ -549,7 +549,7 @@
 
             <!-- Medical & Documents -->
             <section
-                class="rounded-xl border border-gray-100 bg-white shadow-sm"
+                class="rounded-xl border border-emerald-200 bg-emerald-50/40 shadow-sm"
             >
                 <div class="border-b border-gray-100 px-6 py-4">
                     <h2 class="text-lg font-semibold text-gray-900">
@@ -865,6 +865,33 @@
                         v-model="form.partial_payment_date"
                         :error="form.errors.partial_payment_date"
                     />
+                    <FormGroup
+                        label="Payment Method"
+                        :error="form.errors.payment_method"
+                        hint="How was this payment made?"
+                    >
+                        <select
+                            v-model="form.payment_method"
+                            :class="inputClass('payment_method')"
+                        >
+                            <option value="">— Select method —</option>
+                            <option value="bank">Bank</option>
+                            <option value="cash">Cash</option>
+                            <option value="mfs">MFS (bKash/Nagad/Rocket)</option>
+                        </select>
+                    </FormGroup>
+                    <FormGroup
+                        label="Payment Notes"
+                        :error="form.errors.payment_notes"
+                        class="md:col-span-2"
+                    >
+                        <input
+                            v-model="form.payment_notes"
+                            type="text"
+                            :class="inputClass('payment_notes')"
+                            placeholder="e.g. bKash TrxID, bank ref, or any note for this payment"
+                        />
+                    </FormGroup>
                 </div>
 
                 <!-- Payment & Refund History (edit mode only) -->
@@ -902,6 +929,9 @@
                                             Date
                                         </th>
                                         <th class="px-3 py-2 font-semibold">
+                                            Installment
+                                        </th>
+                                        <th class="px-3 py-2 font-semibold">
                                             Type
                                         </th>
                                         <th class="px-3 py-2 font-semibold">
@@ -922,7 +952,7 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
                                     <tr
-                                        v-for="record in paymentHistory"
+                                        v-for="record in paymentHistoryDisplay"
                                         :key="record.id"
                                         class="transition hover:bg-gray-50"
                                     >
@@ -930,6 +960,20 @@
                                             class="px-3 py-2 whitespace-nowrap text-xs"
                                         >
                                             {{ record.payment_date || "—" }}
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap">
+                                            <span
+                                                v-if="record.installment !== '—'"
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                                                :class="
+                                                    record.installment === 'Final Payment'
+                                                        ? 'bg-emerald-100 text-emerald-700'
+                                                        : 'bg-indigo-50 text-indigo-700'
+                                                "
+                                            >
+                                                {{ record.installment }}
+                                            </span>
+                                            <span v-else class="text-xs text-gray-400">—</span>
                                         </td>
                                         <td class="px-3 py-2">
                                             <span
@@ -1133,7 +1177,7 @@
 
             <!-- Notes -->
             <section
-                class="rounded-xl border border-gray-100 bg-white shadow-sm"
+                class="rounded-xl border border-orange-200 bg-orange-50/40 shadow-sm"
             >
                 <div class="border-b border-gray-100 px-6 py-4">
                     <h2 class="text-lg font-semibold text-gray-900">
@@ -1157,7 +1201,7 @@
 
             <!-- Status -->
             <section
-                class="rounded-xl border border-gray-100 bg-white shadow-sm"
+                class="rounded-xl border border-purple-200 bg-purple-50/40 shadow-sm"
             >
                 <div class="border-b border-gray-100 px-6 py-4">
                     <h2 class="text-lg font-semibold text-gray-900">
@@ -1651,6 +1695,36 @@ const props = defineProps({
 
 const isEdit = computed(() => !!props.client);
 
+const ordinal = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
+// Label each payment record as 1st / 2nd / ... / Final Payment (installment tracking).
+const paymentHistoryDisplay = computed(() => {
+    const payments = props.paymentHistory.filter((r) => r.type === "payment");
+    const ordered = [...payments].sort((a, b) => {
+        const da = a.payment_date || "";
+        const db = b.payment_date || "";
+        if (da !== db) return da < db ? -1 : 1;
+        return (a.id || 0) - (b.id || 0);
+    });
+    const fullyPaid =
+        Number(props.client?.current_due || 0) <= 0 &&
+        Number(props.totalReceived || 0) > 0;
+    const labelById = {};
+    ordered.forEach((p, i) => {
+        const isLast = i === ordered.length - 1;
+        labelById[p.id] =
+            isLast && fullyPaid ? "Final Payment" : `${ordinal(i + 1)} Payment`;
+    });
+    return props.paymentHistory.map((r) => ({
+        ...r,
+        installment: r.type === "payment" ? labelById[r.id] || "—" : "—",
+    }));
+});
+
 // Refund state (edit mode only)
 const showRefundModal = ref(false);
 
@@ -1820,6 +1894,8 @@ const buildFormState = () => ({
     partial_payment_date: props.client?.partial_payment_date ?? "",
     payment_source: props.client?.payment_source ?? "client",
     payment_agent_id: props.client?.payment_agent_id ?? "",
+    payment_method: "",
+    payment_notes: "",
     notes: props.client?.notes ?? "",
     online_status: props.client?.online_status ?? "pending",
     calling_status: props.client?.calling_status ?? "pending",

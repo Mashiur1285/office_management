@@ -50,19 +50,35 @@
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Client Info</h2>
                 <div class="grid gap-4 md:grid-cols-2">
                     <FormGroup label="Client Name" :error="form.errors.client_id">
-                        <SearchableSelect
-                            v-model="form.client_id"
-                            :options="clients"
-                            placeholder="Select client"
-                            @change="handleClientChange"
-                        />
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 min-w-0">
+                                <SearchableSelect
+                                    v-model="form.client_id"
+                                    :options="clientList"
+                                    placeholder="Select client"
+                                    @change="handleClientChange"
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                @click="openClientModal"
+                                title="Add new client"
+                                class="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
+                            >
+                                <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
+                            </button>
+                        </div>
                     </FormGroup>
                     <FormGroup label="Organization Name" :error="form.errors.organization_name">
                         <input
                             v-model="form.organization_name"
+                            list="invoice-org-list"
                             class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
-                            placeholder="Organization name"
+                            placeholder="Select or type organization"
                         />
+                        <datalist id="invoice-org-list">
+                            <option v-for="org in orgList" :key="org" :value="org" />
+                        </datalist>
                     </FormGroup>
                     <FormGroup label="Passport Number">
                         <input
@@ -79,11 +95,25 @@
                         />
                     </FormGroup>
                     <FormGroup label="Agent Name">
-                        <input
-                            v-model="form.client_agent"
-                            readonly
-                            class="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-700"
-                        />
+                        <div class="flex items-center gap-2">
+                            <input
+                                v-model="form.client_agent"
+                                list="invoice-agent-list"
+                                class="flex-1 min-w-0 rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-all focus:border-[#1d4ed8] focus:ring-1 focus:ring-[#1d4ed8]"
+                                placeholder="Select or type agent"
+                            />
+                            <datalist id="invoice-agent-list">
+                                <option v-for="agent in agentList" :key="agent.id" :value="agent.name" />
+                            </datalist>
+                            <button
+                                type="button"
+                                @click="openAgentModal"
+                                title="Add new agent"
+                                class="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
+                            >
+                                <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
+                            </button>
+                        </div>
                     </FormGroup>
                     <FormGroup label="Client Email" :error="form.errors.client_email">
                         <input
@@ -359,21 +389,123 @@
                 </button>
             </div>
         </form>
+
+        <!-- Quick-create Client Modal -->
+        <Teleport to="body">
+            <div v-if="clientModal.open" class="fixed inset-0 z-[60] flex items-center justify-center p-4" @click.self="closeClientModal">
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                <div class="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+                    <div class="mb-5 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900">Add New Client</h3>
+                        <button type="button" @click="closeClientModal" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+                            <font-awesome-icon icon="xmark" class="h-4 w-4" />
+                        </button>
+                    </div>
+
+                    <p v-if="clientModal.error" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">{{ clientModal.error }}</p>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Full Name <span class="text-red-500">*</span></label>
+                            <input v-model="clientModal.fields.name" class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm" placeholder="Client full name" />
+                            <p v-if="clientModal.errors.name" class="mt-1 text-xs text-red-600">{{ clientModal.errors.name[0] }}</p>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Passport Number <span class="text-red-500">*</span></label>
+                            <input v-model="clientModal.fields.passport_number" class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm font-mono" placeholder="e.g. AB1234567" />
+                            <p v-if="clientModal.errors.passport_number" class="mt-1 text-xs text-red-600">{{ clientModal.errors.passport_number[0] }}</p>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Mobile</label>
+                            <input v-model="clientModal.fields.mobile" class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm" placeholder="+880..." />
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+                            <input v-model="clientModal.fields.email" type="email" class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm" placeholder="client@example.com" />
+                            <p v-if="clientModal.errors.email" class="mt-1 text-xs text-red-600">{{ clientModal.errors.email[0] }}</p>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Organization</label>
+                            <input v-model="clientModal.fields.organization_name" list="invoice-org-list" class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm" placeholder="Organization name" />
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Agent</label>
+                            <select v-model="clientModal.fields.agent_id" class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm">
+                                <option :value="null">— No agent —</option>
+                                <option v-for="agent in agentList" :key="agent.id" :value="agent.id">{{ agent.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" @click="closeClientModal" class="rounded-full border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cancel</button>
+                        <button type="button" @click="submitClientModal" :disabled="clientModal.processing" class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60">
+                            <font-awesome-icon v-if="clientModal.processing" icon="spinner" class="h-3.5 w-3.5 animate-spin" />
+                            {{ clientModal.processing ? 'Saving...' : 'Save Client' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
+
+        <!-- Quick-create Agent Modal -->
+        <Teleport to="body">
+            <div v-if="agentModal.open" class="fixed inset-0 z-[60] flex items-center justify-center p-4" @click.self="closeAgentModal">
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+                    <div class="mb-5 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900">Add New Agent</h3>
+                        <button type="button" @click="closeAgentModal" class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+                            <font-awesome-icon icon="xmark" class="h-4 w-4" />
+                        </button>
+                    </div>
+
+                    <p v-if="agentModal.error" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">{{ agentModal.error }}</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Agent Name <span class="text-red-500">*</span></label>
+                            <input v-model="agentModal.fields.name" class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm" placeholder="Agent full name" />
+                            <p v-if="agentModal.errors.name" class="mt-1 text-xs text-red-600">{{ agentModal.errors.name[0] }}</p>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700">Mobile</label>
+                            <input v-model="agentModal.fields.mobile" class="w-full rounded-lg border border-gray-200 px-4 py-2 text-sm" placeholder="+880..." />
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" @click="closeAgentModal" class="rounded-full border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cancel</button>
+                        <button type="button" @click="submitAgentModal" :disabled="agentModal.processing" class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60">
+                            <font-awesome-icon v-if="agentModal.processing" icon="spinner" class="h-3.5 w-3.5 animate-spin" />
+                            {{ agentModal.processing ? 'Saving...' : 'Save Agent' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
     </div>
 </template>
 
 <script setup>
-import { computed, defineComponent, h, ref, watch } from 'vue';
+import { computed, defineComponent, h, reactive, ref, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import axios from 'axios';
 import SubcategorySelector from '@/Components/SubcategorySelector.vue';
 import SearchableSelect from '@/Components/SearchableSelect.vue';
 
 const props = defineProps({
     clients: Array,
-    agents: Array,
+    agents: { type: Array, default: () => [] },
+    organizations: { type: Array, default: () => [] },
     subcategories: Array,
     defaultTerms: String,
 });
+
+// Local reactive copies so newly created records appear immediately in dropdowns.
+const clientList = ref([...(props.clients ?? [])]);
+const agentList = ref([...(props.agents ?? [])]);
+const orgList = ref([...(props.organizations ?? [])]);
 
 const invoiceDate = new Date().toISOString().split('T')[0];
 
@@ -473,13 +605,99 @@ const showToast = (message) => {
 };
 
 const handleClientChange = () => {
-    const client = props.clients.find(item => item.id === form.client_id);
+    const client = clientList.value.find(item => item.id === form.client_id);
     if (!client) return;
     form.organization_name = client.organization_name || '';
     form.client_email = client.email || '';
     form.client_mobile = client.mobile || '';
     form.client_passport = client.passport_number || '';
     form.client_agent = client.agent_name || '';
+};
+
+// ---- Quick-create Client modal ----
+const clientModal = reactive({
+    open: false,
+    processing: false,
+    error: '',
+    errors: {},
+    fields: { name: '', passport_number: '', mobile: '', email: '', organization_name: '', agent_id: null },
+});
+
+const openClientModal = () => {
+    clientModal.error = '';
+    clientModal.errors = {};
+    clientModal.fields = { name: '', passport_number: '', mobile: '', email: '', organization_name: '', agent_id: null };
+    clientModal.open = true;
+};
+
+const closeClientModal = () => {
+    clientModal.open = false;
+};
+
+const submitClientModal = async () => {
+    clientModal.processing = true;
+    clientModal.error = '';
+    clientModal.errors = {};
+    try {
+        const { data } = await axios.post(route('clients.quick-store'), clientModal.fields);
+        clientList.value.push(data.client);
+        if (data.client.organization_name && !orgList.value.includes(data.client.organization_name)) {
+            orgList.value.push(data.client.organization_name);
+        }
+        form.client_id = data.client.id;
+        handleClientChange();
+        closeClientModal();
+    } catch (e) {
+        if (e.response?.status === 422) {
+            clientModal.errors = e.response.data.errors || {};
+            clientModal.error = 'Please correct the highlighted fields.';
+        } else {
+            clientModal.error = e.response?.data?.message || 'Could not create client. Please try again.';
+        }
+    } finally {
+        clientModal.processing = false;
+    }
+};
+
+// ---- Quick-create Agent modal ----
+const agentModal = reactive({
+    open: false,
+    processing: false,
+    error: '',
+    errors: {},
+    fields: { name: '', mobile: '' },
+});
+
+const openAgentModal = () => {
+    agentModal.error = '';
+    agentModal.errors = {};
+    agentModal.fields = { name: '', mobile: '' };
+    agentModal.open = true;
+};
+
+const closeAgentModal = () => {
+    agentModal.open = false;
+};
+
+const submitAgentModal = async () => {
+    agentModal.processing = true;
+    agentModal.error = '';
+    agentModal.errors = {};
+    try {
+        const { data } = await axios.post(route('agents.quick-store'), agentModal.fields);
+        agentList.value.push(data.agent);
+        form.client_agent = data.agent.name;
+        closeAgentModal();
+    } catch (e) {
+        if (e.response?.status === 422) {
+            agentModal.errors = e.response.data.errors || {};
+            agentModal.error = 'Please correct the highlighted fields.';
+        } else {
+            agentModal.error = e.response?.data?.message || 'Could not create agent. Please try again.';
+        }
+    } finally {
+        agentModal.processing = false;
+    }
 };
 
 const handleServiceCategoryChange = () => {

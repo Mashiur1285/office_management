@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FlightDateChangedNotification extends Notification implements ShouldQueue
+class TicketPurchasedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -17,18 +17,16 @@ class FlightDateChangedNotification extends Notification implements ShouldQueue
         private readonly string  $flightNumber,
         private readonly string  $origin,
         private readonly string  $destination,
-        private readonly string  $oldDate,
-        private readonly string  $newDate,
+        private readonly string  $flightDate,
         private readonly ?string $departureTime  = null,
         private readonly ?string $pnr            = null,
+        private readonly ?string $reservationPnr = null,
         private readonly ?string $ticketNumber   = null,
         private readonly ?string $passportNumber = null,
-        private readonly ?string $issueDate      = null,
+        private readonly ?string $purchaseDate   = null,
         private readonly ?string $arrivalDate    = null,
         private readonly ?string $arrivalTime    = null,
         private readonly ?array  $transits       = null,
-        private readonly ?string $reservationPnr = null,
-        private readonly array   $passengers     = [],
     ) {}
 
     public function via($notifiable): array
@@ -39,25 +37,23 @@ class FlightDateChangedNotification extends Notification implements ShouldQueue
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject("Flight Date Changed – {$this->flightNumber} | {$this->airlineName}")
-            ->view('emails.notifications.flight_date_changed', [
+            ->subject("Ticket Purchased – {$this->flightNumber} | {$this->airlineName}")
+            ->view('emails.notifications.ticket_purchased', [
                 'passengerName'  => $this->passengerName,
                 'airlineName'    => $this->airlineName,
                 'flightNumber'   => $this->flightNumber,
                 'origin'         => $this->origin,
                 'destination'    => $this->destination,
-                'oldDate'        => $this->oldDate,
-                'newDate'        => $this->newDate,
+                'flightDate'     => $this->flightDate,
                 'departureTime'  => $this->departureTime,
                 'pnr'            => $this->pnr,
+                'reservationPnr' => $this->reservationPnr,
                 'ticketNumber'   => $this->ticketNumber,
                 'passportNumber' => $this->passportNumber,
-                'issueDate'      => $this->issueDate,
+                'purchaseDate'   => $this->purchaseDate,
                 'arrivalDate'    => $this->arrivalDate,
                 'arrivalTime'    => $this->arrivalTime,
                 'transits'       => $this->transits,
-                'reservationPnr' => $this->reservationPnr,
-                'passengers'     => $this->passengers,
             ]);
     }
 }

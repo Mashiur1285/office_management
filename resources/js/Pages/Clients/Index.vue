@@ -160,6 +160,8 @@
                             <th class="px-6 py-4 whitespace-nowrap">Agent</th>
                             <th class="px-6 py-4 whitespace-nowrap">Status</th>
                             <th class="px-6 py-4 whitespace-nowrap">Passport</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Phone</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Total Amount</th>
                             <th class="px-6 py-4 whitespace-nowrap">Due Amount</th>
                             <th class="px-6 py-4 whitespace-nowrap">VAT Receivable</th>
                             <th class="px-6 py-4 text-right whitespace-nowrap">Actions</th>
@@ -203,6 +205,12 @@
                                 <span class="font-semibold text-gray-700">{{ client.passport_number || "—" }}</span>
                             </td>
                             <td class="px-6 py-4">
+                                <span class="font-semibold text-gray-700">{{ client.mobile || "—" }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-900 text-[14px]">{{ money(client.total_fee) }}</div>
+                            </td>
+                            <td class="px-6 py-4">
                                 <div class="font-bold text-gray-900 text-[14px]">{{ money(client.current_due) }}</div>
                             </td>
                             <td class="px-6 py-4">
@@ -233,7 +241,7 @@
 
                         <!-- Empty States -->
                         <tr v-if="filteredClients.length === 0 && clients.length === 0">
-                            <td colspan="7" class="px-6 py-16 text-center">
+                            <td colspan="9" class="px-6 py-16 text-center">
                                 <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 border border-gray-100">
                                     <font-awesome-icon icon="users" class="w-6 h-6 text-gray-300" />
                                 </div>
@@ -250,7 +258,7 @@
                             </td>
                         </tr>
                         <tr v-if="filteredClients.length === 0 && clients.length > 0">
-                            <td colspan="7" class="px-6 py-16 text-center">
+                            <td colspan="9" class="px-6 py-16 text-center">
                                 <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 border border-gray-100">
                                     <font-awesome-icon icon="search" class="w-6 h-6 text-gray-300" />
                                 </div>

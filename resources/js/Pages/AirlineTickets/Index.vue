@@ -9,13 +9,37 @@
                 <h1 class="text-[32px] font-bold text-gray-900 tracking-tight leading-none mb-2">Airline Tickets</h1>
                 <p class="text-sm text-gray-500">Manage passenger tickets and send flight reschedule notifications</p>
             </div>
-            <Link
-                href="/airline-tickets/create"
-                class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition flex items-center gap-2 shadow-sm w-fit"
-            >
-                <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
-                Add Ticket
-            </Link>
+            <div class="flex items-center gap-2 flex-wrap">
+                <a
+                    :href="`/airline-tickets/export/print${exportQuery}`"
+                    target="_blank"
+                    class="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-50 transition flex items-center gap-2 shadow-sm w-fit"
+                >
+                    <font-awesome-icon icon="print" class="w-3.5 h-3.5" />
+                    Print
+                </a>
+                <a
+                    :href="`/airline-tickets/export/pdf${exportQuery}`"
+                    class="bg-white border border-gray-200 text-red-600 px-4 py-2.5 rounded-full text-sm font-semibold hover:bg-red-50 transition flex items-center gap-2 shadow-sm w-fit"
+                >
+                    <font-awesome-icon icon="file-pdf" class="w-3.5 h-3.5" />
+                    PDF
+                </a>
+                <a
+                    :href="`/airline-tickets/export/excel${exportQuery}`"
+                    class="bg-white border border-gray-200 text-emerald-600 px-4 py-2.5 rounded-full text-sm font-semibold hover:bg-emerald-50 transition flex items-center gap-2 shadow-sm w-fit"
+                >
+                    <font-awesome-icon icon="file-excel" class="w-3.5 h-3.5" />
+                    Excel
+                </a>
+                <Link
+                    href="/airline-tickets/create"
+                    class="bg-[#1d4ed8] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#1e40af] transition flex items-center gap-2 shadow-sm w-fit"
+                >
+                    <font-awesome-icon icon="plus" class="w-3.5 h-3.5" />
+                    Add Ticket
+                </Link>
+            </div>
         </div>
 
         <!-- Stat Cards -->
@@ -126,7 +150,16 @@
                             class="hover:bg-gray-50/50 transition-colors"
                         >
                             <td class="px-5 py-4">
-                                <div class="font-semibold text-gray-900">{{ ticket.passenger_name }}</div>
+                                <div class="font-semibold text-gray-900 flex items-center gap-2">
+                                    {{ ticket.passenger_name }}
+                                    <span
+                                        v-if="ticket.additional_passengers?.length"
+                                        class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-full"
+                                        :title="`${ticket.additional_passengers.length + 1} passengers under this PNR`"
+                                    >
+                                        +{{ ticket.additional_passengers.length }}
+                                    </span>
+                                </div>
                                 <div class="text-xs text-gray-500 mt-0.5">{{ ticket.passenger_email }}</div>
                             </td>
                             <td class="px-5 py-4">
@@ -156,15 +189,17 @@
                                 <div class="flex items-center justify-end gap-1">
                                     <Link
                                         :href="`/airline-tickets/${ticket.id}`"
-                                        class="text-blue-700 hover:text-blue-900 font-semibold text-xs px-3 py-1.5 rounded-lg hover:bg-blue-50 transition"
+                                        title="View"
+                                        class="w-8 h-8 flex items-center justify-center text-blue-700 hover:text-blue-900 rounded-lg hover:bg-blue-50 transition"
                                     >
-                                        View
+                                        <font-awesome-icon icon="eye" class="w-4 h-4" />
                                     </Link>
                                     <Link
                                         :href="`/airline-tickets/${ticket.id}/edit`"
-                                        class="text-gray-600 hover:text-gray-900 font-semibold text-xs px-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
+                                        title="Edit"
+                                        class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition"
                                     >
-                                        Edit
+                                        <font-awesome-icon icon="pen-to-square" class="w-4 h-4" />
                                     </Link>
                                 </div>
                             </td>
@@ -209,6 +244,14 @@ const page   = usePage();
 const flash  = computed(() => page.props.flash ?? {});
 const search       = ref(props.filters?.search ?? '');
 const statusFilter = ref(props.filters?.status ?? '');
+
+const exportQuery = computed(() => {
+    const params = new URLSearchParams();
+    if (search.value) params.set('search', search.value);
+    if (statusFilter.value) params.set('status', statusFilter.value);
+    const qs = params.toString();
+    return qs ? `?${qs}` : '';
+});
 
 let debounceTimer = null;
 

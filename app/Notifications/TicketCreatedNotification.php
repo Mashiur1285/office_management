@@ -26,6 +26,8 @@ class TicketCreatedNotification extends Notification implements ShouldQueue
         private readonly ?string $arrivalDate    = null,
         private readonly ?string $arrivalTime    = null,
         private readonly ?array  $transits       = null,
+        private readonly ?string $reservationPnr = null,
+        private readonly array   $passengers     = [],
     ) {}
 
     public function via($notifiable): array
@@ -52,6 +54,8 @@ class TicketCreatedNotification extends Notification implements ShouldQueue
                 'arrivalDate'    => $this->arrivalDate,
                 'arrivalTime'    => $this->arrivalTime,
                 'transits'       => $this->transits,
+                'reservationPnr' => $this->reservationPnr,
+                'passengers'     => $this->passengers,
             ]);
     }
 }

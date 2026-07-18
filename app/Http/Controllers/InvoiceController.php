@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agent;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -158,9 +159,22 @@ class InvoiceController extends Controller
             ->values()
             ->toArray();
 
+        $agents = Agent::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        $organizations = Client::whereNotNull('organization_name')
+            ->where('organization_name', '!=', '')
+            ->distinct()
+            ->orderBy('organization_name')
+            ->pluck('organization_name')
+            ->values();
+
         return Inertia::render('Invoices/Create', [
             'clients' => $clients,
             'subcategories' => $subcategories,
+            'agents' => $agents,
+            'organizations' => $organizations,
             'defaultTerms' => self::DEFAULT_TERMS,
         ]);
     }

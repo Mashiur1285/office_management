@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AirlineTicketsExport;
 use App\Models\AirlineTicket;
 use App\Models\Client;
 use App\Notifications\FlightDateChangedNotification;
 use App\Notifications\TicketCreatedNotification;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,31 +15,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AirlineTicketController extends Controller
 {
     public function index(Request $request): Response
     {
-        $query = AirlineTicket::query()
-            ->with('client')
-            ->latest();
-
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('passenger_name', 'like', "%{$search}%")
-                    ->orWhere('passenger_email', 'like', "%{$search}%")
-                    ->orWhere('flight_number', 'like', "%{$search}%")
-                    ->orWhere('pnr', 'like', "%{$search}%")
-                    ->orWhere('ticket_number', 'like', "%{$search}%")
-                    ->orWhere('airline_name', 'like', "%{$search}%");
-            });
-        }
-
-        if ($status = $request->input('status')) {
-            $query->where('status', $status);
-        }
-
-        $tickets = $query->paginate(20)->withQueryString();
+        $tickets = $this->filteredQuery($request)->paginate(20)->withQueryString();
 
         $stats = [
             'total'       => AirlineTicket::count(),
@@ -76,10 +60,24 @@ class AirlineTicketController extends Controller
             'airline_name'    => ['required', 'string', 'max:255'],
             'flight_number'   => ['required', 'string', 'max:20'],
             'pnr'             => ['nullable', 'string', 'max:20'],
+            'reservation_pnr' => ['nullable', 'string', 'max:20'],
             'ticket_number'   => ['nullable', 'string', 'max:50'],
+            'additional_passengers'                   => ['nullable', 'array'],
+            'additional_passengers.*.passenger_name'  => ['nullable', 'string', 'max:255'],
+            'additional_passengers.*.passport_number' => ['nullable', 'string', 'max:50'],
+            'additional_passengers.*.ticket_number'   => ['nullable', 'string', 'max:50'],
+            'ticket_class'    => ['nullable', 'string', 'max:50'],
+            'hand_luggage_kg'          => ['nullable', 'string', 'max:50'],
+            'hand_luggage_max_weight'  => ['nullable', 'string', 'max:50'],
+            'cabin_luggage_kg'         => ['nullable', 'string', 'max:50'],
+            'cabin_luggage_max_weight' => ['nullable', 'string', 'max:50'],
+            'complementary_food'       => ['boolean'],
             'issue_date'      => ['nullable', 'date'],
             'origin'          => ['required', 'string', 'max:100'],
             'destination'     => ['required', 'string', 'max:100'],
+            'airport_name'    => ['nullable', 'string', 'max:150'],
+            'terminal'        => ['nullable', 'string', 'max:50'],
+            'gate'            => ['nullable', 'string', 'max:50'],
             'flight_date'     => ['required', 'date'],
             'departure_time'  => ['nullable', 'date_format:H:i'],
             'arrival_date'    => ['nullable', 'date'],
@@ -90,7 +88,13 @@ class AirlineTicketController extends Controller
             'transits.*.date' => ['nullable', 'date'],
             'transits.*.time' => ['nullable', 'date_format:H:i'],
             'status'          => ['required', 'in:confirmed,rescheduled,cancelled,flown'],
+            'is_purchased'    => ['boolean'],
+            'purchase_date'   => ['nullable', 'date'],
             'notes'           => ['nullable', 'string'],
+            'free_cancellation_days'       => ['nullable', 'integer', 'min:0'],
+            'partial_cancellation_days'    => ['nullable', 'integer', 'min:0'],
+            'partial_cancellation_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'no_refund_hours'              => ['nullable', 'integer', 'min:0'],
         ]);
 
         $data['created_by'] = Auth::id();
@@ -114,6 +118,8 @@ class AirlineTicketController extends Controller
                     arrivalDate:    $ticket->arrival_date ? Carbon::parse($ticket->arrival_date)->format('d M Y') : null,
                     arrivalTime:    $ticket->arrival_time,
                     transits:       $ticket->transits,
+                    reservationPnr: $ticket->reservation_pnr,
+                    passengers:     $ticket->allPassengers(),
                 ));
         }
 
@@ -153,10 +159,24 @@ class AirlineTicketController extends Controller
             'airline_name'    => ['required', 'string', 'max:255'],
             'flight_number'   => ['required', 'string', 'max:20'],
             'pnr'             => ['nullable', 'string', 'max:20'],
+            'reservation_pnr' => ['nullable', 'string', 'max:20'],
             'ticket_number'   => ['nullable', 'string', 'max:50'],
+            'additional_passengers'                   => ['nullable', 'array'],
+            'additional_passengers.*.passenger_name'  => ['nullable', 'string', 'max:255'],
+            'additional_passengers.*.passport_number' => ['nullable', 'string', 'max:50'],
+            'additional_passengers.*.ticket_number'   => ['nullable', 'string', 'max:50'],
+            'ticket_class'    => ['nullable', 'string', 'max:50'],
+            'hand_luggage_kg'          => ['nullable', 'string', 'max:50'],
+            'hand_luggage_max_weight'  => ['nullable', 'string', 'max:50'],
+            'cabin_luggage_kg'         => ['nullable', 'string', 'max:50'],
+            'cabin_luggage_max_weight' => ['nullable', 'string', 'max:50'],
+            'complementary_food'       => ['boolean'],
             'issue_date'      => ['nullable', 'date'],
             'origin'          => ['required', 'string', 'max:100'],
             'destination'     => ['required', 'string', 'max:100'],
+            'airport_name'    => ['nullable', 'string', 'max:150'],
+            'terminal'        => ['nullable', 'string', 'max:50'],
+            'gate'            => ['nullable', 'string', 'max:50'],
             'flight_date'     => ['required', 'date'],
             'departure_time'  => ['nullable', 'date_format:H:i'],
             'arrival_date'    => ['nullable', 'date'],
@@ -167,7 +187,13 @@ class AirlineTicketController extends Controller
             'transits.*.date' => ['nullable', 'date'],
             'transits.*.time' => ['nullable', 'date_format:H:i'],
             'status'          => ['required', 'in:confirmed,rescheduled,cancelled,flown'],
+            'is_purchased'    => ['boolean'],
+            'purchase_date'   => ['nullable', 'date'],
             'notes'           => ['nullable', 'string'],
+            'free_cancellation_days'       => ['nullable', 'integer', 'min:0'],
+            'partial_cancellation_days'    => ['nullable', 'integer', 'min:0'],
+            'partial_cancellation_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'no_refund_hours'              => ['nullable', 'integer', 'min:0'],
         ]);
 
         $airlineTicket->update($data);
@@ -224,9 +250,76 @@ class AirlineTicketController extends Controller
                     arrivalDate:    $airlineTicket->arrival_date ? Carbon::parse($airlineTicket->arrival_date)->format('d M Y') : null,
                     arrivalTime:    $airlineTicket->arrival_time,
                     transits:       $airlineTicket->transits,
+                    reservationPnr: $airlineTicket->reservation_pnr,
+                    passengers:     $airlineTicket->allPassengers(),
                 ));
         }
 
         return back()->with('success', "Flight rescheduled. Notification sent to {$airlineTicket->passenger_email}.");
+    }
+
+    /**
+     * PDF for a single ticket. ?action=download forces download, otherwise streams inline (for printing).
+     */
+    public function ticketPdf(Request $request, AirlineTicket $airlineTicket)
+    {
+        $airlineTicket->load('client', 'creator');
+
+        $pdf = Pdf::loadView('pdfs.airline_ticket', ['ticket' => $airlineTicket]);
+        $fileName = 'ticket-' . ($airlineTicket->pnr ?: $airlineTicket->id) . '.pdf';
+
+        if ($request->query('action') === 'download') {
+            return $pdf->download($fileName);
+        }
+
+        return $pdf->stream($fileName);
+    }
+
+    /**
+     * Export the (filtered) ticket list as excel, pdf (download) or print (inline pdf).
+     */
+    public function export(Request $request, string $type)
+    {
+        $tickets = $this->filteredQuery($request)->get();
+        $date    = now()->format('Y-m-d');
+
+        if ($type === 'excel') {
+            return Excel::download(new AirlineTicketsExport($tickets), "airline-tickets-{$date}.xlsx");
+        }
+
+        $pdf = Pdf::loadView('pdfs.airline_tickets_list', [
+            'tickets' => $tickets,
+            'filters' => $request->only(['search', 'status']),
+        ]);
+
+        if ($type === 'print') {
+            return $pdf->stream("airline-tickets-{$date}.pdf");
+        }
+
+        return $pdf->download("airline-tickets-{$date}.pdf");
+    }
+
+    private function filteredQuery(Request $request)
+    {
+        $query = AirlineTicket::query()
+            ->with('client')
+            ->latest();
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('passenger_name', 'like', "%{$search}%")
+                    ->orWhere('passenger_email', 'like', "%{$search}%")
+                    ->orWhere('flight_number', 'like', "%{$search}%")
+                    ->orWhere('pnr', 'like', "%{$search}%")
+                    ->orWhere('ticket_number', 'like', "%{$search}%")
+                    ->orWhere('airline_name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        return $query;
     }
 }

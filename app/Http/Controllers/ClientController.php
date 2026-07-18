@@ -98,6 +98,7 @@ class ClientController extends Controller
                     'status' => $status['label'],
                     'status_value' => $status['value'],
                     'status_badge' => $status['badge'],
+                    'total_fee' => (float) $client->total_fee,
                     'current_due' => $client->current_due,
                     'vat_receivable' => (float) $vatReceivable,
                     'vat_paid_amount' => $vatPaidAmount,
@@ -483,9 +484,11 @@ class ClientController extends Controller
 
         $paymentSource = $data['payment_source'] ?? 'client';
         $paymentAgentId = $data['payment_agent_id'] ?? null;
+        $paymentMethod = $data['payment_method'] ?? null;
+        $paymentNotes = $data['payment_notes'] ?? null;
         $paidAmount = (float) ($data['partial_paid_amount'] ?? 0);
 
-        $data = collect($data)->except(array_keys($fileFields))->except(['payment_source', 'payment_agent_id'])->toArray();
+        $data = collect($data)->except(array_keys($fileFields))->except(['payment_source', 'payment_agent_id', 'payment_method', 'payment_notes'])->toArray();
 
         $client = Client::create($data);
 
@@ -495,6 +498,8 @@ class ClientController extends Controller
                 'source' => $paymentSource,
                 'agent_id' => $paymentSource === 'agent' ? $paymentAgentId : null,
                 'amount' => $paidAmount,
+                'payment_method' => $paymentMethod,
+                'notes' => $paymentNotes,
                 'payment_date' => $data['partial_payment_date'] ?? now()->toDateString(),
                 'created_by' => auth()->id(),
             ]);
@@ -505,12 +510,45 @@ class ClientController extends Controller
             ->with('success', 'Client created successfully.');
     }
 
+    /**
+     * Lightweight client creation used by the inline "+" button on other forms (e.g. quotations).
+     * Returns JSON so the caller can add the new client to its dropdown without a page reload.
+     */
+    public function quickStore(Request $request)
+    {
+        $data = $request->validate([
+            'name'              => ['required', 'string', 'max:255'],
+            'passport_number'   => ['required', 'string', 'max:100', 'unique:clients,passport_number'],
+            'email'             => ['nullable', 'email', 'max:255'],
+            'mobile'            => ['nullable', 'string', 'max:50'],
+            'organization_name' => ['nullable', 'string', 'max:255'],
+            'agent_id'          => ['nullable', 'integer', 'exists:agents,id'],
+        ]);
+
+        $client = Client::create($data);
+        $client->load('agent:id,name');
+
+        return response()->json([
+            'client' => [
+                'id'                => $client->id,
+                'name'              => $client->name,
+                'organization_name' => $client->organization_name,
+                'email'             => $client->email,
+                'mobile'            => $client->mobile,
+                'passport_number'   => $client->passport_number,
+                'agent_name'        => $client->agent?->name,
+            ],
+        ], 201);
+    }
+
     public function update(UpdateClientRequest $request, Client $client)
     {
         $data = $request->validated();
         $paymentSource = $data['payment_source'] ?? null;
         $paymentAgentId = $data['payment_agent_id'] ?? null;
-        unset($data['payment_source'], $data['payment_agent_id']);
+        $paymentMethod = $data['payment_method'] ?? null;
+        $paymentNotes = $data['payment_notes'] ?? null;
+        unset($data['payment_source'], $data['payment_agent_id'], $data['payment_method'], $data['payment_notes']);
 
         $fileFields = [
             'photo' => 'photo_path',
@@ -565,6 +603,8 @@ class ClientController extends Controller
                 'source' => $paymentSource ?? 'client',
                 'agent_id' => ($paymentSource === 'agent') ? $paymentAgentId : null,
                 'amount' => $delta,
+                'payment_method' => $paymentMethod,
+                'notes' => $paymentNotes,
                 'payment_date' => $data['partial_payment_date'] ?? now()->toDateString(),
                 'created_by' => auth()->id(),
             ]);

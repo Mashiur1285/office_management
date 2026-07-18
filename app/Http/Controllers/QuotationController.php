@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agent;
 use App\Models\Client;
 use App\Models\OfficeStaff;
 use App\Models\Quotation;
@@ -154,10 +155,23 @@ class QuotationController extends Controller
             ->values()
             ->toArray();
 
+        $agents = Agent::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        $organizations = Client::whereNotNull('organization_name')
+            ->where('organization_name', '!=', '')
+            ->distinct()
+            ->orderBy('organization_name')
+            ->pluck('organization_name')
+            ->values();
+
         return Inertia::render('Quotations/Create', [
             'clients' => $clients,
             'officeStaff' => $officeStaff,
             'subcategories' => $subcategories,
+            'agents' => $agents,
+            'organizations' => $organizations,
             'defaultTerms' => self::DEFAULT_TERMS,
             'companyDefaults' => [
                 'phone' => '+88 01716 864 109 / +88 01332 502 234',

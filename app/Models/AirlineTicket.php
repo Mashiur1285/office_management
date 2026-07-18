@@ -16,10 +16,21 @@ class AirlineTicket extends Model
         'airline_name',
         'flight_number',
         'pnr',
+        'reservation_pnr',
+        'additional_passengers',
         'ticket_number',
+        'ticket_class',
+        'hand_luggage_kg',
+        'hand_luggage_max_weight',
+        'cabin_luggage_kg',
+        'cabin_luggage_max_weight',
+        'complementary_food',
         'issue_date',
         'origin',
         'destination',
+        'airport_name',
+        'terminal',
+        'gate',
         'flight_date',
         'original_flight_date',
         'departure_time',
@@ -28,7 +39,13 @@ class AirlineTicket extends Model
         'has_transit',
         'transits',
         'status',
+        'is_purchased',
+        'purchase_date',
         'notes',
+        'free_cancellation_days',
+        'partial_cancellation_days',
+        'partial_cancellation_percent',
+        'no_refund_hours',
         'created_by',
     ];
 
@@ -38,8 +55,29 @@ class AirlineTicket extends Model
         'issue_date'           => 'date',
         'arrival_date'         => 'date',
         'has_transit'          => 'boolean',
+        'complementary_food'   => 'boolean',
+        'is_purchased'         => 'boolean',
+        'purchase_date'        => 'date',
         'transits'             => 'array',
+        'additional_passengers' => 'array',
     ];
+
+    /**
+     * All passengers under this PNR: the primary passenger followed by any additional ones.
+     *
+     * @return array<int, array{passenger_name: ?string, passport_number: ?string, ticket_number: ?string}>
+     */
+    public function allPassengers(): array
+    {
+        return array_merge(
+            [[
+                'passenger_name'  => $this->passenger_name,
+                'passport_number' => $this->passport_number,
+                'ticket_number'   => $this->ticket_number,
+            ]],
+            $this->additional_passengers ?? []
+        );
+    }
 
     public function client(): BelongsTo
     {

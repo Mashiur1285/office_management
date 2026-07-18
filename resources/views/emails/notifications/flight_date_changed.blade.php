@@ -100,8 +100,8 @@
                     </div>
                     <div class="flight-no">
                         Flight {{ $flightNumber }}
-                        @if($pnr) &nbsp;·&nbsp; PNR: <strong>{{ $pnr }}</strong> @endif
-                        @if($ticketNumber) &nbsp;·&nbsp; Ticket: <strong>{{ $ticketNumber }}</strong> @endif
+                        @if($pnr) &nbsp;·&nbsp; Airline PNR: <strong>{{ $pnr }}</strong> @endif
+                        @if(!empty($reservationPnr)) &nbsp;·&nbsp; Res PNR: <strong>{{ $reservationPnr }}</strong> @endif
                     </div>
                 </div>
 
@@ -123,34 +123,46 @@
                     </div>
                 </div>
 
+                @php
+                    $rows = !empty($passengers) ? $passengers : [[
+                        'passenger_name'  => $passengerName,
+                        'passport_number' => $passportNumber,
+                        'ticket_number'   => $ticketNumber,
+                    ]];
+                @endphp
+
                 <!-- Passenger Info -->
-                <div class="section-title">Passenger Information</div>
-                <div>
-                    <div class="info-row">
-                        <span class="info-label">Full Name</span>
-                        <span class="info-value">{{ $passengerName }}</span>
-                    </div>
-                    @if(!empty($passportNumber))
-                    <div class="info-row">
-                        <span class="info-label">Passport Number</span>
-                        <span class="info-value">{{ $passportNumber }}</span>
-                    </div>
-                    @endif
-                </div>
+                <div class="section-title">Passenger Information @if(count($rows) > 1)({{ count($rows) }} passengers)@endif</div>
+                <table width="100%" style="border-collapse:collapse; margin-top:6px;">
+                    <tr>
+                        <th align="left" style="padding:8px 10px; background:#f3f4f6; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6b7280; border:1px solid #e5e7eb;">#</th>
+                        <th align="left" style="padding:8px 10px; background:#f3f4f6; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6b7280; border:1px solid #e5e7eb;">Full Name</th>
+                        <th align="left" style="padding:8px 10px; background:#f3f4f6; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6b7280; border:1px solid #e5e7eb;">Passport No.</th>
+                        <th align="left" style="padding:8px 10px; background:#f3f4f6; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6b7280; border:1px solid #e5e7eb;">Ticket No.</th>
+                    </tr>
+                    @foreach($rows as $i => $p)
+                    <tr>
+                        <td style="padding:8px 10px; font-size:14px; color:#6b7280; border:1px solid #e5e7eb;">{{ $i + 1 }}</td>
+                        <td style="padding:8px 10px; font-size:14px; color:#111827; font-weight:600; border:1px solid #e5e7eb;">{{ $p['passenger_name'] ?? '—' }}</td>
+                        <td style="padding:8px 10px; font-size:14px; color:#111827; border:1px solid #e5e7eb;">{{ ($p['passport_number'] ?? '') ?: '—' }}</td>
+                        <td style="padding:8px 10px; font-size:14px; color:#111827; border:1px solid #e5e7eb;">{{ ($p['ticket_number'] ?? '') ?: '—' }}</td>
+                    </tr>
+                    @endforeach
+                </table>
 
                 <!-- Ticket Details -->
                 <div class="section-title">Ticket Details</div>
                 <div>
-                    @if(!empty($ticketNumber))
-                    <div class="info-row">
-                        <span class="info-label">Ticket Number</span>
-                        <span class="info-value">{{ $ticketNumber }}</span>
-                    </div>
-                    @endif
                     @if(!empty($pnr))
                     <div class="info-row">
-                        <span class="info-label">PNR</span>
+                        <span class="info-label">Airline PNR</span>
                         <span class="info-value">{{ $pnr }}</span>
+                    </div>
+                    @endif
+                    @if(!empty($reservationPnr))
+                    <div class="info-row">
+                        <span class="info-label">Reservation / Guest PNR</span>
+                        <span class="info-value">{{ $reservationPnr }}</span>
                     </div>
                     @endif
                     @if(!empty($issueDate))

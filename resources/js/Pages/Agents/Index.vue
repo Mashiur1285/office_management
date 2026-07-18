@@ -123,6 +123,8 @@
                             <th class="px-6 py-4 whitespace-nowrap">District</th>
                             <th class="px-6 py-4 whitespace-nowrap">Services</th>
                             <th class="px-6 py-4 whitespace-nowrap text-right">Clients</th>
+                            <th class="px-6 py-4 whitespace-nowrap text-right">Total Amount</th>
+                            <th class="px-6 py-4 whitespace-nowrap text-right">Due</th>
                             <th class="px-6 py-4 whitespace-nowrap text-right">Actions</th>
                         </tr>
                     </thead>
@@ -154,6 +156,12 @@
                                     {{ agent.clients_count }}
                                 </span>
                             </td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="font-bold text-gray-900 text-[14px]">{{ money(agent.total_amount) }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="font-bold text-[14px]" :class="Number(agent.total_due) > 0 ? 'text-rose-600' : 'text-gray-400'">{{ money(agent.total_due) }}</span>
+                            </td>
                             <td class="px-6 py-4 text-right border-l border-transparent group-hover:border-gray-100">
                                 <div class="flex items-center justify-end gap-1.5 transition-opacity">
                                     <button @click="router.visit(props.readOnly ? `/database/agents/${agent.id}` : `/agents/${agent.id}`)" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#1d4ed8] hover:bg-blue-50 transition" title="View">
@@ -167,7 +175,7 @@
                         </tr>
                         <!-- Empty States -->
                         <tr v-if="filteredAgents.length === 0 && agents.length === 0">
-                            <td colspan="6" class="px-6 py-16 text-center">
+                            <td colspan="8" class="px-6 py-16 text-center">
                                 <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 border border-gray-100">
                                     <font-awesome-icon icon="address-card" class="w-6 h-6 text-gray-300" />
                                 </div>
@@ -184,7 +192,7 @@
                             </td>
                         </tr>
                         <tr v-if="filteredAgents.length === 0 && agents.length > 0">
-                            <td colspan="6" class="px-6 py-16 text-center">
+                            <td colspan="8" class="px-6 py-16 text-center">
                                 <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 border border-gray-100">
                                     <font-awesome-icon icon="search" class="w-6 h-6 text-gray-300" />
                                 </div>
@@ -223,6 +231,16 @@ const props = defineProps({
 
 const agents = props.agents || [];
 const searchQuery = ref("");
+
+const money = (value) => {
+    return (
+        "৳" +
+        new Intl.NumberFormat("en-BD", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(Number(value || 0))
+    );
+};
 
 const stats = computed(() => ({
     totalClients: agents.reduce((sum, a) => sum + (a.clients_count || 0), 0),

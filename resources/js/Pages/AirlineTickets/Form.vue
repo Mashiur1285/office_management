@@ -33,17 +33,69 @@
 
                 <!-- Section: Passenger -->
                 <div>
-                    <h2 class="section-title">Passenger Info</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label class="label">Full Name <span class="req">*</span></label>
-                            <input v-model="form.passenger_name" type="text" class="input" placeholder="Full name" />
-                            <p v-if="form.errors.passenger_name" class="err">{{ form.errors.passenger_name }}</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="section-title mb-0">Passenger Info</h2>
+                        <span class="text-xs text-gray-400">{{ 1 + form.additional_passengers.length }} passenger(s) under this PNR</span>
+                    </div>
+
+                    <!-- Passenger rows (multiple under one PNR) -->
+                    <div class="space-y-3">
+                        <!-- Primary passenger -->
+                        <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_auto] gap-3 sm:items-end">
+                            <div>
+                                <label class="label">Full Name <span class="req">*</span></label>
+                                <input v-model="form.passenger_name" type="text" class="input" placeholder="Full name" />
+                                <p v-if="form.errors.passenger_name" class="err">{{ form.errors.passenger_name }}</p>
+                            </div>
+                            <div>
+                                <label class="label">Passport Number</label>
+                                <input v-model="form.passport_number" type="text" class="input font-mono" placeholder="e.g. AB1234567" />
+                            </div>
+                            <div>
+                                <label class="label">Ticket Number</label>
+                                <input v-model="form.ticket_number" type="text" class="input font-mono" placeholder="e.g. 997-1234567890" />
+                            </div>
+                            <button
+                                type="button"
+                                @click="addPassenger"
+                                title="Add another passenger"
+                                class="h-[42px] w-[42px] flex-shrink-0 flex items-center justify-center rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition"
+                            >
+                                <font-awesome-icon icon="plus" class="w-4 h-4" />
+                            </button>
                         </div>
-                        <div>
-                            <label class="label">Passport Number</label>
-                            <input v-model="form.passport_number" type="text" class="input font-mono" placeholder="e.g. AB1234567" />
+
+                        <!-- Additional passengers -->
+                        <div
+                            v-for="(p, idx) in form.additional_passengers"
+                            :key="idx"
+                            class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_auto] gap-3 sm:items-end"
+                        >
+                            <div>
+                                <label class="label sm:hidden">Full Name</label>
+                                <input v-model="p.passenger_name" type="text" class="input" placeholder="Full name" />
+                            </div>
+                            <div>
+                                <label class="label sm:hidden">Passport Number</label>
+                                <input v-model="p.passport_number" type="text" class="input font-mono" placeholder="e.g. AB1234567" />
+                            </div>
+                            <div>
+                                <label class="label sm:hidden">Ticket Number</label>
+                                <input v-model="p.ticket_number" type="text" class="input font-mono" placeholder="e.g. 997-1234567890" />
+                            </div>
+                            <button
+                                type="button"
+                                @click="removePassenger(idx)"
+                                title="Remove passenger"
+                                class="h-[42px] w-[42px] flex-shrink-0 flex items-center justify-center rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition"
+                            >
+                                <font-awesome-icon icon="trash" class="w-4 h-4" />
+                            </button>
                         </div>
+                    </div>
+
+                    <!-- Contact / booking-level fields -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100">
                         <div>
                             <label class="label">Phone</label>
                             <input v-model="form.passenger_phone" type="text" class="input" placeholder="+880..." />
@@ -53,7 +105,7 @@
                             <input v-model="form.passenger_email" type="email" class="input" placeholder="email@example.com" />
                             <p v-if="form.errors.passenger_email" class="err">{{ form.errors.passenger_email }}</p>
                         </div>
-                        <div class="sm:col-span-2">
+                        <div>
                             <label class="label">Link to Client <span class="text-gray-400 font-normal">(optional)</span></label>
                             <select v-model="form.client_id" class="input">
                                 <option :value="null">— No client link —</option>
@@ -70,12 +122,22 @@
                     <h2 class="section-title">Ticket Information</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div>
-                            <label class="label">Ticket Number</label>
-                            <input v-model="form.ticket_number" type="text" class="input font-mono" placeholder="e.g. 997-1234567890" />
+                            <label class="label">Airline PNR Number</label>
+                            <input v-model="form.pnr" type="text" class="input font-mono" placeholder="e.g. ABCDEF" />
                         </div>
                         <div>
-                            <label class="label">PNR Number</label>
-                            <input v-model="form.pnr" type="text" class="input font-mono" placeholder="e.g. ABCDEF" />
+                            <label class="label">Reservation / Guest PNR</label>
+                            <input v-model="form.reservation_pnr" type="text" class="input font-mono" placeholder="e.g. GUEST123" />
+                        </div>
+                        <div>
+                            <label class="label">Ticket Class</label>
+                            <select v-model="form.ticket_class" class="input">
+                                <option value="">— Select —</option>
+                                <option value="Economy">Economy</option>
+                                <option value="Premium Economy">Premium Economy</option>
+                                <option value="Business">Business</option>
+                                <option value="First">First</option>
+                            </select>
                         </div>
                         <div>
                             <label class="label">Issue Date</label>
@@ -89,6 +151,82 @@
                                 <option value="cancelled">Cancelled</option>
                                 <option value="flown">Flown</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Purchase / Procurement -->
+                    <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/40 p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <font-awesome-icon icon="receipt" class="w-4 h-4 text-emerald-600" />
+                            <span class="label mb-0">Ticket Purchased?</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-500">No</span>
+                                <button
+                                    type="button"
+                                    @click="form.is_purchased = !form.is_purchased"
+                                    :class="['relative inline-flex h-6 w-11 items-center rounded-full transition-colors', form.is_purchased ? 'bg-emerald-500' : 'bg-gray-200']"
+                                >
+                                    <span :class="['inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform', form.is_purchased ? 'translate-x-6' : 'translate-x-1']"></span>
+                                </button>
+                                <span class="text-sm text-gray-500">Yes</span>
+                            </div>
+                        </div>
+                        <div v-if="form.is_purchased" class="sm:ml-auto">
+                            <label class="label">Purchase Date</label>
+                            <input v-model="form.purchase_date" type="date" class="input" />
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100" />
+
+                <!-- Section: Luggage & Amenities -->
+                <div>
+                    <h2 class="section-title">Luggage &amp; Amenities</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+                            <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <font-awesome-icon icon="suitcase-rolling" class="w-3.5 h-3.5" /> Hand Luggage
+                            </h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="label">Allowance (kg)</label>
+                                    <input v-model="form.hand_luggage_kg" type="text" class="input" placeholder="e.g. 7" />
+                                </div>
+                                <div>
+                                    <label class="label">Max Weight (kg)</label>
+                                    <input v-model="form.hand_luggage_max_weight" type="text" class="input" placeholder="e.g. 10" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+                            <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <font-awesome-icon icon="suitcase" class="w-3.5 h-3.5" /> Cabin Luggage
+                            </h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="label">Allowance (kg)</label>
+                                    <input v-model="form.cabin_luggage_kg" type="text" class="input" placeholder="e.g. 23" />
+                                </div>
+                                <div>
+                                    <label class="label">Max Weight (kg)</label>
+                                    <input v-model="form.cabin_luggage_max_weight" type="text" class="input" placeholder="e.g. 30" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-3">
+                        <span class="label mb-0">Complementary Food</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">No</span>
+                            <button
+                                type="button"
+                                @click="form.complementary_food = !form.complementary_food"
+                                :class="['relative inline-flex h-6 w-11 items-center rounded-full transition-colors', form.complementary_food ? 'bg-emerald-500' : 'bg-gray-200']"
+                            >
+                                <span :class="['inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform', form.complementary_food ? 'translate-x-6' : 'translate-x-1']"></span>
+                            </button>
+                            <span class="text-sm text-gray-500">Yes</span>
                         </div>
                     </div>
                 </div>
@@ -108,6 +246,20 @@
                             <label class="label">Flight Number <span class="req">*</span></label>
                             <input v-model="form.flight_number" type="text" class="input" placeholder="e.g. BG-001" />
                             <p v-if="form.errors.flight_number" class="err">{{ form.errors.flight_number }}</p>
+                        </div>
+                        <div>
+                            <label class="label">Airport Name</label>
+                            <input v-model="form.airport_name" type="text" class="input" placeholder="e.g. Hazrat Shahjalal Intl" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="label">Terminal</label>
+                                <input v-model="form.terminal" type="text" class="input" placeholder="e.g. T2" />
+                            </div>
+                            <div>
+                                <label class="label">Gate</label>
+                                <input v-model="form.gate" type="text" class="input" placeholder="e.g. 12B" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -207,6 +359,32 @@
                     </div>
                 </div>
 
+                <!-- Cancellation Policy -->
+                <div class="rounded-xl border border-red-100 bg-red-50/30 p-4">
+                    <h3 class="text-xs font-bold text-red-700 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <font-awesome-icon icon="ban" class="w-3.5 h-3.5" /> Cancellation Policy
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex flex-wrap items-center gap-2 text-gray-700">
+                            <span>Free cancellation before</span>
+                            <input v-model="form.free_cancellation_days" type="number" min="0" class="input w-20 text-center" placeholder="0" />
+                            <span>days.</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 text-gray-700">
+                            <span>Partial cancellation before</span>
+                            <input v-model="form.partial_cancellation_days" type="number" min="0" class="input w-20 text-center" placeholder="0" />
+                            <span>days, charged</span>
+                            <input v-model="form.partial_cancellation_percent" type="number" min="0" max="100" step="0.01" class="input w-20 text-center" placeholder="0" />
+                            <span>% of the ticket fee.</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 text-gray-700">
+                            <span>No refund before</span>
+                            <input v-model="form.no_refund_hours" type="number" min="0" class="input w-20 text-center" placeholder="0" />
+                            <span>hours.</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Notes -->
                 <div>
                     <label class="label">Notes</label>
@@ -254,10 +432,25 @@ const form = useForm({
     airline_name:    props.ticket?.airline_name    ?? '',
     flight_number:   props.ticket?.flight_number   ?? '',
     pnr:             props.ticket?.pnr             ?? '',
+    reservation_pnr: props.ticket?.reservation_pnr ?? '',
     ticket_number:   props.ticket?.ticket_number   ?? '',
+    additional_passengers: props.ticket?.additional_passengers?.map(p => ({
+        passenger_name:  p.passenger_name  ?? '',
+        passport_number: p.passport_number ?? '',
+        ticket_number:   p.ticket_number   ?? '',
+    })) ?? [],
+    ticket_class:    props.ticket?.ticket_class    ?? '',
+    hand_luggage_kg:          props.ticket?.hand_luggage_kg          ?? '',
+    hand_luggage_max_weight:  props.ticket?.hand_luggage_max_weight  ?? '',
+    cabin_luggage_kg:         props.ticket?.cabin_luggage_kg         ?? '',
+    cabin_luggage_max_weight: props.ticket?.cabin_luggage_max_weight ?? '',
+    complementary_food:       props.ticket?.complementary_food       ?? false,
     issue_date:      props.ticket?.issue_date      ?? '',
     origin:          props.ticket?.origin          ?? '',
     destination:     props.ticket?.destination     ?? '',
+    airport_name:    props.ticket?.airport_name    ?? '',
+    terminal:        props.ticket?.terminal        ?? '',
+    gate:            props.ticket?.gate            ?? '',
     flight_date:     props.ticket?.flight_date     ?? '',
     departure_time:  props.ticket?.departure_time  ?? '',
     arrival_date:    props.ticket?.arrival_date    ?? '',
@@ -265,8 +458,22 @@ const form = useForm({
     has_transit:     props.ticket?.has_transit     ?? false,
     transits:        props.ticket?.transits        ?? [{ at: '', date: '', time: '' }],
     status:          props.ticket?.status          ?? 'confirmed',
+    is_purchased:    props.ticket?.is_purchased    ?? false,
+    purchase_date:   props.ticket?.purchase_date   ?? '',
     notes:           props.ticket?.notes           ?? '',
+    free_cancellation_days:       props.ticket?.free_cancellation_days       ?? '',
+    partial_cancellation_days:    props.ticket?.partial_cancellation_days    ?? '',
+    partial_cancellation_percent: props.ticket?.partial_cancellation_percent ?? '',
+    no_refund_hours:              props.ticket?.no_refund_hours              ?? '',
 });
+
+function addPassenger() {
+    form.additional_passengers.push({ passenger_name: '', passport_number: '', ticket_number: '' });
+}
+
+function removePassenger(idx) {
+    form.additional_passengers.splice(idx, 1);
+}
 
 function addTransit() {
     form.transits.push({ at: '', date: '', time: '' });

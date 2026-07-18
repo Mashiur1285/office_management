@@ -1,6 +1,15 @@
 @php
-    $zulia_footer_logo = public_path('images/zulia.jpeg');
+    $footerSettings = \App\Models\Setting::getSettings();
+    $footerAppName  = $footerSettings->app_name ?? 'Zulia Tours & Travels BD Limited';
+
+    if ($footerSettings->logo_path && \Storage::disk('public')->exists($footerSettings->logo_path)) {
+        $zulia_footer_logo = storage_path('app/public/' . $footerSettings->logo_path);
+    } else {
+        $zulia_footer_logo = public_path('images/zulia.jpeg');
+    }
 @endphp
+
+@if($footerSettings->letterhead_enabled)
 <style>
     #pdf-footer {
         position: fixed;
@@ -15,22 +24,33 @@
 <table id="pdf-footer" style="width:100%; border-collapse:collapse; border:none; border-top:2px solid #1a3a8f; background:#fff;">
     <tr>
         <td style="border:none; width:46px; vertical-align:middle; padding-right:12px; padding-top:8px; padding-bottom:6px;">
-            <img src="{{ $zulia_footer_logo }}" alt="Zulia Logo" style="height:36px; width:36px; object-fit:contain;" />
+            <img src="{{ $zulia_footer_logo }}" alt="Logo" style="height:36px; width:36px; object-fit:contain;" />
         </td>
         <td style="border:none; vertical-align:middle; padding-top:8px; padding-bottom:6px;">
             <div style="font-size:10px; font-weight:800; color:#1a3a8f; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px;">
-                Zulia Tours &amp; Travels BD Limited
+                {{ $footerAppName }}
             </div>
+            @if($footerSettings->company_address)
             <div style="font-size:7.5px; color:#4b5563; margin-bottom:2px;">
-                <strong style="color:#374151;">Address:</strong>&nbsp;
-                25,26,27, Kazi Nazrul Islam Avenue, Banglamotor Trade Center, (Former Happy Rahman Plaza) 4th Floor, Banglamotor Shahbagh, Dhaka-1000.
+                <strong style="color:#374151;">Address:</strong>&nbsp;{{ $footerSettings->company_address }}
             </div>
+            @endif
+            @if($footerSettings->company_phone)
             <div style="font-size:7.5px; color:#4b5563; margin-bottom:2px;">
-                <strong style="color:#374151;">Mobile:</strong>&nbsp;+88 01716 864 109 / +88 01332 502 234
+                <strong style="color:#374151;">Mobile:</strong>&nbsp;{{ $footerSettings->company_phone }}
             </div>
+            @endif
+            @if($footerSettings->company_email)
             <div style="font-size:7.5px; color:#4b5563;">
-                <strong style="color:#374151;">Email:</strong>&nbsp;zulia.tourstravelsbd@gmail.com
+                <strong style="color:#374151;">Email:</strong>&nbsp;{{ $footerSettings->company_email }}
             </div>
+            @endif
+            @if($footerSettings->footer_note)
+            <div style="font-size:7.5px; color:#64748b; font-style:italic; margin-top:3px;">
+                {{ $footerSettings->footer_note }}
+            </div>
+            @endif
         </td>
     </tr>
 </table>
+@endif

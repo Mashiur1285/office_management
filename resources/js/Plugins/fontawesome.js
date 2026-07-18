@@ -134,7 +134,10 @@ import {
     faLock,
     faRotate,
     faPlaneSlash,
-    faPaperPlane
+    faPaperPlane,
+    faSuitcase,
+    faSuitcaseRolling,
+    faBan
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
@@ -273,7 +276,10 @@ library.add(
     faLock,
     faRotate,
     faPlaneSlash,
-    faPaperPlane
+    faPaperPlane,
+    faSuitcase,
+    faSuitcaseRolling,
+    faBan
 );
 
 export default {

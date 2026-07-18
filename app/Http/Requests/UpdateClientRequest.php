@@ -58,6 +58,8 @@ class UpdateClientRequest extends FormRequest
             'partial_payment_date' => ['nullable', 'date'],
             'payment_source' => ['nullable', 'in:client,agent'],
             'payment_agent_id' => ['nullable', 'integer', 'exists:agents,id'],
+            'payment_method' => ['nullable', 'in:bank,cash,mfs'],
+            'payment_notes' => ['nullable', 'string', 'max:1000'],
             'next_payment_amount' => ['nullable', 'numeric', 'min:0'],
             'next_payment_date' => ['nullable', 'date'],
             'final_payment' => ['nullable', 'numeric', 'min:0'],

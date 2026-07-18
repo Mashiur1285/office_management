@@ -73,6 +73,10 @@ Route::middleware('auth')->group(function () {
         Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
     });
 
+    // Inline "+" quick-create endpoints (used by forms such as quotation create)
+    Route::post('clients/quick-store', [ClientController::class, 'quickStore'])->name('clients.quick-store');
+    Route::post('agents/quick-store', [AgentController::class, 'quickStore'])->name('agents.quick-store');
+
     Route::middleware('permission:quotation.add')->group(function () {
         Route::get('quotations/create', [QuotationController::class, 'create'])->name('quotations.create');
         Route::post('quotations', [QuotationController::class, 'store'])->name('quotations.store');
@@ -108,7 +112,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // Airline Tickets
+    Route::get('airline-tickets/export/{type}', [AirlineTicketController::class, 'export'])
+        ->name('airline-tickets.export');
     Route::resource('airline-tickets', AirlineTicketController::class);
+    Route::get('airline-tickets/{airlineTicket}/pdf', [AirlineTicketController::class, 'ticketPdf'])
+        ->name('airline-tickets.pdf');
     Route::post('airline-tickets/{airlineTicket}/reschedule', [AirlineTicketController::class, 'reschedule'])
         ->name('airline-tickets.reschedule');
 

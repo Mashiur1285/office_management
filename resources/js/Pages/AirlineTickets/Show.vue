@@ -22,7 +22,10 @@
                                         {{ ticket.airline_name }}
                                     </span>
                                     <span v-if="ticket.pnr" class="bg-white/20 px-3 py-1 rounded-full font-mono">
-                                        PNR: {{ ticket.pnr }}
+                                        Airline PNR: {{ ticket.pnr }}
+                                    </span>
+                                    <span v-if="ticket.reservation_pnr" class="bg-white/20 px-3 py-1 rounded-full font-mono">
+                                        Res PNR: {{ ticket.reservation_pnr }}
                                     </span>
                                 </div>
                             </div>
@@ -32,6 +35,14 @@
                                 <font-awesome-icon icon="arrow-left" class="w-4 h-4" />
                                 Back
                             </Link>
+                            <a :href="`/airline-tickets/${ticket.id}/pdf`" target="_blank" class="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition">
+                                <font-awesome-icon icon="print" class="w-4 h-4" />
+                                Print
+                            </a>
+                            <a :href="`/airline-tickets/${ticket.id}/pdf?action=download`" class="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition">
+                                <font-awesome-icon icon="file-pdf" class="w-4 h-4" />
+                                PDF
+                            </a>
                             <Link :href="`/airline-tickets/${ticket.id}/edit`" class="flex items-center gap-2 px-5 py-2.5 bg-white text-[#1d4ed8] hover:bg-blue-50 rounded-xl text-sm font-semibold shadow transition">
                                 <font-awesome-icon icon="pen" class="w-4 h-4" />
                                 Edit
@@ -71,7 +82,11 @@
                         <div class="flex items-center justify-center gap-4 py-5 mb-5 bg-gray-50 rounded-xl">
                             <div class="text-center">
                                 <div class="text-3xl font-black text-gray-900 tracking-wide">{{ ticket.origin }}</div>
-                                <div class="text-xs text-gray-500 mt-1 font-medium">Origin</div>
+                                <div class="text-[10px] text-gray-400 mt-1 font-semibold uppercase tracking-wider">Departure</div>
+                                <div class="text-sm font-semibold text-gray-700 mt-0.5">
+                                    {{ formatDate(ticket.flight_date) }}
+                                    <span v-if="ticket.departure_time" class="text-gray-500 font-normal">· {{ ticket.departure_time }}</span>
+                                </div>
                             </div>
                             <div class="flex-1 flex items-center gap-2 px-4">
                                 <div class="flex-1 border-t-2 border-dashed border-gray-300"></div>
@@ -80,7 +95,11 @@
                             </div>
                             <div class="text-center">
                                 <div class="text-3xl font-black text-gray-900 tracking-wide">{{ ticket.destination }}</div>
-                                <div class="text-xs text-gray-500 mt-1 font-medium">Destination</div>
+                                <div class="text-[10px] text-gray-400 mt-1 font-semibold uppercase tracking-wider">Arrival</div>
+                                <div class="text-sm font-semibold text-gray-700 mt-0.5">
+                                    {{ ticket.arrival_date ? formatDate(ticket.arrival_date) : '—' }}
+                                    <span v-if="ticket.arrival_time" class="text-gray-500 font-normal">· {{ ticket.arrival_time }}</span>
+                                </div>
                             </div>
                         </div>
 
@@ -94,16 +113,32 @@
                                 <p class="font-semibold text-gray-900 font-mono mt-1">{{ ticket.flight_number }}</p>
                             </div>
                             <div v-if="ticket.pnr">
-                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">PNR</span>
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Airline PNR</span>
                                 <p class="font-semibold text-gray-900 font-mono mt-1">{{ ticket.pnr }}</p>
                             </div>
-                            <div v-if="ticket.ticket_number">
-                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ticket No.</span>
-                                <p class="font-semibold text-gray-900 font-mono mt-1">{{ ticket.ticket_number }}</p>
+                            <div v-if="ticket.reservation_pnr">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Reservation PNR</span>
+                                <p class="font-semibold text-gray-900 font-mono mt-1">{{ ticket.reservation_pnr }}</p>
+                            </div>
+                            <div v-if="ticket.ticket_class">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Class</span>
+                                <p class="font-semibold text-gray-900 mt-1">{{ ticket.ticket_class }}</p>
                             </div>
                             <div v-if="ticket.issue_date">
                                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Issue Date</span>
                                 <p class="font-semibold text-gray-900 mt-1">{{ formatDate(ticket.issue_date) }}</p>
+                            </div>
+                            <div v-if="ticket.airport_name">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Airport</span>
+                                <p class="font-semibold text-gray-900 mt-1">{{ ticket.airport_name }}</p>
+                            </div>
+                            <div v-if="ticket.terminal">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Terminal</span>
+                                <p class="font-semibold text-gray-900 mt-1">{{ ticket.terminal }}</p>
+                            </div>
+                            <div v-if="ticket.gate">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Gate</span>
+                                <p class="font-semibold text-gray-900 mt-1">{{ ticket.gate }}</p>
                             </div>
                         </div>
 
@@ -123,16 +158,36 @@
 
                     <!-- Passenger Info -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Passenger Info</h2>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest">Passenger Info</h2>
+                            <span v-if="allPassengers.length > 1" class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
+                                {{ allPassengers.length }} passengers
+                            </span>
+                        </div>
+
+                        <!-- Passengers table -->
+                        <div class="overflow-x-auto mb-5">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                                        <th class="py-2 pr-4 font-semibold">#</th>
+                                        <th class="py-2 pr-4 font-semibold">Full Name</th>
+                                        <th class="py-2 pr-4 font-semibold">Passport No.</th>
+                                        <th class="py-2 font-semibold">Ticket No.</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    <tr v-for="(p, i) in allPassengers" :key="i">
+                                        <td class="py-2.5 pr-4 text-gray-400 font-semibold">{{ i + 1 }}</td>
+                                        <td class="py-2.5 pr-4 font-semibold text-gray-900">{{ p.passenger_name || '—' }}</td>
+                                        <td class="py-2.5 pr-4 font-mono text-gray-700">{{ p.passport_number || '—' }}</td>
+                                        <td class="py-2.5 font-mono text-gray-700">{{ p.ticket_number || '—' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-                            <div>
-                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Full Name</span>
-                                <p class="font-semibold text-gray-900 mt-1">{{ ticket.passenger_name }}</p>
-                            </div>
-                            <div v-if="ticket.passport_number">
-                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Passport No.</span>
-                                <p class="font-semibold text-gray-900 font-mono mt-1">{{ ticket.passport_number }}</p>
-                            </div>
                             <div v-if="ticket.passenger_phone">
                                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</span>
                                 <p class="font-medium text-gray-700 mt-1">{{ ticket.passenger_phone }}</p>
@@ -148,6 +203,50 @@
                                 </Link>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Luggage & Amenities -->
+                    <div v-if="hasLuggageInfo" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Luggage &amp; Amenities</h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                            <div v-if="ticket.hand_luggage_kg || ticket.hand_luggage_max_weight">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Hand Luggage</span>
+                                <p class="font-semibold text-gray-900 mt-1">
+                                    {{ ticket.hand_luggage_kg ? ticket.hand_luggage_kg + ' kg' : '—' }}
+                                    <span v-if="ticket.hand_luggage_max_weight" class="text-gray-500 font-normal">(max {{ ticket.hand_luggage_max_weight }} kg)</span>
+                                </p>
+                            </div>
+                            <div v-if="ticket.cabin_luggage_kg || ticket.cabin_luggage_max_weight">
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Cabin Luggage</span>
+                                <p class="font-semibold text-gray-900 mt-1">
+                                    {{ ticket.cabin_luggage_kg ? ticket.cabin_luggage_kg + ' kg' : '—' }}
+                                    <span v-if="ticket.cabin_luggage_max_weight" class="text-gray-500 font-normal">(max {{ ticket.cabin_luggage_max_weight }} kg)</span>
+                                </p>
+                            </div>
+                            <div>
+                                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Complementary Food</span>
+                                <p class="font-semibold mt-1" :class="ticket.complementary_food ? 'text-emerald-600' : 'text-gray-500'">
+                                    {{ ticket.complementary_food ? 'Yes' : 'No' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cancellation Policy -->
+                    <div v-if="hasCancellationInfo" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">Cancellation Policy</h2>
+                        <ul class="space-y-2 text-sm text-gray-700 list-disc pl-5">
+                            <li v-if="ticket.free_cancellation_days != null">
+                                Free cancellation before <strong>{{ ticket.free_cancellation_days }}</strong> days.
+                            </li>
+                            <li v-if="ticket.partial_cancellation_days != null || ticket.partial_cancellation_percent != null">
+                                Partial cancellation before <strong>{{ ticket.partial_cancellation_days ?? '—' }}</strong> days,
+                                charged <strong>{{ ticket.partial_cancellation_percent ?? '—' }}%</strong> of the ticket fee.
+                            </li>
+                            <li v-if="ticket.no_refund_hours != null">
+                                No refund before <strong>{{ ticket.no_refund_hours }}</strong> hours.
+                            </li>
+                        </ul>
                     </div>
 
                     <!-- Notes -->
@@ -188,13 +287,23 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
+                        <div class="mt-4 flex flex-wrap items-center gap-2">
                             <span
                                 class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold capitalize"
                                 :class="statusClass(ticket.status)"
                             >
                                 {{ ticket.status }}
                             </span>
+                            <span
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
+                                :class="ticket.is_purchased ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : 'bg-gray-100 text-gray-500 ring-1 ring-gray-200'"
+                            >
+                                <font-awesome-icon :icon="ticket.is_purchased ? 'circle-check' : 'circle-xmark'" class="w-3 h-3" />
+                                {{ ticket.is_purchased ? 'Purchased' : 'Not Purchased' }}
+                            </span>
+                        </div>
+                        <div v-if="ticket.is_purchased && ticket.purchase_date" class="mt-2 text-xs text-gray-500">
+                            Purchased on <span class="font-semibold text-gray-700">{{ formatDate(ticket.purchase_date) }}</span>
                         </div>
                     </div>
 
@@ -348,6 +457,26 @@ const props = defineProps({
 
 const page  = usePage();
 const flash = computed(() => page.props.flash ?? {});
+
+const allPassengers = computed(() => {
+    const primary = {
+        passenger_name:  props.ticket.passenger_name,
+        passport_number: props.ticket.passport_number,
+        ticket_number:   props.ticket.ticket_number,
+    };
+    return [primary, ...(props.ticket.additional_passengers ?? [])];
+});
+
+const hasLuggageInfo = computed(() => {
+    const t = props.ticket;
+    return !!(t.hand_luggage_kg || t.hand_luggage_max_weight || t.cabin_luggage_kg || t.cabin_luggage_max_weight || t.complementary_food);
+});
+
+const hasCancellationInfo = computed(() => {
+    const t = props.ticket;
+    return t.free_cancellation_days != null || t.partial_cancellation_days != null
+        || t.partial_cancellation_percent != null || t.no_refund_hours != null;
+});
 
 const showModal = ref(false);
 
